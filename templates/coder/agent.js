@@ -31,7 +31,8 @@ export async function* demoAgent({ task, history }) {
       parts: [{ type: "text", text: "Generating code..." }],
     },
   };
-
+  
+  //the artinet api returns objects from other contexts, requiring a deep copy to avoid mishandling.
   const response = await artinet.v0.connect({
     agentId: "Qwen/Qwen2.5-Coder-32B-Instruct",
     messages: [

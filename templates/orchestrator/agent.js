@@ -51,9 +51,9 @@ export async function* demoAgent({ userMessage, isCancelled }) {
             parts: [{ text: "Task sent to Artinet...", type: "text" }],
           },
     };
-    //the artinet api returns objects from other contexts, mishandling them can result in errors
+    //the artinet api returns objects from other contexts, requiring a deep copy to avoid mishandling.
     const returnedTask = { ...task };
-    response = JSON.stringify(returnedTask, null, 2);
+    response = returnedTask;
   } catch (error) {
     console.error("Error sending task: ", error);
     response = "Failed to send task: " + JSON.stringify(error, null, 2);

@@ -18,5 +18,10 @@ const testTask = {
 };
 
 for await (const result of testDeployment(deployment, [testTask])) {
-  console.log("testDeployment", "Received result:", JSON.stringify(result));
+  console.log(
+    "testDeployment",
+    "Received result:",
+    JSON.stringify(result, null, 2),
+    "\n"
+  );
 }
