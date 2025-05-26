@@ -1,0 +1,14 @@
+{
+  "name": "quick-agent",
+  "version": "1.0.0",
+  "description": "a simple echo agent that returns your original message.",
+  "type": "module",
+  "scripts": {
+    "start": "node launch.js",
+    "test": "node test-deploy.js",
+    "deploy": "node deploy.js"
+  },
+  "dependencies": {
+    "@artinet/sdk": "latest"
+  }
+}

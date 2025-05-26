@@ -1,0 +1,44 @@
+{
+  "name": "@artinet/quick-agents",
+  "version": "0.0.1",
+  "description": "This is a demo of an artinet compatible Quick-Agent.",
+  "keywords": [
+    "a2a",
+    "demo",
+    "artinet",
+    "quick"
+  ],
+  "bin": {
+    "quick-agent": "dist/index.js",
+    "ctpl": "dist/index.js"
+  },
+  "files": [
+    "dist/**/*",
+    "templates/**/*"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "license": "MIT",
+  "author": "human0.0.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "start": "node dist/index.js",
+    "finish": "echo \"Done. Project is ready!\" && exit 0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/prompts": "^2.4.9",
+    "prompts": "^2.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ora": "^8.2.0"
+  }
+}

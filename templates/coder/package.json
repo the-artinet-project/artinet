@@ -1,0 +1,13 @@
+{
+  "name": "quick-agent",
+  "version": "1.0.0",
+  "description": "a coding agent that will return code snippets based on your requests.",
+  "type": "module",
+  "scripts": {
+    "test": "node test-deploy.js",
+    "deploy": "node deploy.js"
+  },
+  "dependencies": {
+    "@artinet/sdk": "latest"
+  }
+}

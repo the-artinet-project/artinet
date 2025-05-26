@@ -1,0 +1,14 @@
+{
+  "name": "quick-agent",
+  "version": "1.0.0",
+  "description": "an orchestrator agent that can call other agents to get the information it needs.",
+  "type": "module",
+  "scripts": {
+    "test": "node test-deploy.js",
+    "deploy": "node deploy.js"
+  },
+  "dependencies": {
+    "@artinet/sdk": "latest"
+  }
+}
+
