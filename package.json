@@ -1,7 +1,7 @@
 {
   "name": "@artinet/create-quick-agent",
-  "version": "0.0.3",
-  "description": "A tool to create a Quick-Agent projects via the CLI.",
+  "version": "0.0.4",
+  "description": "A tool to create a Quick-Agent project via the CLI.",
   "keywords": [
     "artinet",
     "a2a",
