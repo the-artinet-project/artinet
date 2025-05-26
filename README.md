@@ -1,4 +1,4 @@
-# `create-quick-agent`
+# `@artinet/create-quick-agent`
 
 A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-quick-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
@@ -20,7 +20,7 @@ A command-line interface (CLI) tool to quickly scaffold starter agent projects f
 The easiest way to use `create-quick-agent` is with `npx`, which ensures you're always using the latest version:
 
 ```bash
-npx create-quick-agent
+npx @artinet/create-quick-agent@latest
 ```
 
 This command will initiate an interactive session:
