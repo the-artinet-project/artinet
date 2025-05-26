@@ -2,6 +2,8 @@
 
 A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-quick-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
+From [the artinet project](https://artinet.io/).
+
 ## Features
 
 *   **Interactive Setup:** Guides you through selecting a template and naming your project.

@@ -1,6 +1,6 @@
 {
   "name": "@artinet/create-quick-agent",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A tool to create a Quick-Agent project via the CLI.",
   "keywords": [
     "artinet",
@@ -12,13 +12,20 @@
     "agentic-ai",
     "agentic-web"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/the-artinet-project/create-quick-agent"
+  },
+  "homepage": "https://github.com/the-artinet-project/artinet-sdk#readme",
   "bin": {
     "create-quick-agent": "dist/index.js",
     "ctpl": "dist/index.js"
   },
   "files": [
     "dist/**/*",
-    "templates/**/*"
+    "templates/**/*",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=22.0.0"
