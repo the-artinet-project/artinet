@@ -8,7 +8,7 @@
     "deploy": "node deploy.js"
   },
   "dependencies": {
-    "@artinet/sdk": "latest"
+    "@artinet/sdk": "0.5.3"
   }
 }
 
