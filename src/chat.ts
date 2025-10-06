@@ -25,13 +25,15 @@ export async function chat(
   const name = agentCard.name;
   const version = agentCard.version;
   const description = agentCard.description;
-  console.log(`Connected to: ${chalk.bgWhite(`${name} v${version}`)}`);
-  console.log(`Description: ${chalk.bgWhite(`${description}`)}`);
+  console.log(
+    `Connected to: ${chalk.bgWhite(chalk.black(`${name} v${version}`))}`
+  );
+  console.log(`Description: ${chalk.bgWhite(chalk.black(`${description}`))}`);
   if (verbose) {
     console.log(
-      `Agent Card: \n${chalk.bgWhite(`${JSON.stringify(agentCard, null, 2)}`)}\n\n`
+      `Agent Card: \n${chalk.bgWhite(chalk.black(`${JSON.stringify(agentCard, null, 2)}`))}\n\n`
     );
-    console.log(`Task ID: ${chalk.bgWhite(`${taskId.trim()}`)}`);
+    console.log(`Task ID: ${chalk.bgWhite(chalk.black(`${taskId.trim()}`))}`);
   }
   console.log();
   console.log(chalk.bgGray("Chat started: Type 'exit' to quit.\n"));
@@ -56,7 +58,9 @@ export async function chat(
     };
     console.log();
     if (verbose) {
-      console.log(chalk.bgWhite(`📤 Sending message: ${msg.messageId}`));
+      console.log(
+        chalk.bgWhite(chalk.black(`📤 Sending message: ${msg.messageId}`))
+      );
     }
     try {
       const agentResponseSource = client.sendStreamingMessage({ message: msg });
@@ -65,9 +69,11 @@ export async function chat(
         if (verbose) {
           updateKind =
             chalk.bgWhite(
-              `📥 Type: ${chalk.bgWhiteBright(
-                chalk.black(update.kind.toUpperCase().replace("-", " "))
-              )}`
+              chalk.grey(
+                `📥 Type: ${chalk.bgWhiteBright(
+                  chalk.black(update.kind.toUpperCase().replace("-", " "))
+                )}`
+              )
             ) + " ";
           const state: TaskState | undefined =
             (update as TaskStatusUpdateEvent)?.status?.state ??
@@ -91,10 +97,14 @@ export async function chat(
                 updateKind += chalk.bgRedBright(`${state.toUpperCase()}`);
                 break;
               case TaskState.submitted:
-                updateKind += chalk.bgYellow(`${state.toUpperCase()}`);
+                updateKind += chalk.bgYellow(
+                  chalk.black(`${state.toUpperCase()}`)
+                );
                 break;
               case TaskState["input-required"]:
-                updateKind += chalk.bgMagenta(`${state.toUpperCase()}`);
+                updateKind += chalk.bgMagenta(
+                  chalk.black(`${state.toUpperCase()}`)
+                );
                 break;
               case TaskState.working:
                 updateKind += chalk.bgBlueBright(`${state.toUpperCase()}`);
