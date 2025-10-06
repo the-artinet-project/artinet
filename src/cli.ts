@@ -26,7 +26,7 @@ program
   .action(async (options) => {
     let client: A2AClient | undefined;
     try {
-      client = new A2AClient(options.endpoint ?? "http://localhost:3000/api");
+      client = new A2AClient(options?.endpoint ?? "http://localhost:3000/api");
     } catch (error) {
       console.error(chalk.red("Error creating client:"));
       console.error(error instanceof Error ? error.message : String(error));
@@ -41,7 +41,7 @@ program
       console.error(error instanceof Error ? error.message : String(error));
       process.exit(1);
     });
-    if (options.card) {
+    if (options?.card) {
       console.log();
       console.log(
         `Agent Card:\n\n${chalk.bgWhiteBright(JSON.stringify(agentCard, null, 2))}`
@@ -51,8 +51,8 @@ program
     await chat(
       agentCard,
       client,
-      options.task.trim() || undefined,
-      options.verbose
+      options?.task?.trim() || undefined,
+      options?.verbose
     );
     process.exit(0);
   });
