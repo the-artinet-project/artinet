@@ -1,6 +1,6 @@
 {
   "name": "@artinet/lchat",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A lightweight chat client for connecting to A2A Servers.",
   "author": "artinet",
   "license": "Apache-2.0",
@@ -41,6 +41,7 @@
   "types": "./dist/src/index.d.ts",
   "rootDir": ".",
   "scripts": {
+    "prepublishOnly": "npm run clean && npm run build",
     "build": "tsc --project tsconfig.json",
     "clean": "rimraf dist",
     "dev": "tsx src/cli.ts",
