@@ -5,11 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { A2AClient } from "@artinet/sdk";
+import { A2AClient, configureLogger } from "@artinet/sdk";
 import { Command } from "commander";
 import { chat } from "./chat.js";
 import chalk from "chalk";
-
+configureLogger({ level: "silent" });
 const program = new Command();
 
 program

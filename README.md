@@ -1,6 +1,6 @@
-# @artinet/chat
+# @artinet/lchat
 
-A minimalist CLI chat client for connecting to Agent2Agent (A2A) Servers.
+A light-weight/minimalist CLI chat client for connecting to local and remote Agent2Agent (A2A) Servers.
 
 ## Installation
 
@@ -11,7 +11,7 @@ npm install -g @artinet/chat
 ## Usage
 
 ```bash
-# Connect to default endpoint (http://localhost:3000/api)
+# Connect to default endpoint (http://localhost:3000/a2a)
 lchat
 
 # Connect to custom endpoint
