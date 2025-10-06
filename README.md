@@ -2,6 +2,10 @@
 
 A light-weight/minimalist CLI chat client for connecting to local and remote Agent2Agent (A2A) Servers.
 
+
+https://github.com/user-attachments/assets/71e25f02-da97-470f-a5e4-19096b165e7b
+
+
 ## Installation
 
 ```bash
