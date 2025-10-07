@@ -1,6 +1,6 @@
 # `@artinet/create-agent`
 
-A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
+A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. [`create-agent`](https://www.npmjs.com/package/@artinet/create-agent) streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
 From the [artinet](https://artinet.io/).
 
