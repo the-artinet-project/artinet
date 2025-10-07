@@ -4,11 +4,14 @@
   "description": "an orchestrator agent that can call other agents to get the information it needs.",
   "type": "module",
   "scripts": {
-    "test": "node test-deploy.js",
-    "deploy": "node deploy.js"
+    "start": "tsx src/launch.ts",
+    "start:with-chat": "tsx src/launch.ts --with-chat"
   },
   "dependencies": {
-    "@artinet/sdk": "0.5.3"
+    "@artinet/lchat": "0.0.5",
+    "@artinet/router": "0.0.6",
+    "@artinet/sdk": "0.5.7",
+    "uuid": "^13.0.0",
+    "tsx": "^4.19.2"
   }
 }
-

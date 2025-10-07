@@ -1,20 +1,20 @@
-# `@artinet/create-quick-agent`
+# `@artinet/create-agent`
 
-A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-quick-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
+A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
 From [the artinet project](https://artinet.io/).
 
 ## Prerequisites
 
-*   [Node.js](https://nodejs.org/) (version 22.x or higher recommended, check `package.json` for specific engine requirements)
-*   `npm` (comes with Node.js)
+- [Node.js](https://nodejs.org/) (version 22.x or higher recommended, check `package.json` for specific engine requirements)
+- `npm` (comes with Node.js)
 
 ## Installation & Usage
 
-The easiest way to use `create-quick-agent` is with `npx`, which ensures you're always using the latest version:
+The easiest way to use `create-agent` is with `npx`, which ensures you're always using the latest version:
 
 ```bash
-npx @artinet/create-quick-agent@latest
+npx @artinet/create-agent@latest
 ```
 
 This command will initiate an interactive session:
@@ -33,11 +33,11 @@ This command will initiate an interactive session:
 
 ## Available Templates
 
-`create-quick-agent` currently offers the following templates:
+`create-agent` currently offers the following templates:
 
-*   **`basic`**: A minimal agent template, perfect for understanding the core structure or for simple agent tasks.
-*   **`coder`**: A template pre-configured for developing agents with a focus on code generation, understanding, or manipulation tasks.
-*   **`orchestrator`**: A template designed for building orchestrator agents that can manage and coordinate multiple other agents or tasks.
+- **`basic`**: A minimal agent template, perfect for understanding the core structure or for simple agent tasks.
+- **`coder`**: A template pre-configured for developing agents with a focus on code generation, understanding, or manipulation tasks.
+- **`orchestrator`**: A template designed for building orchestrator agents that can manage and coordinate multiple other agents or tasks.
 
 ## Contributing
 

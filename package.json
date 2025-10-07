@@ -1,24 +1,31 @@
 {
-  "name": "@artinet/create-quick-agent",
-  "version": "0.0.7",
-  "description": "A tool to create a Quick-Agent project via the CLI.",
+  "name": "@artinet/create-agent",
+  "version": "0.0.1",
+  "description": "A tool to create template Agent2Agent projects via the CLI.",
   "keywords": [
     "artinet",
+    "cli",
     "a2a",
     "agents",
     "ai-agent",
     "quick-agent",
     "artificial-intelligence",
     "agentic-ai",
-    "agentic-web"
+    "agentic-web",
+    "agent2agent",
+    "multi-agent",
+    "multi-agent-system"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/the-artinet-project/create-quick-agent"
+    "url": "https://github.com/the-artinet-project/create-agent"
   },
-  "homepage": "https://github.com/the-artinet-project/artinet-sdk#readme",
+  "homepage": "https://artinet.io",
+  "issues": {
+    "url": "https://github.com/the-artinet-project/artinet-sdk/issues"
+  },
   "bin": {
-    "create-quick-agent": "dist/index.js",
+    "create-agent": "dist/index.js",
     "ctpl": "dist/index.js"
   },
   "files": [
@@ -31,17 +38,19 @@
     "node": ">=22.0.0"
   },
   "license": "Apache-2.0",
-  "author": "human0.0.1",
+  "author": "artinet",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "build": "tsc --project tsconfig.json",
     "start": "node dist/index.js"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "@types/node": "^22.15.21",
     "ts-node": "^10.9.2",
     "@types/prompts": "^2.4.9"

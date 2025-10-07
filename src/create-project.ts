@@ -11,11 +11,17 @@ import {
 import { Ora } from "ora";
 import path from "path";
 
+const ignoreFiles = ["node_modules", "package-lock.json"];
+
 export const copyFilesAndDirectories = async (source, destination) => {
   const entries = await readdir(source);
 
   for (const entry of entries) {
     const sourcePath = path.join(source, entry);
+    if (ignoreFiles.some((file) => entry.includes(file))) {
+      continue;
+    }
+
     const destPath = path.join(destination, entry);
 
     const stat = await lstat(sourcePath);
@@ -68,9 +74,11 @@ export const installDependencies = async (
       spinner.succeed(`Done. Project ${projectName} is ready!`);
       console.log(`\nTo get started:`);
       console.log(`  cd ${projectName}`);
-      console.log(`  npm test (to run the test deployment)`);
       console.log(
-        `\n  *dont forget to update the agentCard in the ./lib/card.js file*`
+        `  npm start:with-chat (to run the agent with an lchat client)`
+      );
+      console.log(
+        `\n  *dont forget to customize the agentCard in the ./lib/card.js file*`
       );
     } else {
       spinner.fail(
@@ -83,7 +91,7 @@ export const installDependencies = async (
   });
 
   npmInstall.on("error", (err) => {
-    spinner.fail("\nFailed to start 'npm install':" + err.message);
+    spinner.fail("\nFailed to run 'npm install':" + err.message);
     console.log(
       `Please try running 'npm install' manually in the '${projectName}' directory.`
     );

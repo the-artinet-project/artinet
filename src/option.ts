@@ -10,12 +10,11 @@ export const templates = [
     value: "coder",
     title: "coding agent",
     description:
-      "a coding agent that will return code snippets based on your requests.",
+      "a coding agent that will return code snippets based on the callers request.",
   },
   {
     value: "orchestrator",
     title: "orchestrator agent",
-    description:
-      "an orchestrator agent that can call other agents to get the information it needs.",
+    description: "an orchestration agent that can invoke other agents.",
   },
 ];

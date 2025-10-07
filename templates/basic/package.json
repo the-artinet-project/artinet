@@ -4,11 +4,13 @@
   "description": "a simple echo agent that returns your original message.",
   "type": "module",
   "scripts": {
-    "start": "node launch.js",
-    "test": "node test-deploy.js",
-    "deploy": "node deploy.js"
+    "start": "tsx src/launch.ts",
+    "start:with-chat": "tsx src/launch.ts --with-chat"
   },
   "dependencies": {
-    "@artinet/sdk": "0.5.3"
+    "@artinet/lchat": "0.0.5",
+    "@artinet/sdk": "0.5.7",
+    "uuid": "^13.0.0",
+    "tsx": "^4.19.2"
   }
 }
