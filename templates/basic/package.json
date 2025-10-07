@@ -8,8 +8,8 @@
     "start:with-chat": "tsx src/launch.ts --with-chat"
   },
   "dependencies": {
-    "@artinet/lchat": "0.0.5",
-    "@artinet/sdk": "0.5.7",
+    "@artinet/lchat": "0.0.6",
+    "@artinet/sdk": "0.5.9",
     "uuid": "^13.0.0",
     "tsx": "^4.19.2"
   }

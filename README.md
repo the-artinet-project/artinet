@@ -2,7 +2,7 @@
 
 A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. `create-agent` streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
-From [the artinet project](https://artinet.io/).
+From the [artinet](https://artinet.io/).
 
 ## Prerequisites
 

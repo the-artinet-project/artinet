@@ -75,7 +75,7 @@ export const installDependencies = async (
       console.log(`\nTo get started:`);
       console.log(`  cd ${projectName}`);
       console.log(
-        `  npm start:with-chat (to run the agent with an lchat client)`
+        `  npm run start:with-chat (to run the agent with an lchat client)`
       );
       console.log(
         `\n  *dont forget to customize the agentCard in the ./lib/card.js file*`
