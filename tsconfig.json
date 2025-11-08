@@ -9,8 +9,8 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
     "lib": ["ES2022", "DOM"],
-    "baseUrl": ".",
+    "baseUrl": "."
   },
   "include": ["src/**/*", "index.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "src/test-server.ts"]
 }

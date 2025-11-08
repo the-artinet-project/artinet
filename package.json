@@ -1,7 +1,7 @@
 {
-  "name": "@artinet/lchat",
-  "version": "0.0.6",
-  "description": "A lightweight chat client for connecting to A2A Servers.",
+  "name": "@artinet/ask",
+  "version": "0.0.7",
+  "description": "A lightweight command-line chat client for connecting to A2A Servers.",
   "author": "artinet",
   "license": "Apache-2.0",
   "repository": {
@@ -18,9 +18,10 @@
     "LICENSE"
   ],
   "bin": {
-    "lchat": "./dist/src/cli.js"
+    "ask": "./dist/src/cli.js"
   },
   "keywords": [
+    "ask",
     "lchat",
     "artinet",
     "chat",
@@ -33,7 +34,7 @@
     "orchestration"
   ],
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.9.1"
   },
   "type": "module",
   "main": "./dist/src/index.js",
@@ -41,16 +42,18 @@
   "types": "./dist/src/index.d.ts",
   "rootDir": ".",
   "scripts": {
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean:all && npm i && npm run build",
     "build": "tsc --project tsconfig.json",
     "clean": "rimraf dist",
+    "clean:all": "rimraf dist node_modules package-lock.json",
     "dev": "tsx src/cli.ts",
-    "chat": "node dist/src/cli.js"
+    "dev:server": "tsx src/test-server.ts",
+    "ask": "node dist/src/cli.js"
   },
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.1",
-    "@artinet/sdk": "0.5.9",
+    "@artinet/sdk": "^0.5.14",
     "prompts": "^2.4.2",
     "uuid": "^13.0.0"
   },

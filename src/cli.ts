@@ -5,17 +5,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { A2AClient, configureLogger } from "@artinet/sdk";
+import { A2AClient } from "@artinet/sdk";
 import { Command } from "commander";
 import { chat } from "./chat.js";
 import chalk from "chalk";
-configureLogger({ level: "silent" });
-const program = new Command();
 
+const program = new Command();
 program
-  .name("lchat")
-  .description("a lightweight chat client for connecting to A2A Servers")
-  .version("0.0.1")
+  .name("ask")
+  .description("A lightweight chat client for connecting to A2A Servers")
+  .version("0.0.7")
   .option("-v, --verbose", "Enable verbose output")
   .option("-t, --task <taskId>", "Set the task ID")
   .option(
@@ -23,6 +22,7 @@ program
     "Set the A2A endpoint (default: http://localhost:3000/a2a)"
   )
   .option("-c, --card", "Show the agent card")
+  .option("-m, --message <message>", "Send a single message and exit")
   .action(async (options) => {
     let client: A2AClient | undefined;
     try {
@@ -44,7 +44,9 @@ program
     if (options?.card) {
       console.log();
       console.log(
-        `Agent Card:\n\n${chalk.bgWhiteBright(JSON.stringify(agentCard, null, 2))}`
+        `Agent Card:\n\n${chalk.bgWhiteBright(
+          JSON.stringify(agentCard, null, 2)
+        )}`
       );
       process.exit(0);
     }
@@ -52,7 +54,8 @@ program
       agentCard,
       client,
       options?.task?.trim() || undefined,
-      options?.verbose
+      options?.verbose,
+      options?.message?.trim()
     );
     process.exit(0);
   });
