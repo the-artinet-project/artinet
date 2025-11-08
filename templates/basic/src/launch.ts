@@ -1,6 +1,6 @@
 import { createAgentServer, InMemoryTaskStore } from "@artinet/sdk";
 import { demoAgent } from "./agent.js";
-import { agentCard, launchLChat } from "./lib/index.js";
+import { agentCard, launchAsk } from "./lib/index.js";
 
 // Create a server
 const { app } = createAgentServer({
@@ -11,7 +11,7 @@ const { app } = createAgentServer({
     agentCard: agentCard,
   },
   // Custom agent card path
-  agentCardPath: "/.well-known/agent.json",
+  agentCardPath: "/.well-known/agent-card.json",
 
   // Base path for the API endpoint
   basePath: "/a2a",
@@ -28,13 +28,15 @@ const { app } = createAgentServer({
 app.listen(3000, () => {
   console.log("A2A Agent started on port 3000");
   if (process.argv.includes("--with-chat")) {
-    launchLChat();
+    launchAsk();
   } else {
     console.log("Try connecting with an A2A client:");
     console.log("  Endpoint: http://localhost:3000/a2a");
-    console.log("  Agent Card: http://localhost:3000/.well-known/agent.json");
     console.log(
-      '\n💡 Tip: Run with "--with-chat" to automatically start an lchat client'
+      "  Agent Card: http://localhost:3000/.well-known/agent-card.json"
+    );
+    console.log(
+      '\n💡 Tip: Run with "--with-chat" to automatically start an ask client'
     );
   }
 });

@@ -9,7 +9,7 @@ import { AgentCard } from "@artinet/sdk";
 export const agentCard: AgentCard = {
   name: "basic-agent",
   description: "A simple agent that returns your original message.",
-  url: "http://localhost:3000/api",
+  url: "http://localhost:3000/a2a",
   protocolVersion: "0.3.0",
   defaultInputModes: ["text"],
   defaultOutputModes: ["text"],

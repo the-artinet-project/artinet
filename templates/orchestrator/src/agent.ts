@@ -20,7 +20,7 @@ export const codingAgentEngine: AgentEngine = AgentBuilder()
     return await router.connect({
       message: {
         identifier: "deepseek-ai/DeepSeek-R1",
-        preferredEndpoint: "hf-inference",
+        preferredEndpoint: "open-router",
         session: {
           messages: [
             {
@@ -47,10 +47,11 @@ router.createAgent({
 export const demoAgent: AgentEngine = AgentBuilder()
   .text(() => "Thinking about your request...")
   .text(async ({ command }) => {
+    console.log("Orchestrating request...");
     return await router.connect({
       message: {
         identifier: "deepseek-ai/DeepSeek-R1",
-        preferredEndpoint: "hf-inference",
+        preferredEndpoint: "open-router",
         session: {
           messages: [
             {

@@ -8,8 +8,7 @@
 import { AgentEngine, getPayload, AgentBuilder } from "@artinet/sdk";
 
 export const demoAgent: AgentEngine = AgentBuilder()
-  .text(({ command }) => {
-    const userText = getPayload(command.message).text;
+  .text(({ content: userText }) => {
     return {
       parts: [`Processing request: ${userText}`],
       args: [userText],

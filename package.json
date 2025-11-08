@@ -1,6 +1,6 @@
 {
   "name": "@artinet/create-agent",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A tool to create template Agent2Agent projects via the CLI.",
   "keywords": [
     "artinet",
@@ -35,7 +35,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.9.1"
   },
   "license": "Apache-2.0",
   "author": "artinet",
@@ -44,8 +44,8 @@
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "prepublishOnly": "npm run clean && npm i && npm run build",
     "build": "tsc --project tsconfig.json",
     "start": "node dist/index.js"
   },

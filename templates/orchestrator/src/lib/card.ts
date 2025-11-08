@@ -7,7 +7,7 @@ export const agentCard: AgentCard = {
   name: "orchestrator-agent", //rename to your agent name
   description:
     "An orchestrator agent that can call other agents to get the information it needs.",
-  url: "https://orchestrator-agent.example.com/api",
+  url: "http://localhost:3000/a2a",
   version: "1.0.0",
   capabilities: {
     streaming: true,
@@ -30,7 +30,7 @@ export const codingAgentCard: AgentCard = {
   defaultOutputModes: ["text"],
   name: "coding-agent", //rename to your agent name
   description: "A coding agent that generates code.",
-  url: "https://coding-agent.example.com/api",
+  url: "http://localhost:3001/a2a",
   version: "1.0.0",
   capabilities: {
     streaming: true,

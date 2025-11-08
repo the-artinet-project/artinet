@@ -19,7 +19,7 @@ export const demoAgent: AgentEngine = AgentBuilder()
     return await router.connect({
       message: {
         identifier: "deepseek-ai/DeepSeek-R1",
-        preferredEndpoint: "hf-inference",
+        preferredEndpoint: "open-router",
         session: {
           messages: [
             {

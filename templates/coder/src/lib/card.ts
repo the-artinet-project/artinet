@@ -6,7 +6,7 @@ export const agentCard: AgentCard = {
   defaultOutputModes: ["text"],
   name: "coding-agent", //rename to your agent name
   description: "A coding agent that generates code.",
-  url: "https://coding-agent.example.com/api",
+  url: "http://localhost:3000/a2a",
   version: "1.0.0",
   capabilities: {
     streaming: true,

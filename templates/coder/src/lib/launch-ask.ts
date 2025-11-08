@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 
-export function launchLChat() {
+export function launchAsk() {
   console.log();
   let chatArgs: string[] = [];
   const chatFlagIndex = process.argv.indexOf("--with-chat");
@@ -12,7 +12,7 @@ export function launchLChat() {
   }
   console.log("🛑 Type [exit] to end the session");
   console.log();
-  const chatProcess = spawn("lchat", [...chatArgs], {
+  const chatProcess = spawn("ask", [...chatArgs], {
     stdio: "inherit",
     cwd: process.cwd(),
   });
