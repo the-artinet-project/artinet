@@ -1,3 +1,11 @@
+[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
+[![npm version](https://img.shields.io/npm/v/easy-a2a.svg?logoColor=black)](https://www.npmjs.com/package/easy-a2a)
+[![npm downloads](https://img.shields.io/npm/dt/easy-a2a.svg)](https://www.npmjs.com/package/easy-a2a)
+[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Known Vulnerabilities](https://snyk.io/test/npm/easy-a2a/badge.svg)](https://snyk.io/test/npm/easy-a2a)
+[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/easy-a2a?style=social)](https://github.com/the-artinet-project/easy-a2a/stargazers)
+[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+
 # easy-a2a
 
 Turn any OpenAI-compatible API (OpenAI, HuggingFace, OpenRouter, local models, etc.) into an A2A agent.
