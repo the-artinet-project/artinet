@@ -1,6 +1,6 @@
 {
   "name": "@artinet/bash-mcp",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Model Context Protocol (MCP) server for executing bash commands.",
   "author": "artinet",
   "license": "Apache-2.0",
