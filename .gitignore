@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+.env
+.DS_Store
+.idea
+.vscode
+.history
+**/test/config
+**/test/metadata.json
+**/test/runtime.test.ts
