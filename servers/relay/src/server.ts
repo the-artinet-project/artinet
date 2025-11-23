@@ -87,13 +87,16 @@ The assistant should always return the result to the user in a clear and concise
       },
       async (args) => {
         const result: SendMessageSuccessResult | undefined =
-          await this.relay?.sendMessage(args.agentId, {
-            message: {
-              role: "user",
-              messageId: uuidv4(),
-              kind: "message",
-              parts: [{ text: args.message, kind: "text" }],
-              taskId: args.taskId ?? uuidv4(),
+          await this.relay?.sendMessage({
+            agentId: args.agentId,
+            messageSendParams: {
+              message: {
+                role: "user",
+                messageId: uuidv4(),
+                kind: "message",
+                parts: [{ text: args.message, kind: "text" }],
+                taskId: args.taskId ?? uuidv4(),
+              },
             },
           });
         return {
@@ -130,12 +133,14 @@ The assistant should always return the result to the user in a clear and concise
         outputSchema: TaskSchema.shape,
       },
       async (args) => {
-        const result: Task | undefined = await this.relay?.getTask(
-          args.agentId,
-          {
+        const result: Task | undefined = await this.relay?.getTask({
+          agentId: args.agentId,
+          taskQuery: {
             id: args.taskId,
-          }
-        );
+            metadata: {},
+            historyLength: undefined,
+          },
+        });
         return {
           content: [
             {
@@ -168,12 +173,13 @@ The assistant should always return the result to the user in a clear and concise
         outputSchema: TaskSchema.shape,
       },
       async (args) => {
-        const result: Task | undefined = await this.relay?.cancelTask(
-          args.agentId,
-          {
+        const result: Task | undefined = await this.relay?.cancelTask({
+          agentId: args.agentId,
+          taskId: {
             id: args.taskId,
-          }
-        );
+            metadata: {},
+          },
+        });
         return {
           content: [
             {
@@ -202,9 +208,9 @@ The assistant should always return the result to the user in a clear and concise
         outputSchema: AgentCardSchema.shape,
       },
       async (args) => {
-        const result: AgentCard | undefined = await this.relay?.getAgentCard(
-          args.agentId
-        );
+        const result: AgentCard | undefined = await this.relay?.getAgentCard({
+          agentId: args.agentId,
+        });
         const text: string = result
           ? JSON.stringify(result, null, 2)
           : "No agent card found. This may be because the agent is not registered or the agent is not responding.";
@@ -230,7 +236,7 @@ The assistant should always return the result to the user in a clear and concise
             .describe("The agents that are registered with the relay."),
         }).shape,
       },
-      async (_) => {
+      async () => {
         const result: AgentCard[] = (await this.relay?.getAgentCards()) ?? [];
         const text: string =
           result && result.length > 0
@@ -239,7 +245,7 @@ The assistant should always return the result to the user in a clear and concise
         return {
           content: [
             {
-              type: "text",
+              type: "text" as const,
               text: text,
             },
           ],
@@ -266,7 +272,7 @@ The assistant should always return the result to the user in a clear and concise
       },
       async (args) => {
         const result: AgentCard[] =
-          (await this.relay?.searchAgents(args.query)) ?? [];
+          (await this.relay?.searchAgents({ query: args.query })) ?? [];
         const text: string =
           result && result.length > 0
             ? JSON.stringify({ agents: result }, null, 2)

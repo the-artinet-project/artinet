@@ -31,6 +31,7 @@ const testAgentCard: AgentCard = {
       id: "test-skill",
       name: "test-skill",
       description: "A test skill",
+      tags: [],
     },
   ],
 };
@@ -82,7 +83,7 @@ describe.only("RelayMCPServer", () => {
           message: "Hi!",
         },
       });
-      const taskResponse = (response as CallToolResult).content[0]
+      const taskResponse = ((response as CallToolResult).content[0] as any)
         .text as string;
       expect(taskResponse).toBe("hello world!");
       expect(
