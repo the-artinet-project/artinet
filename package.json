@@ -1,6 +1,6 @@
 {
   "name": "easy-a2a",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An easy to use library for building Agent2Agent (A2A) agents backed by OpenAI APIs.",
   "type": "module",
   "main": "./dist/index.js",
