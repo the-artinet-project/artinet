@@ -1,6 +1,6 @@
 {
   "name": "@artinet/ask",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A lightweight command-line chat client for connecting to A2A Servers.",
   "author": "artinet",
   "license": "Apache-2.0",
@@ -22,16 +22,13 @@
   },
   "keywords": [
     "ask",
-    "lchat",
     "artinet",
     "chat",
     "a2a",
     "agent2agent",
     "agent",
     "ai",
-    "artificial intelligence",
-    "agentic ai",
-    "orchestration"
+    "artificial intelligence"
   ],
   "engines": {
     "node": ">=18.9.1"
@@ -53,7 +50,7 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.1",
-    "@artinet/sdk": "^0.5.14",
+    "@artinet/sdk": "^0.5.18",
     "prompts": "^2.4.2",
     "uuid": "^13.0.0"
   },

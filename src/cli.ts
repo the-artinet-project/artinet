@@ -14,7 +14,7 @@ const program = new Command();
 program
   .name("ask")
   .description("A lightweight chat client for connecting to A2A Servers")
-  .version("0.0.7")
+  .version("0.0.8")
   .option("-v, --verbose", "Enable verbose output")
   .option("-t, --task <taskId>", "Set the task ID")
   .option(

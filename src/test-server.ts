@@ -20,6 +20,7 @@ const { app } = createAgentServer({
             id: "test-skill",
             name: "test-skill",
             description: "A test skill",
+            tags: ["test"],
           },
         ],
       },
