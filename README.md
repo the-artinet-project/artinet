@@ -89,6 +89,17 @@ npm run lint
 
 **The goal is to eventually merge more definitions (e.g. ProjectNanda Agent Definitions, Agency definitions) into a unified spec**. This consolidation will enable consistent agent definitions, discovery, sharing, and simplified tooling across the artinet.
 
+## Contributing
+
+We welcome contributions from the community! Whether you want to:
+
+- Enhance the agent definition standard with new capabilities
+- Improve documentation and examples
+- Fix bugs or add features
+- Share your use cases and patterns
+
+Please read our [Contributing Guide](CONTRIBUTING.md) to get started. All contributors are recognized and appreciated.
+
 ## License
 
 Apache-2.0
@@ -97,3 +108,4 @@ Apache-2.0
 
 - [GitHub Repository](https://github.com/the-artinet-project/agent-def)
 - [Issue Tracker](https://github.com/the-artinet-project/agent-def/issues)
+- [Contributing Guide](CONTRIBUTING.md)
