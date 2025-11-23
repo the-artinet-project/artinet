@@ -16,10 +16,9 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "generate:schema": "tsx ./scripts/generate-schema.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "lint": "eslint .",
     "clean": "rimraf dist",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "artinet",

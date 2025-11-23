@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
 import { mkdirSync, writeFileSync } from "fs";
 import { AgentDefinitionSchema } from "../src/definition";
 import { zodToJsonSchema } from "zod-to-json-schema";
