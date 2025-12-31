@@ -12,6 +12,8 @@
 !mcp/**
 !orc8
 !orc8/**
+!relay
+!relay/**
 !types
 !sdk
 !fleet
