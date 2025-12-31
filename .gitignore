@@ -1,5 +1,7 @@
 *
 !.gitignore
+!agent-def
+!agent-def/**
 !types
 !sdk
 !fleet
