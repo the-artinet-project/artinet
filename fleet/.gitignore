@@ -1,0 +1,12 @@
+*
+!src
+!src/**
+!test
+!test/**
+!.gitignore
+!.npmignore
+!package.json
+!tsconfig.json
+!eslint.config.js
+!jest.config.js
+!README.md

@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM"],
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "entry": "src/index.ts",
+  "include": [
+    "src/routes/**/*",
+    "src/server/**/*",
+    "src/types/**/*",
+    "src/index.ts",
+    "archive/forward-request.ts",
+    "src/settings.ts"
+  ],
+  "exclude": [
+    "archive/private/**/*",
+    "archive/**/*",
+    "node_modules",
+    "base/**/*",
+    "test",
+    "dist",
+    "examples"
+  ]
+}
