@@ -4,6 +4,8 @@
 !agent-def/**
 !ask
 !ask/**
+!easy
+!easy/**
 !types
 !sdk
 !fleet
