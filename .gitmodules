@@ -1,3 +1,6 @@
 [submodule "types"]
 	path = types
 	url = https://github.com/the-artinet-project/types.git
+[submodule "sdk"]
+	path = sdk
+	url = https://github.com/the-artinet-project/artinet-sdk.git
