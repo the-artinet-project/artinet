@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "rootDir": ".",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "lib": ["ES2022", "DOM"],
+    "baseUrl": "."
+  },
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["node_modules", "dist", "src/test-server.ts"]
+}
