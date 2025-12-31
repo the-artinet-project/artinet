@@ -6,6 +6,8 @@
 !ask/**
 !easy
 !easy/**
+!loader
+!loader/**
 !types
 !sdk
 !fleet
