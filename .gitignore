@@ -2,6 +2,8 @@
 !.gitignore
 !agent-def
 !agent-def/**
+!ask
+!ask/**
 !types
 !sdk
 !fleet
