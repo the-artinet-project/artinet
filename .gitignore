@@ -8,6 +8,8 @@
 !easy/**
 !loader
 !loader/**
+!mcp
+!mcp/**
 !types
 !sdk
 !fleet
