@@ -4,6 +4,8 @@
 !agent-def/**
 !ask
 !ask/**
+!create-agent
+!create-agent/**
 !easy
 !easy/**
 !loader
