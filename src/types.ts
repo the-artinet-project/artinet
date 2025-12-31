@@ -63,7 +63,7 @@ export const CallsSchema = z.discriminatedUnion("type", [
   Runtime.AgentCallSchema,
   Runtime.ToolCallSchema,
 ]);
-export type Calls = z.message<typeof CallsSchema>;
+export type Calls = z.input<typeof CallsSchema>;
 /**
  * Type-level bundle that maps a call type to its associated types.
  *
