@@ -2,9 +2,8 @@
  * Copyright 2025 The Artinet Project
  * SPDX-License-Identifier: Apache-2.0
  */
-import { z } from "zod";
-import { AgentCardSchema } from "@artinet/sdk";
-import { ServiceSchema } from "@artinet/types";
+import { z } from "zod/v4";
+import { Runtime } from "@artinet/types";
 
 /**
  * Group definition
@@ -36,7 +35,7 @@ export const GroupSchema = z.object({
       "Optional properties of the group (e.g., role, priority, status)"
     ),
 });
-export type Group = z.infer<typeof GroupSchema>;
+export type Group = z.output<typeof GroupSchema>;
 
 /**
  * Agent definition schema
@@ -67,7 +66,7 @@ export type Group = z.infer<typeof GroupSchema>;
  * ---
  * ```
  */
-export const AgentDefinitionSchema = AgentCardSchema.partial({
+export const AgentDefinitionSchema = Runtime.AgentInfoSchema.partial({
   protocolVersion: true,
   url: true,
   capabilities: true,
@@ -91,6 +90,32 @@ export const AgentDefinitionSchema = AgentCardSchema.partial({
    * @example "deepseek-ai/DeepSeek-R1"
    */
   modelId: z.string().optional().describe("Model identifier"),
+  /**
+   * Optional model specification
+   *
+   * Specifies the LLM model to use for this agent.
+   *
+   * @example "openai/gpt-4o-mini"
+   * @example "anthropic/claude-3-opus-20241022"
+   * @example "deepseek-ai/DeepSeek-R1"
+   */
+  modelUri: z.string().optional().describe(`"Model URI"`),
+
+  /**
+   * Tool IDs that this agent can use
+   *
+   * A flexible list of tool identifiers that reference MCP servers, in-memory
+   * functions, or any other tool providers available in the runtime environment.
+   * Tools are resolved by the agent runtime based on these IDs.
+   *
+   * @example ["filesystem", "web-search", "code-analyzer"]
+   * @example ["mcp-server-git", "mcp-server-postgres", "custom-api-client"]
+   * @deprecated use toolUris instead
+   */
+  toolIds: z
+    .array(z.string())
+    .optional()
+    .describe("List of tool ids that this agent can use"),
 
   /**
    * Tool IDs that this agent can use
@@ -102,9 +127,9 @@ export const AgentDefinitionSchema = AgentCardSchema.partial({
    * @example ["filesystem", "web-search", "code-analyzer"]
    * @example ["mcp-server-git", "mcp-server-postgres", "custom-api-client"]
    */
-  toolIds: z
+  toolUris: z
     .array(z.string())
-    .default([])
+    .optional()
     .describe("List of tool ids that this agent can use"),
 
   /**
@@ -117,8 +142,25 @@ export const AgentDefinitionSchema = AgentCardSchema.partial({
    *
    * @example ["database-specialist", "security-auditor", "code-reviewer"]
    * @example ["agent://team-lead", "https://agents.example.com/research"]
+   * @deprecated use agentUris instead
    */
   agentIds: z
+    .array(z.string())
+    .optional()
+    .describe("The agent ids that this agent can call"),
+
+  /**
+   * Agent IDs that this agent can call
+   *
+   * Explicitly defines which other agents this agent has permission to invoke.
+   * These could be local agent instances, remote agent servers, or any agent
+   * accessible in the runtime environment. This provides explicit access control
+   * separate from group membership.
+   *
+   * @example ["database-specialist", "security-auditor", "code-reviewer"]
+   * @example ["agent://team-lead", "https://agents.example.com/research"]
+   */
+  agentUris: z
     .array(z.string())
     .optional()
     .describe("The agent ids that this agent can call"),
@@ -145,7 +187,6 @@ export const AgentDefinitionSchema = AgentCardSchema.partial({
   groupIds: z
     .array(z.union([z.string(), GroupSchema]))
     .optional()
-    .default([])
     .describe("List of group ids that this agent belongs to"),
 
   /**
@@ -172,7 +213,7 @@ export const AgentDefinitionSchema = AgentCardSchema.partial({
    */
   instructions: z.string().describe("System prompt for the agent"),
 });
-export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>;
+export type AgentDefinition = z.output<typeof AgentDefinitionSchema>;
 
 /**
  * Agent configuration schema
@@ -198,7 +239,7 @@ export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>;
  *   instructions: "You are a backend system architect...",
  *
  *   // Configuration-specific fields
- *   servers: [
+ *   services: [
  *     {
  *       type: "mcp",
  *       id: "filesystem",
@@ -234,7 +275,7 @@ export const AgentConfigurationSchema = AgentDefinitionSchema.extend({
    * ]
    */
   services: z
-    .array(ServiceSchema)
+    .array(Runtime.ServiceSchema)
     .default([])
     .describe("List of MCP or A2A services"),
 
@@ -259,4 +300,4 @@ export const AgentConfigurationSchema = AgentDefinitionSchema.extend({
     .optional()
     .describe("Runtime metadata for environment-specific configuration"),
 });
-export type AgentConfiguration = z.infer<typeof AgentConfigurationSchema>;
+export type AgentConfiguration = z.output<typeof AgentConfigurationSchema>;

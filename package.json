@@ -1,6 +1,6 @@
 {
   "name": "agent-def",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.1",
   "description": "A standardized definition for collaborative agents.",
   "main": "dist/src/definition.js",
   "module": "dist/src/definition.js",
@@ -61,8 +61,8 @@
     "zod-to-json-schema": "^3.25.0"
   },
   "dependencies": {
-    "@artinet/sdk": "^0.5.18",
-    "@artinet/types": "^0.0.8",
-    "zod": "^3.23.8"
+    "@artinet/sdk": "^0.6.0-preview.1",
+    "@artinet/types": "^0.0.9-alpha.3",
+    "zod": "^3.25"
   }
 }
