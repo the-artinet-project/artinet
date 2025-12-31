@@ -35,23 +35,12 @@
  * Copyright 2025 The Artinet Project
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  core,
-  A2A,
-  Agent as A2A_Agent,
-  Service as A2A_Service,
-  CreateAgentParams,
-  getContent,
-  FAILED_UPDATE,
-  SUBMITTED_UPDATE,
-  STATUS_UPDATE,
-  MessageBuilder,
-  createAgent,
-} from "@artinet/sdk";
+
+import * as sdk from "@artinet/sdk";
 import { API } from "@artinet/types";
 import * as Callable from "./types.js";
 import { Manager } from "./manager.js";
-import * as Util from "./model-util.js";
+import * as util from "./model-util.js";
 import { Monitor } from "./monitor.js";
 import { logger } from "@artinet/sdk";
 import { v4 as uuidv4 } from "uuid";
@@ -59,10 +48,10 @@ import { getHistory } from "./utils/history.js";
 import { artinetProvider } from "./api/connect.js";
 
 /** Function type for adding callable services to the model. */
-type AddFn = typeof Util.add;
+type AddFn = typeof util.add;
 
 /** Function type for the reactive agentic loop. */
-type ReactFn = typeof Util.react;
+type ReactFn = typeof util.react;
 
 /**
  * Represents a service execution request containing the API payload
@@ -72,9 +61,9 @@ type ServiceRequest = {
   /** The API connect request to be processed. */
   request: API.ConnectRequest;
   /** Optional execution options (parentTaskId, abortSignal, etc.). */
-  options?: Omit<Callable.Options, "tasks" | "callback">;
+  options?: Omit<Callable.Options, "tasks">;
   /** Optional messenger for context-aware messaging. */
-  messenger?: A2A.Context["messages"];
+  messenger?: sdk.A2A.Context["messages"];
 };
 
 /**
@@ -82,7 +71,11 @@ type ServiceRequest = {
  *
  * @interface CreateModelParams
  */
-interface CreateModelParams {
+export interface CreateModelParams
+  extends Omit<
+    Partial<sdk.A2A.AgentCard & { uri: string }>,
+    "provider" | "skills"
+  > {
   /**
    * The identifier for the underlying LLM model.
    * This is passed to the API provider to select the appropriate model.
@@ -95,7 +88,7 @@ interface CreateModelParams {
    * Defaults to the Artinet API provider.
    * Implement this to integrate your own backend.
    */
-  provider?: Util.APIProvider;
+  provider?: util.APIProvider;
 
   /**
    * Pre-registered callable services (agents and tools).
@@ -126,6 +119,12 @@ interface CreateModelParams {
    * Subscribe to events for real-time orchestration visibility.
    */
   events?: Monitor;
+
+  /**
+   * Instructions for the model.
+   * These are added to the beginning of the request messages.
+   */
+  instructions?: string;
 }
 
 /**
@@ -147,7 +146,7 @@ export type Params = CreateModelParams;
  * - An event monitor for real-time updates
  *
  * @extends Manager
- * @implements {core.Service<ServiceRequest, API.ConnectResponse>}
+ * @implements {sdk.core.Service<ServiceRequest, API.ConnectResponse>}
  *
  * @example
  * ```typescript
@@ -165,7 +164,7 @@ export type Params = CreateModelParams;
  */
 export class Model
   extends Manager
-  implements core.Service<ServiceRequest, API.ConnectResponse>
+  implements sdk.core.Service<ServiceRequest, API.ConnectResponse>
 {
   /**
    * Creates a new Model instance.
@@ -182,13 +181,23 @@ export class Model
   protected constructor(
     private readonly modelId: string = "deepseek-r1",
     readonly abortSignal: AbortSignal = new AbortController().signal,
-    protected _provider: Util.APIProvider = artinetProvider,
+    protected _provider: util.APIProvider = artinetProvider,
     _data: Map<string, Callable.Agent | Callable.Tool> = new Map(),
     private _sessions: Record<string, Record<string, string>> = {},
     private _history: Callable.Response[] = [],
-    private _events: Monitor = new Monitor()
+    private _events: Monitor = new Monitor(),
+    private _instructions: string = "",
+    private _params: Partial<CreateModelParams> = {}
   ) {
     super(_data);
+  }
+
+  get instructions(): string {
+    return this._instructions;
+  }
+
+  set instructions(instructions: string) {
+    this._instructions = instructions;
   }
 
   /**
@@ -203,7 +212,7 @@ export class Model
    * The current API provider function used for LLM communication.
    * Can be swapped at runtime for custom backend integration.
    */
-  get provider(): Util.APIProvider {
+  get provider(): util.APIProvider {
     return this._provider;
   }
 
@@ -223,10 +232,10 @@ export class Model
   }
 
   /** Bound reference to the add utility function. */
-  protected _add: AddFn = Util.add.bind(this);
+  protected _add: AddFn = util.add.bind(this);
 
   /** Bound reference to the reactive loop utility function. */
-  protected _react: ReactFn = Util.react.bind(this);
+  protected _react: ReactFn = util.react.bind(this);
 
   /** Promise chain for serializing async add operations. */
   private _addPromise: Promise<void> | undefined = undefined;
@@ -278,8 +287,20 @@ export class Model
       await this._addPromise;
     }
 
-    const parentTaskId = options?.parentTaskId ?? uuidv4();
-    const abortSignal = options?.abortSignal ?? this.abortSignal;
+    const parentTaskId: string = options?.parentTaskId ?? uuidv4();
+    const abortSignal: AbortSignal = options?.abortSignal ?? this.abortSignal;
+
+    if (this.instructions.trim() && this.instructions !== "") {
+      request.messages.unshift({
+        role: "system",
+        content: this.instructions,
+      });
+    }
+
+    const callback: (data: Callable.Response) => void =
+      options?.callback ??
+      ((data: Callable.Response) =>
+        this.events.emit("update", data, undefined));
 
     return await this._react(
       request,
@@ -291,8 +312,7 @@ export class Model
         parentTaskId: parentTaskId,
         abortSignal: abortSignal,
         tasks: this.sessions,
-        callback: (data: Callable.Response) =>
-          this.events.emit("update", data, undefined),
+        callback,
       }
     );
   }
@@ -308,26 +328,30 @@ export class Model
    *
    * @returns An A2A Engine function for use with A2A agent infrastructure
    */
-  get engine(): A2A.Engine {
+  get engine(): sdk.A2A.Engine {
     const self = this;
-    return async function* (context: A2A.Context) {
-      const message: string | undefined = getContent(context.userMessage);
+    return async function* (context: sdk.A2A.Context) {
+      const message: string | undefined = sdk.extractTextContent(
+        context.userMessage
+      );
 
       if (!message) {
-        yield FAILED_UPDATE(
-          context.taskId,
-          context.contextId,
-          context.userMessage.messageId,
-          "no user message detected"
-        );
+        yield sdk.describe.update.failed({
+          taskId: context.taskId,
+          contextId: context.contextId,
+          message: sdk.describe.message({
+            messageId: context.userMessage.messageId,
+            parts: [{ kind: "text", text: "no user message detected" }],
+          }),
+        });
         return;
       }
 
-      yield SUBMITTED_UPDATE(
-        context.taskId,
-        context.contextId,
-        context.userMessage
-      );
+      yield sdk.describe.update.submitted({
+        taskId: context.taskId,
+        contextId: context.contextId,
+        message: context.userMessage,
+      });
 
       const messages: API.Message[] = [
         ...getHistory(await context.getTask()),
@@ -337,31 +361,28 @@ export class Model
         },
       ];
 
-      const request: API.ConnectRequest = Util.request(
+      const request: API.ConnectRequest = util.request(
         self.modelId,
         messages,
-        await Util.options(self.values)
+        await util.options(self.values)
       );
-
       const response: API.ConnectResponse = await self.execute({
         request,
         options: {
           parentTaskId: context.taskId,
           abortSignal: context.abortSignal,
+          callback: util.bindResponses(context).bind(context),
         },
       });
-
-      yield STATUS_UPDATE(
-        context.taskId,
-        context.contextId,
-        A2A.TaskState.completed,
-        new MessageBuilder({
-          contextId: context.contextId,
+      yield sdk.describe.update.completed({
+        taskId: context.taskId,
+        contextId: context.contextId,
+        message: sdk.describe.message({
           taskId: context.taskId,
-          role: "agent",
-          parts: [{ kind: "text", text: Util.response(response) }],
-        }).message
-      );
+          contextId: context.contextId,
+          parts: [{ kind: "text", text: util.response(response) }],
+        }),
+      });
 
       return;
     };
@@ -386,9 +407,15 @@ export class Model
    * });
    * ```
    */
-  get agent(): A2A_Agent {
-    return createAgent({
-      agentCard: Util.createCard(this.modelId, this.values),
+  get agent(): sdk.Agent {
+    return sdk.createAgent({
+      agentCard: {
+        ...util.createCard(
+          this._params.uri ?? this._params.name ?? this.modelId,
+          this.values
+        ),
+        ...(this._params as Partial<sdk.A2A.AgentCard>),
+      },
       engine: this.engine,
       contexts: this._events,
     });
@@ -399,7 +426,7 @@ export class Model
    *
    * Supports multiple service types:
    * - **MCP Tool Servers**: Pass `StdioServerParameters` with command/args
-   * - **A2A Agents**: Pass an existing `A2A_Agent` or `A2AClient` instance
+   * - **A2A Agents**: Pass an existing `sdk.Agent` or `A2AClient` instance
    * - **Agent Definitions**: Pass `CreateAgentParams` to create a new agent
    *
    * Services are added asynchronously but the method returns immediately
@@ -417,12 +444,12 @@ export class Model
    *   .add({ engine: myEngine, agentCard: myCard });
    * ```
    */
-  add(service: Util.CallableService, uri?: string): Model {
+  add(service: util.CallableService, uri?: string): Model {
     if (
-      service instanceof A2A_Service ||
+      service instanceof sdk.Service ||
       (typeof service === "object" && "engine" in service)
     ) {
-      (service as A2A_Service | CreateAgentParams).contexts = this._events;
+      (service as sdk.Service | sdk.CreateAgentParams).contexts = this._events;
     }
     this.addPromise(
       this._add(service, uri)
@@ -477,10 +504,10 @@ export class Model
       abortSignal?: AbortSignal;
     }
   ): Promise<string> {
-    const request: API.ConnectRequest = Util.request(
+    const request: API.ConnectRequest = util.request(
       this.modelId,
       messages,
-      await Util.options(this.values, options)
+      await util.options(this.values, options)
     );
 
     const response: API.ConnectResponse = await this.execute({
@@ -491,7 +518,7 @@ export class Model
       },
     });
 
-    return Util.response(response);
+    return util.response(response);
   }
 
   /**
@@ -519,23 +546,28 @@ export class Model
    * });
    * ```
    */
-  static create({
-    modelId = "deepseek-r1",
-    provider = artinetProvider,
-    services = [],
-    abortSignal = new AbortController().signal,
-    sessions = {},
-    history = [],
-    events = new Monitor(),
-  }: CreateModelParams): Model {
+  static create(
+    params: CreateModelParams = {
+      modelId: "deepseek-r1",
+      provider: artinetProvider,
+      services: [],
+      abortSignal: new AbortController().signal,
+      sessions: {},
+      history: [],
+      events: new Monitor(),
+      instructions: "",
+    }
+  ): Model {
     return new Model(
-      modelId,
-      abortSignal,
-      provider,
-      new Map(services.map((service) => [service.uri, service])),
-      sessions,
-      history,
-      events
+      params.modelId,
+      params.abortSignal,
+      params.provider,
+      new Map(params.services?.map((service) => [service.uri, service]) ?? []),
+      params.sessions,
+      params.history,
+      params.events,
+      params.instructions?.trim() ?? "",
+      params
     );
   }
 }

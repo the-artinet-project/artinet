@@ -36,7 +36,10 @@
  * The Model class exported as `orc8`.
  * Prefer using `orc8.create()` factory function for new implementations.
  */
-export { Model as orc8 } from "./model.js";
+export {
+  Model as orc8,
+  type CreateModelParams as Orc8Params,
+} from "./model.js";
 
 /**
  * Factory function for creating new Model instances with type-safe parameters.

@@ -134,7 +134,8 @@ export class Agent implements Callable.Agent {
         id: this._id,
       }));
     }
-    this._info = await this._infoPromise;
+    /*Probably overkill, but would like to avoid setting _info to undefined if the promise is rejected */
+    this._info = (await this._infoPromise) ?? this._info;
     this._infoPromise = undefined;
     return this._info;
   }

@@ -112,6 +112,7 @@ export class Monitor
    * @internal
    */
   private emitError = (error: any, state: A2A.Task): void => {
+    if (!this.listenerCount("error")) return;
     this.emit("error", error, state);
   };
 

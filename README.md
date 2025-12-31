@@ -13,15 +13,19 @@ Dynamic orchestration for A2A agents and MCP tools.
 ## Installation
 
 ```bash
-npm install orc8 @modelcontextprotocol/sdk
+npm install orc8 @modelcontextprotocol/sdk openai
 ```
 
 ## Quick Start
 
 ```typescript
 import { orc8 } from "orc8";
+import { openaiProvider } "orc8/openai";
 
-const orchestrator = orc8.create({ modelId: "gpt-4" });
+const orchestrator = orc8.create({
+  modelId: "gpt-4o",
+  provider: openaiProvider({ apiKey: process.env.OPENAI_API_KEY }),
+});
 
 // Add MCP tools
 orchestrator.add({
@@ -40,10 +44,6 @@ await orchestrator.stop();
 ## Adding Agents
 
 ```typescript
-import { orc8 } from "orc8";
-
-const orchestrator = orc8.create({ modelId: "gpt-4" });
-
 orchestrator.add({
   engine: async function* (context) {
     yield {
@@ -118,17 +118,13 @@ orchestrator.add({
 const response = await orchestrator.connect("List files in /tmp");
 ```
 
-Works with OpenAI-compatible APIs by setting the base URL:
+Works with any OpenAI-compatible APIs by setting the base URL:
 
 ```typescript
 const provider = openaiProvider({
   apiKey: process.env.API_KEY,
   baseURL: "https://api.openrouter.ai/v1", // or any compatible endpoint
 });
-```
-
-```bash
-npm install openai
 ```
 
 ## Custom Provider

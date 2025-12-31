@@ -157,7 +157,8 @@ export class Tool
     if (!this._infoPromise) {
       this._infoPromise = Utils.getToolInfo(this._uri, this._id, this._client);
     }
-    this._info = await this._infoPromise;
+    /*Probably overkill, but would like to avoid setting _info to undefined if the promise is rejected */
+    this._info = (await this._infoPromise) ?? this._info;
     this._infoPromise = undefined;
     return this._info;
   }
@@ -243,7 +244,7 @@ export class Tool
     });
     // Monitor the error stream for updates during initialization
     const handle = (data: Buffer) =>
-      logger.warn(`[${uri}]: create tool error: `, data.toString());
+      logger.warn(`[${uri}]: tool update: `, data.toString());
 
     (transport as StdioClientTransport)?.stderr?.on("data", handle);
     const client = await Utils.initClient(transport, uri);

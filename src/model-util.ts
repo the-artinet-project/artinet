@@ -152,7 +152,7 @@ export async function options(
 ): Promise<API.ConnectOptions> {
   //todo convert to async
   const targets = await Promise.all(
-    callables.map((callable) => callable.getTarget())
+    callables.map(async (callable) => await callable?.getTarget?.())
   );
   const tools = targets.filter((target) => Runtime.isToolService(target));
   const agents = targets.filter((target) => Runtime.isAgentService(target));
@@ -369,7 +369,7 @@ export async function react(
 ): Promise<API.ConnectResponse> {
   let iterations: number = options.iterations ?? Callable.DEFAULT_ITERATIONS;
 
-  let response: API.ConnectResponse | undefined = undefined;
+  let apiResponse: API.ConnectResponse | undefined = undefined;
   let results: Callable.Response[] = [];
 
   for (let i = 0; i < iterations && !options.abortSignal?.aborted; i++) {
@@ -382,19 +382,19 @@ export async function react(
       maxIteration
     );
 
-    response = await provider(updatedRequest, options.abortSignal);
+    apiResponse = await provider(updatedRequest, options.abortSignal);
 
-    results = await call({ request: createCall(response), options });
+    results = await call({ request: createCall(apiResponse), options });
     if (results.length === 0) break;
 
     history = [...history, ...results];
   }
 
-  if (!response) {
+  if (!apiResponse) {
     throw new Error("No response from model");
   }
 
-  return response;
+  return apiResponse;
 }
 
 function createSkill(value: Callable.Agent | Callable.Tool): A2A.AgentSkill {
@@ -446,4 +446,58 @@ export function createCard(
     description: `An agent that uses the ${modelId} large language model.`,
     skills: callables.map((value) => createSkill(value)),
   };
+}
+
+/**
+ * Generates an A2A artifact update event from a callable response.
+ *
+ * @param taskId - The task ID to bind the artifact to
+ * @param contextId - The context ID to bind the artifact to
+ * @param data - The callable response to create an artifact from
+ * @returns An A2A artifact update event
+ *
+ * @example
+ * ```typescript
+ * const artifact = createArtifact("task-123", "context-456", { id: "artifact-789", content: "Hello, world!" });
+ * // artifact.taskId === "task-123"
+ * // artifact.contextId === "context-456"
+ * // artifact.kind === "artifact-update"
+ * // artifact.artifact.artifactId === "artifact-789"
+ * // artifact.artifact.parts[0].kind === "data"
+ * // artifact.artifact.parts[0].data.content === "Hello, world!"
+ * ```
+ */
+export function createArtifact(
+  taskId: string,
+  contextId: string,
+  data: Callable.Response
+): A2A.TaskArtifactUpdateEvent {
+  const artifact: A2A.TaskArtifactUpdateEvent = {
+    taskId: taskId,
+    contextId: contextId,
+    kind: "artifact-update",
+    artifact: {
+      artifactId: data.id,
+      parts: [{ kind: "data", data: data as { [x: string]: unknown } }],
+    },
+    metadata: {
+      ["timestamp"]: new Date().toISOString(),
+    },
+  };
+  return artifact;
+}
+
+/**
+ * Binds callable responses to the A2A context.
+ *
+ * @param context - The A2A context to bind the responses to
+ * @returns A function that binds a callable response to the context
+ */
+export function bindResponses(
+  context: A2A.Context
+): (data: Callable.Response) => void {
+  return (data: Callable.Response) =>
+    context.publisher.onUpdate(
+      createArtifact(context.taskId, context.contextId, data)
+    );
 }

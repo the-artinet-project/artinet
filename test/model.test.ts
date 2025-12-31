@@ -8,15 +8,9 @@ import { Model } from "../src/model.js";
 import { Monitor } from "../src/monitor.js";
 import { echoAgentEngine, testAgentCard } from "./agents/echo-agent.js";
 import { createMockAgentRequest, createMockProvider } from "./utils.js";
-import {
-  A2A,
-  STATUS_UPDATE,
-  MESSAGE,
-  FAILED_UPDATE,
-  getContent,
-} from "@artinet/sdk";
+import * as sdk from "@artinet/sdk";
 jest.setTimeout(60000);
-
+// sdk.applyDefaults();
 describe("Model Tests", () => {
   let model: Model;
 
@@ -118,12 +112,12 @@ describe("Model Tests", () => {
 
       model.add(
         {
-          engine: async function* (context: A2A.Context) {
-            const userText = getContent(context.userMessage) ?? "";
+          engine: async function* (context: sdk.A2A.Context) {
+            const userText = sdk.getContent(context.userMessage) ?? "";
             called = true;
             expect(userText).toBe("Hello Test Agent!");
             if (!userText) {
-              yield FAILED_UPDATE(
+              yield sdk.FAILED_UPDATE(
                 context.taskId,
                 context.contextId,
                 context.userMessage.messageId,
@@ -131,11 +125,11 @@ describe("Model Tests", () => {
               );
               return;
             }
-            yield STATUS_UPDATE(
+            yield sdk.STATUS_UPDATE(
               context.taskId,
               context.contextId,
-              A2A.TaskState.completed,
-              MESSAGE({
+              sdk.A2A.TaskState.completed,
+              sdk.describe.message({
                 role: "agent",
                 parts: [{ kind: "text", text: `Test response: ${userText}` }],
               })
@@ -264,7 +258,7 @@ describe("Model Tests", () => {
       });
 
       const response = await model.agent.sendMessage("Hello!");
-      expect((response as A2A.Task).status.message?.parts[0]).toEqual({
+      expect((response as sdk.A2A.Task).status.message?.parts[0]).toEqual({
         kind: "text",
         text: "Agent response",
       });
