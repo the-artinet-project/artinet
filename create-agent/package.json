@@ -1,0 +1,62 @@
+{
+  "name": "@artinet/create-agent",
+  "version": "0.0.2",
+  "description": "A tool to create template Agent2Agent projects via the CLI.",
+  "keywords": [
+    "artinet",
+    "cli",
+    "a2a",
+    "agents",
+    "ai-agent",
+    "quick-agent",
+    "artificial-intelligence",
+    "agentic-ai",
+    "agentic-web",
+    "agent2agent",
+    "multi-agent",
+    "multi-agent-system"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/the-artinet-project/create-agent"
+  },
+  "homepage": "https://artinet.io",
+  "issues": {
+    "url": "https://github.com/the-artinet-project/artinet-sdk/issues"
+  },
+  "bin": {
+    "create-agent": "dist/index.js",
+    "ctpl": "dist/index.js"
+  },
+  "files": [
+    "dist/**/*",
+    "templates/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.9.1"
+  },
+  "license": "Apache-2.0",
+  "author": "artinet",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "prepublishOnly": "npm run clean && npm i && npm run build",
+    "build": "tsc --project tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^22.15.21",
+    "ts-node": "^10.9.2",
+    "@types/prompts": "^2.4.9"
+  },
+  "dependencies": {
+    "prompts": "^2.4.2",
+    "ora": "^8.2.0"
+  }
+}
