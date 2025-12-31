@@ -10,6 +10,8 @@
 !loader/**
 !mcp
 !mcp/**
+!orc8
+!orc8/**
 !types
 !sdk
 !fleet
