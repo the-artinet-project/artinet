@@ -63,10 +63,14 @@
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@opentelemetry/api": "^1.9.0",
+    "@a2a-js/sdk": "^0.3.7",
     "express": "^5.2.1",
     "openai": "^6.15.0"
   },
   "devDependencies": {
+    "express": "^5.2.1",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "@a2a-js/sdk": "^0.3.7",
     "@artinet/loader": "^0.0.1",
     "@eslint/js": "^9.25.1",
     "@types/express": "^5.0.0",
