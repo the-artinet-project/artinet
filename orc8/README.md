@@ -1,12 +1,12 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/orc8.svg)](https://www.npmjs.com/package/orc8)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/router.svg)](https://www.npmjs.com/package/orc8)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/orc8/badge.svg)](https://snyk.io/test/npm/orc8)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/orc8?style=social)](https://github.com/the-artinet-project/orc8/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/orc8"><img src="https://img.shields.io/npm/v/orc8?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/orc8"><img src="https://img.shields.io/npm/dt/@artinet/router?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/orc8"><img src="https://snyk.io/test/npm/orc8/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
 
-# orc8
+<h1 align="center"><em>orc8</em></h1>
 
 Dynamic orchestration for A2A agents and MCP tools.
 
