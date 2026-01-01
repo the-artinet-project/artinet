@@ -4,7 +4,7 @@
 [![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/fleet/badge.svg)](https://snyk.io/test/npm/@artinet/fleet)
 
-# @artinet/fleet
+<h1 align="center"><em>fleet</em></h1>
 
 Deploy AI agents on any infrastructure.
 
@@ -15,7 +15,7 @@ Fleet is a lightweight server framework for hosting [A2A Protocol](https://githu
 ## Installation
 
 ```bash
-npm install @artinet/fleet express openai @modelcontextprotocol/sdk
+npm install @artinet/fleet express openai @modelcontextprotocol/sdk @a2a-js/sdk
 ```
 
 **Requirements:** Node.js ≥ 18.9.1
