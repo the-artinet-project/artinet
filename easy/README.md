@@ -1,12 +1,13 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/easy-a2a.svg?logoColor=black)](https://www.npmjs.com/package/easy-a2a)
-[![npm downloads](https://img.shields.io/npm/dt/easy-a2a.svg)](https://www.npmjs.com/package/easy-a2a)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/easy-a2a/badge.svg)](https://snyk.io/test/npm/easy-a2a)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/easy-a2a?style=social)](https://github.com/the-artinet-project/easy-a2a/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
 
-# easy-a2a
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/easy-a2a"><img src="https://img.shields.io/npm/v/easy-a2a?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/easy-a2a"><img src="https://img.shields.io/npm/dt/easy-a2a?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/easy-a2a"><img src="https://snyk.io/test/npm/easy-a2a/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
+
+<h1 align="center"><em>easy a2a</em></h1>
 
 Turn any OpenAI-compatible API (OpenAI, HuggingFace, OpenRouter, local models, etc.) into an A2A agent.
 
