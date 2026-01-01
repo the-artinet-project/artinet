@@ -1,4 +1,10 @@
-# artinet-mcp
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/bash-mcp"><img src="https://img.shields.io/npm/v/@artinet/bash-mcp?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/agent-relay-mcp"><img src="https://img.shields.io/npm/v/@artinet/agent-relay-mcp?color=black" alt="Version"></a>
+</p>
+
+<h1 align="center"><em>mcp</em></h1>
 
 A collection of [Model Context Protocol (MCP)](https://modelcontextprotocol.io) servers for the artinet ecosystem. These tools enable AI assistants to safely interact with system resources through standardized MCP interfaces.
 
