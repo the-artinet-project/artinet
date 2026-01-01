@@ -1,9 +1,9 @@
 [![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/bash-mcp.svg)](https://www.npmjs.com/package/@artinet/bash-mcp)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/bash-mcp.svg)](https://www.npmjs.com/package/@artinet/bash-mcp)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@artinet/bash-mcp?color=black)](https://www.npmjs.com/package/@artinet/bash-mcp)
+[![npm downloads](https://img.shields.io/npm/dt/@artinet/bash-mcp?color=black)](https://www.npmjs.com/package/@artinet/bash-mcp)
+[![Apache License](https://img.shields.io/badge/License-Apache_2.0-black.svg)](LICENSE)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/bash-mcp/badge.svg)](https://snyk.io/test/npm/@artinet/bash-mcp)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/mcp?style=social)](https://github.com/the-artinet-project/mcp/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/mcp?style=social&color=black)](https://github.com/the-artinet-project/mcp/stargazers)
 [![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
 
 # Bash MCP Server
