@@ -22,7 +22,7 @@ import {
   MockStore,
 } from "../mock.js";
 import { loadAgent, invokeAgent } from "../../src/routes/request/index.js";
-import { InMemoryStore } from "../../src/storage.js";
+import { InMemoryStore } from "../../src/storage/in-memory.js";
 import { RequestAgent } from "../../src/routes/request/index.js";
 import { CreateAgent } from "../../src/routes/create/index.js";
 import { describe as des6, applyDefaults } from "@artinet/sdk";

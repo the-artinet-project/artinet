@@ -146,6 +146,23 @@ export const createValidAgentConfig = (
   ...overrides,
 });
 
+export const createValidStoredAgent = (
+  overrides: Partial<armada.StoredAgent> = {}
+): armada.StoredAgent => ({
+  agentId: "test-agent-id",
+  name: "test-agent",
+  prompt: "test-prompt",
+  modelId: "test-model-id",
+  version: "1.0.0",
+  updatedAt: new Date().toISOString(),
+  status: "ACTIVE",
+  visibility: "PUBLIC",
+  owner: "test-owner",
+  metadata: createValidAgentConfig(),
+  agents: [],
+  servers: [],
+  ...overrides,
+});
 /**
  * Creates a mock RequestContext for testing
  */

@@ -1,10 +1,12 @@
 *
+!dockerfile
 !src
 !src/**
 !test
 !test/**
 !.gitignore
 !.npmignore
+!launch.js
 !package.json
 !tsconfig.json
 !eslint.config.js

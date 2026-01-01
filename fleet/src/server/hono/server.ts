@@ -72,7 +72,8 @@ export function fleet(
   app: hono.Hono;
   launch: (port: number) => ServerType;
   ship: (
-    agents: CreateAgentRoute["request"][]
+    agents: CreateAgentRoute["request"][],
+    userId?: string
   ) => Promise<{ launch: (port?: number) => ServerType }>;
 } {
   const context = createContext(settings);
@@ -159,10 +160,14 @@ export function fleet(
   };
 
   const ship = async (
-    agents: CreateAgentRoute["request"][]
+    agents: CreateAgentRoute["request"][],
+    userId?: string
   ): Promise<{ launch: (port?: number) => ServerType }> => {
     for (const agent of agents) {
-      const response = await set(agent, context);
+      const response = await set(agent, {
+        ...createRequestContext(context),
+        userId: userId ?? (await user?.({} as any)),
+      });
       if (response.success) {
         sdk.logger.info(`Agent shipped: ${response.agentId}`);
       }

@@ -76,7 +76,8 @@ export function fleet(
   app: express.Application;
   launch: (port: number) => Server;
   ship: (
-    agents: CreateAgentRoute["request"][]
+    agents: CreateAgentRoute["request"][],
+    userId?: string
   ) => Promise<{ launch: (port?: number) => Server }>;
 } {
   const context = createContext(settings);
@@ -187,10 +188,14 @@ export function fleet(
   };
 
   const ship = async (
-    agents: CreateAgentRoute["request"][]
+    agents: CreateAgentRoute["request"][],
+    userId?: string
   ): Promise<{ launch: (port?: number) => Server }> => {
     for (const agent of agents) {
-      const response = await set(agent, context);
+      const response = await set(agent, {
+        ...createRequestContext(context),
+        userId: userId ?? (await user?.({} as any)),
+      });
       if (response.success) {
         sdk.logger.info(`Agent shipped: ${response.agentId}`);
       }

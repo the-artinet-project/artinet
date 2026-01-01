@@ -12,6 +12,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./sqlite": {
+      "types": "./dist/storage/sqlite.d.ts",
+      "import": "./dist/storage/sqlite.js",
+      "default": "./dist/storage/sqlite.js"
+    },
     "./express": {
       "types": "./dist/server/express/fleet.d.ts",
       "import": "./dist/server/express/fleet.js",
@@ -71,29 +76,36 @@
     "@opentelemetry/api": "^1.9.0",
     "express": "^5.2.1",
     "hono": "^4.11.3",
-    "openai": "^6.15.0"
+    "openai": "^6.15.0",
+    "pino": "^10.1.0"
   },
   "devDependencies": {
     "@a2a-js/sdk": "^0.3.7",
     "@artinet/loader": "^0.0.1",
     "@eslint/js": "^9.25.1",
     "@modelcontextprotocol/sdk": "^1.24.3",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.19.3",
     "@types/supertest": "^6.0.3",
+    "autocannon": "^8.0.0",
+    "better-sqlite3": "^12.5.0",
+    "drizzle-orm": "^0.45.1",
     "eslint": "^9.25.1",
     "express": "^5.2.1",
     "globals": "^16.0.0",
     "hono": "^4.11.3",
     "jest": "^29.7.0",
     "pino": "^10.1.0",
+    "pm2": "^6.0.14",
     "rimraf": "^5.0.5",
     "supertest": "latest",
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.1"
+    "typescript-eslint": "^8.31.1",
+    "undici": "^5.29.0"
   },
   "engines": {
     "node": ">=18.9.1"

@@ -1,0 +1,48 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Install curl for fetching the launch script
+RUN apk add --no-cache curl
+
+# Fetch the launch script
+# Fetch launch.js from GitHub
+RUN curl -fsSL -o launch.js \
+    https://raw.githubusercontent.com/the-artinet-project/artinet/main/fleet/launch.js
+
+
+RUN npm init -y && npm install @artinet/fleet \
+pino-caller@^4.0.0 \
+pino-pretty@^13.1.3 \
+pm2@^6.0.14 \
+hono@^4.11.3 \
+openai@^6.15.0 \
+@modelcontextprotocol/sdk@^1.24.3 \
+@opentelemetry/api@^1.9.0 \
+@a2a-js/sdk@^0.3.7 \
+better-sqlite3@^12.5.0 \
+drizzle-orm@^0.45.1 \
+pino@^10.1.0
+
+RUN npm install @opentelemetry/auto-instrumentations-node \
+                @opentelemetry/exporter-trace-otlp-http
+
+ENV PORT=3000
+ENV DB_PATH=/data/fleet.db
+ENV BASE_PATH=/
+ENV USER="default"
+ENV DEFAULT_INSTRUCTIONS="You are a helpful assistant."
+ENV OPENAI_API_KEY=
+ENV INFERENCE_PROVIDER_URL=undefined
+
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=
+ENV OTEL_SERVICE_NAME=fleet
+
+
+ENV LOG_LEVEL=warn
+
+# Create data directory for SQLite
+RUN mkdir -p /data
+
+EXPOSE 3000
+
+CMD ["npx", "pm2-runtime", "start", "launch.js", "-i", "max"]

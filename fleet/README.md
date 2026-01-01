@@ -16,6 +16,21 @@ Fleet is a lightweight server framework for hosting [A2A Protocol](https://githu
 npm install @artinet/fleet openai @modelcontextprotocol/sdk @a2a-js/sdk
 ```
 
+## Configuration
+
+Copy the example and fill in your values:
+
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+Run:
+
+```bash
+docker run --env-file .env -v fleet-data:/data artinet-fleet
+```
+
 **Requirements:** Node.js ≥ 18.9.1
 
 ## Quick Start

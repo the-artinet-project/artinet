@@ -118,7 +118,7 @@ export async function request({
   const requestContext: RequestContext = {
     ...context,
     agentId,
-    requestId: await generateRequestId(context, reqId),
+    requestId: generateRequestId(context, reqId),
     userId: await user?.(ctx),
   };
 

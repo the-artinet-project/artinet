@@ -6,7 +6,7 @@ import {
   loadAgent,
   invokeAgent,
 } from "./routes/index.js";
-import { InMemoryStore } from "./storage.js";
+import { InMemoryStore } from "./storage/in-memory.js";
 
 export const DEFAULTS = {
   basePath: "/",
