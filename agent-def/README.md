@@ -1,4 +1,12 @@
-# agent-def
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/agent-def"><img src="https://img.shields.io/npm/v/agent-def?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/agent-def"><img src="https://img.shields.io/npm/dt/agent-def?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/agent-def"><img src="https://snyk.io/test/npm/agent-def/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
+
+<h1 align="center"><em>agent-def</em></h1>
 
 A standardized, portable definition format for collaborative AI agents.
 
