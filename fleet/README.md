@@ -1,9 +1,9 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/fleet.svg?logoColor=black)](https://www.npmjs.com/package/@artinet/fleet)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
-[![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/fleet/badge.svg)](https://snyk.io/test/npm/@artinet/fleet)
-
+<p align="center">
+ <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/fleet"><img src="https://img.shields.io/npm/v/@artinet/fleet?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/fleet"><img src="https://snyk.io/test/npm/@artinet/fleet/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
 <h1 align="center"><em>fleet</em></h1>
 
 Deploy AI agents on any infrastructure.
