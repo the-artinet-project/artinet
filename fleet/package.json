@@ -38,12 +38,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/fleet.git"
+    "url": "git+https://github.com/the-artinet-project/artinet.git"
   },
   "bugs": {
-    "url": "https://github.com/the-artinet-project/fleet/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
-  "homepage": "https://github.com/the-artinet-project/fleet#readme",
+  "homepage": "https://github.com/the-artinet-project/artinet#readme",
   "files": [
     "dist",
     "package.json",

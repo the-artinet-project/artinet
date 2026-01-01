@@ -61,8 +61,8 @@
     "zod-to-json-schema": "^3.25.0"
   },
   "dependencies": {
-    "@artinet/sdk": "^0.6.0-preview.1",
-    "@artinet/types": "^0.0.9-alpha.3",
+    "@artinet/sdk": "^0.6.0-preview.2",
+    "@artinet/types": "^0.0.9-alpha.4",
     "zod": "^3.25"
   }
 }

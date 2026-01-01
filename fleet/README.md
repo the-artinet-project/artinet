@@ -29,11 +29,7 @@ Set an `OPENAI_API_KEY` in you environment variables, then start your Server.
 ```typescript
 import { fleet } from "@artinet/fleet/express";
 
-const app = fleet();
-
-app.listen(3000, () => {
-  console.log("Fleet running at http://localhost:3000");
-});
+const { app } = fleet().launch(3000);
 ```
 
 That's it. You now have:
@@ -44,6 +40,38 @@ That's it. You now have:
 - `POST /agentId/:id` — JSON-RPC agent interaction
 
 ### 2. Deploy an Agent
+
+**Prelaunch**:
+
+```typescript
+import { fleet } from "@artinet/fleet/express";
+
+const myFleet = await fleet().ship([
+  {
+    config: {
+      uri: "my-agent",
+      ...
+    },
+  },
+]);
+
+myFleet.launch(3000);
+```
+
+**Ship**:
+
+```typescript
+import { ship } from "@artinet/fleet";
+
+await ship("http://localhost:3000", {
+    config: {
+      uri: "my-agent",
+      ...
+    },
+});
+```
+
+**Curl**:
 
 ```bash
 curl -X POST http://localhost:3000/deploy \
@@ -106,7 +134,7 @@ curl -X POST http://localhost:3000/agentId/my-agent \
   }'
 ```
 
-or via the [SDK](https://github.com/the-artinet-project/artinet-sdk):
+or via the [sdk](https://github.com/the-artinet-project/artinet-sdk):
 
 ```typescript
 import { A2AClient } from "@artinet/sdk";

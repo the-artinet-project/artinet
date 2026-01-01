@@ -9,14 +9,14 @@ import {
   RequestAgentRoute,
   TestAgentRoute,
 } from "../../src/routes/request/types/definitions.js";
-import * as SDK from "@artinet/sdk";
+import * as sdk from "@artinet/sdk";
 import * as armada from "@artinet/armada";
 import {
   createMockContext,
   createValidAgentConfig,
   createMockAgent,
 } from "../mock.js";
-SDK.applyDefaults();
+// sdk.applyDefaults();
 describe("Request Route", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,7 +41,7 @@ describe("Request Route", () => {
       await expect(
         requestImplementation(request, context)
       ).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           data: {
             message: /Agent test-agent-id not found: {"error":"Unknown error"}/,
           },
@@ -72,7 +72,7 @@ describe("Request Route", () => {
       await expect(
         requestImplementation(request, context)
       ).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           data: {
             message: /Agent test-agent-id failed to load/,
           },
@@ -102,7 +102,7 @@ describe("Request Route", () => {
       await expect(
         requestImplementation(request, context)
       ).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           data: {
             message: /Agent test-agent-id failed to invoke/,
           },
@@ -423,7 +423,7 @@ describe("Request Route", () => {
       const config = createValidAgentConfig();
 
       await expect(loadAgent(config, undefined)).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           message: "Context not found",
         })
       );
@@ -439,7 +439,7 @@ describe("Request Route", () => {
       });
 
       await expect(loadAgent(config, context)).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           message: "Agents not found: agent-1, agent-2",
         })
       );
@@ -492,7 +492,7 @@ describe("Request Route", () => {
       });
       const context = createMockContext();
       const result = await loadAgent(config, context);
-      await (result as SDK.A2A.Service).stop();
+      await (result as sdk.A2A.Service).stop();
     });
 
     it("should use default model when modelId is not provided", async () => {
@@ -529,7 +529,7 @@ describe("Request Route", () => {
       } as unknown as TestAgentRoute["request"]);
 
     it("should throw error for A2AClient agents", async () => {
-      const mockClient = new SDK.A2AClient("http://localhost:3000");
+      const mockClient = new sdk.A2AClient("http://localhost:3000");
       const request = createTestRequest([
         {
           message: {
@@ -542,7 +542,7 @@ describe("Request Route", () => {
       ]);
 
       await expect(testInvoke(request, mockClient)).rejects.toThrowError(
-        SDK.INVALID_REQUEST({
+        sdk.INVALID_REQUEST({
           message: "Test agent requests are not supported for A2AClients",
           id: request.id,
           agentId: request.agentId,
@@ -555,7 +555,7 @@ describe("Request Route", () => {
       const request = createTestRequest([]);
 
       await expect(testInvoke(request, mockAgent)).rejects.toThrowError(
-        SDK.INVALID_PARAMS({
+        sdk.INVALID_PARAMS({
           message: "Invalid parameters for testing: no tests provided",
           id: request.id,
           agentId: request.agentId,
@@ -657,7 +657,7 @@ describe("Request Route", () => {
       const context = createMockContext({
         target: createValidAgentConfig(),
         load: jest.fn(() => {
-          throw SDK.INTERNAL_ERROR({
+          throw sdk.INTERNAL_ERROR({
             data: { message: "Custom error" },
           });
         }),
@@ -666,7 +666,7 @@ describe("Request Route", () => {
       await expect(
         requestImplementation(request, context)
       ).rejects.toThrowError(
-        SDK.INTERNAL_ERROR({
+        sdk.INTERNAL_ERROR({
           data: { message: "Custom error" },
         })
       );
