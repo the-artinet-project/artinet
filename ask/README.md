@@ -7,9 +7,7 @@
 <a href="https://snyk.io/test/npm/@artinet/ask"><img src="https://snyk.io/test/npm/@artinet/ask/badge.svg" alt="Known Vulnerabilities"></a>
 </p>
 
-<h1 align="center"><em>easy a2a</em></h1>
-
-# @artinet/ask
+<h1 align="center"><em>ask</em></h1>
 
 A light-weight/minimalist commandline client for connecting to local and remote Agent2Agent (A2A) Servers.
 
