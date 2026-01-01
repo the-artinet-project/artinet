@@ -1,13 +1,13 @@
 
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/create-agent.svg)](https://www.npmjs.com/package/@artinet/create-agent)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/create-agent.svg)](https://www.npmjs.com/package/@artinet/create-agent)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/create-agent/badge.svg)](https://snyk.io/test/npm/@artinet/create-agent)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/create-agent?style=social)](https://github.com/the-artinet-project/create-agent/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/create-agent"><img src="https://img.shields.io/npm/v/@artinet/create-agent?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/create-agent"><img src="https://img.shields.io/npm/dt/@artinet/create-agent?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/create-agent"><img src="https://snyk.io/test/npm/@artinet/create-agent/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
 
-# `@artinet/create-agent`
+<h1 align="center"><em>create agent</em></h1>
 
 A command-line interface (CLI) tool to quickly scaffold starter agent projects from a predefined set of templates. [`create-agent`](https://www.npmjs.com/package/@artinet/create-agent) streamlines the initial setup process, allowing you to get your new agent project up and running in minutes.
 
