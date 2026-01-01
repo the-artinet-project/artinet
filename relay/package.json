@@ -1,0 +1,67 @@
+{
+  "name": "@artinet/agent-relay",
+  "version": "0.0.9-alpha.1",
+  "description": "A library for discovering and relaying messages between A2A enabled AI agents via the @artinet/sdk.",
+  "author": "artinet",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-artinet-project/agent-relay.git"
+  },
+  "issues": {
+    "url": "https://github.com/the-artinet-project/agent-relay/issues"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "artinet",
+    "agent2agent",
+    "a2a",
+    "ai",
+    "agent",
+    "artificial intelligence"
+  ],
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "module": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "rootDir": ".",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "clean": "rimraf dist",
+    "clean:all": "rimraf dist node_modules package-lock.json",
+    "start": "node dist/bin/stdio.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "prepublishOnly": "npm run clean:all && npm i && npm run build && npm test"
+  },
+  "dependencies": {
+    "@artinet/sdk": "^0.6.0-preview.1",
+    "@artinet/types": "^0.0.9-alpha.3",
+    "p-limit": "^7.2.0",
+    "portscanner": "^2.2.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.25"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.3"
+  },
+  "devDependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@types/node": "^20.17.50",
+    "@types/portscanner": "^2.1.4",
+    "eslint": "^9.25.1",
+    "jest": "^29.7.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.31.0"
+  },
+  "engines": {
+    "node": ">=18.9.1"
+  }
+}
