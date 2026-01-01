@@ -1,4 +1,12 @@
-# @artinet/loader
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/loader"><img src="https://img.shields.io/npm/v/@artinet/loader?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/loader"><img src="https://img.shields.io/npm/dt/@artinet/loader?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/loader"><img src="https://snyk.io/test/npm/@artinet/loader/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
+
+<h1 align="center"><em>loader</em></h1>
 
 Load and validate agent definitions from markdown files.
 
