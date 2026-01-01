@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import * as armada from "@artinet/armada";
 import { AgentConfigurationSchema } from "agent-def";
 import * as sdk from "@artinet/sdk";

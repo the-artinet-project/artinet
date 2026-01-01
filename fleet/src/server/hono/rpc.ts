@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import express from "express";
+import * as hono from "hono";
 import * as sdk from "@artinet/sdk";
 import { ResultOrError } from "../../types.js";
+import { streamSSE } from "hono/streaming";
 
 export function toJSONRPCResponse(
   id: string,
@@ -23,39 +24,43 @@ export function toJSONRPCResponse(
 }
 
 export async function handleJSONRPCResponse(
-  res: express.Response,
+  ctx: hono.Context,
   id: string,
   method: string,
   response: ResultOrError
 ): Promise<void> {
   if (response.type === "success" && method === "agentcard/get") {
-    res.json(response.result);
+    ctx.status(200);
+    ctx.res = ctx.json(response.result);
     return;
   }
 
   if (response.type === "success") {
-    res.json(toJSONRPCResponse(String(id), response));
+    ctx.status(200);
+    ctx.res = ctx.json(toJSONRPCResponse(String(id), response));
     return;
   }
 
   if (response.type === "error") {
-    res.status(500).json(toJSONRPCResponse(String(id), response));
+    ctx.status(500);
+    ctx.res = ctx.json(toJSONRPCResponse(String(id), response));
     return;
   }
 
   if (response.type === "stream") {
-    res.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-    });
     const stream = response.stream;
-    for await (const data of stream) {
-      res.write(
-        `data: ${JSON.stringify({ jsonrpc: "2.0", id, result: data })}\n\n`
-      );
-    }
-    res.end();
+    ctx.res = streamSSE(ctx, async (responseStream) => {
+      for await (const data of stream) {
+        responseStream.writeSSE({
+          data: JSON.stringify({ jsonrpc: "2.0", id, result: data }),
+        });
+      }
+      responseStream.close();
+    });
+    ctx.status(200);
+    ctx.res.headers.set("Content-Type", "text/event-stream");
+    ctx.res.headers.set("Cache-Control", "no-cache");
+    ctx.res.headers.set("Connection", "keep-alive");
     return;
   }
 

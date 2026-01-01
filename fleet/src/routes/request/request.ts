@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import * as armada from "@artinet/armada";
 import { RequestAgentRoute, TestAgentRoute } from "./types/definitions.js";
 import { FetchAgent } from "./interceptors/fetch-agent.js";

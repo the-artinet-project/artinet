@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { orc8, Orc8Params } from "orc8";
 import { openaiProvider } from "orc8/openai";
 import { AgentConfiguration } from "agent-def";

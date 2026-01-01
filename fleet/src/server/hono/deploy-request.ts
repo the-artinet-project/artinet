@@ -3,70 +3,69 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import express from "express";
+import * as hono from "hono";
+import * as sdk from "@artinet/sdk";
 import {
   CreateAgent,
   CreateAgentRoute,
   CreateAgentRequestSchema,
 } from "../../routes/create/index.js";
 import { generateRequestId, generateRegistrationId } from "./utils.js";
-import { logger, validateSchema } from "@artinet/sdk";
 
 export type handler = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  ctx: hono.Context,
+  next: hono.Next,
   context: CreateAgentRoute["context"],
   deploy?: CreateAgentRoute["implementation"]
 ) => Promise<void>;
 
 export async function handle(
-  req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
+  ctx: hono.Context,
+  _next: hono.Next,
   context: CreateAgentRoute["context"],
   deploy: CreateAgentRoute["implementation"] = CreateAgent
 ): Promise<void> {
-  logger.warn(`handle deploy request with body: ${JSON.stringify(req.body)}`);
-  const request: CreateAgentRoute["request"] = await validateSchema(
+  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+  const req = sdk.safeParse(await ctx.req.text());
+  sdk.logger.warn(`handle deploy request with body: ${JSON.stringify(req)}`);
+  const request: CreateAgentRoute["request"] = await sdk.validateSchema(
     CreateAgentRequestSchema,
-    req?.body ?? {}
+    req
   );
   context.registrationId = generateRegistrationId(request.config.uri);
   const result: CreateAgentRoute["response"] = await deploy(request, context);
-  res.json(result);
+  ctx.res = ctx.json(result);
 }
 
 export const factory =
   (deploy: CreateAgentRoute["implementation"] = CreateAgent): handler =>
   async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
+    ctx: hono.Context,
+    next: hono.Next,
     context: CreateAgentRoute["context"]
   ) =>
-    await handle(req, res, next, context, deploy);
+    await handle(ctx, next, context, deploy);
 
 export interface Params {
-  request: express.Request;
-  response: express.Response;
-  next: express.NextFunction;
+  ctx: hono.Context;
+  next: hono.Next;
   context: CreateAgentRoute["context"];
   handler: handler;
-  user: (req: express.Request) => Promise<string>;
+  user: (ctx: hono.Context) => Promise<string>;
 }
 export async function request({
-  request: req,
-  response: res,
+  ctx,
   next,
   context,
   handler = handle,
   user,
 }: Params): Promise<void> {
+  const reqId =
+    ctx.req.header("x-request-id") ?? sdk.safeParse(await ctx.req.text())?.id;
   const requestContext: CreateAgentRoute["context"] = {
     ...context,
-    requestId: generateRequestId(context, req),
-    userId: await user?.(req),
+    requestId: generateRequestId(context, reqId),
+    userId: await user?.(ctx),
   };
-  return await handler(req, res, next, requestContext);
+  await handler(ctx, next, requestContext);
 }

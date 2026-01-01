@@ -3,20 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import express from "express";
 import { v4 as uuidv4 } from "uuid";
 import slugify from "@sindresorhus/slugify";
 
 export function generateRequestId(
   context: { requestId?: string },
-  req: express.Request
+  reqId?: string
 ): string {
-  return (
-    context.requestId ??
-    (req?.headers?.["x-request-id"] as string | undefined) ??
-    (req?.body?.id as string | undefined) ??
-    uuidv4()
-  );
+  return context.requestId ?? reqId ?? uuidv4();
 }
 
 export const generateRegistrationId = (uri: string) => {

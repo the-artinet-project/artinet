@@ -1,5 +1,9 @@
 import { jest } from "@jest/globals";
-import { Request, Response } from "express";
+import { Context as HonoContext } from "hono";
+import {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from "express";
 import * as SDK from "@artinet/sdk";
 import * as armada from "@artinet/armada";
 import { AgentConfiguration } from "agent-def";
@@ -217,11 +221,22 @@ export const createMockResponse = (): Partial<Response> & {
  * Creates a mock Express request
  */
 export const createMockRequest = (
-  overrides: Partial<Request> = {}
-): Partial<Request> => ({
+  overrides: Partial<ExpressRequest> = {}
+): Partial<ExpressRequest> => ({
   body: {},
   params: {},
   path: "/test",
   headers: {},
+  ...overrides,
+});
+
+/**
+ * Creates a mock Express request
+ */
+export const createMockHonoRequest = (
+  overrides: Partial<Request> = {}
+): Partial<Request> => ({
+  body: null,
+  headers: new Headers(),
   ...overrides,
 });

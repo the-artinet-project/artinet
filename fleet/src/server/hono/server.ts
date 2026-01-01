@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Server } from "http";
-import * as sdk from "@artinet/sdk";
-import express from "express";
+import * as hono from "hono";
+import { serve, type ServerType } from "@hono/node-server";
 
+import * as sdk from "@artinet/sdk";
 import { CreateAgentRoute } from "../../routes/create/index.js";
 import { Settings as FleetSettings } from "../../settings.js";
 import { DEFAULTS } from "../../default.js";
@@ -15,21 +15,18 @@ import * as agent from "./agent-request.js";
 import * as testing from "./test-request.js";
 import * as deployment from "./deploy-request.js";
 import { AGENT_FIELD_NAME } from "./agent-request.js";
+import { errorHandler } from "./error-handler.js";
 
 export type Settings = FleetSettings & {
-  user?: (req: express.Request) => Promise<string>;
+  user?: (ctx: hono.Context) => Promise<string>;
   retrieve?: agent.handler;
   deploy?: deployment.handler;
   evaluate?: testing.handler;
-  auth?: (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => Promise<void>;
+  auth?: (ctx: hono.Context, next: hono.Next) => Promise<void>;
 };
 
 export interface Options {
-  app?: express.Application;
+  app?: hono.Hono;
   authOnRetrieve?: boolean;
   enableTesting?: boolean;
 }
@@ -43,8 +40,7 @@ const createContext = (settings: Partial<Settings>) => {
     evaluate: testing.factory(settings.test ?? DEFAULTS.test),
     user: settings.user
       ? settings.user
-      : (_req: express.Request) =>
-          Promise.resolve(settings.userId ?? "default"),
+      : (_ctx: hono.Context) => Promise.resolve(settings.userId ?? "default"),
   };
   return _settings;
 };
@@ -68,16 +64,16 @@ const createRequestContext = (context: Settings) => {
 export function fleet(
   settings: Partial<Settings> = DEFAULTS,
   {
-    app = express(),
+    app = new hono.Hono(),
     authOnRetrieve = false,
     enableTesting = true,
   }: Options = {}
 ): {
-  app: express.Application;
-  launch: (port: number) => Server;
+  app: hono.Hono;
+  launch: (port: number) => ServerType;
   ship: (
     agents: CreateAgentRoute["request"][]
-  ) => Promise<{ launch: (port?: number) => Server }>;
+  ) => Promise<{ launch: (port?: number) => ServerType }>;
 } {
   const context = createContext(settings);
   const {
@@ -94,9 +90,9 @@ export function fleet(
     set,
   } = context;
 
-  const router = express.Router();
-  router.use(express.json());
-
+  const router = new hono.Hono();
+  // router.use(hono.json());
+  router.onError(errorHandler);
   if (auth) {
     router.use(testPath, auth);
     router.use(deploymentPath, auth);
@@ -109,86 +105,62 @@ export function fleet(
   if (enableTesting === true && evaluate !== undefined) {
     router.post(
       testPath,
-      async (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) =>
+      async (ctx: hono.Context, next: hono.Next) =>
         await testing.request({
-          request: req,
-          response: res,
+          ctx,
           next,
           context: createRequestContext(context),
           handler: evaluate,
           user,
-        }),
-      sdk.errorHandler
+        })
     );
   }
 
   router.post(
     deploymentPath,
-    async (
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) =>
+    async (ctx: hono.Context, next: hono.Next) =>
       await deployment.request({
-        request: req,
-        response: res,
+        ctx,
         next,
         context: createRequestContext(context),
         handler: deploy,
         user,
       })
   );
+
   router.use(
-    `${agentPath}/:${AGENT_FIELD_NAME}`,
-    async (
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) =>
+    `${agentPath}/:${AGENT_FIELD_NAME}/*`,
+    async (ctx: hono.Context, next: hono.Next) =>
       await agent.request({
-        request: req,
-        response: res,
+        ctx,
         next,
         context: createRequestContext(context),
         handler: retrieve,
         user,
-      }),
-    sdk.errorHandler
+      })
   );
 
   router.use(
-    `${fallbackPath}/:${AGENT_FIELD_NAME}`,
-    async (
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) =>
+    `${fallbackPath}/:${AGENT_FIELD_NAME}/*`,
+    async (ctx: hono.Context, next: hono.Next) =>
       await agent.request({
-        request: req,
-        response: res,
+        ctx,
         next,
         context: createRequestContext(context),
         handler: retrieve,
         user,
-      }),
-    sdk.errorHandler
+      })
   );
 
-  app.use(basePath, router);
+  app.route(basePath, router);
 
-  const launch = (port: number = 3000): Server => {
-    return app.listen(port, () => {
-      sdk.logger.info(`Fleet server running on http://localhost:${port}`);
-    });
+  const launch = (port: number = 3000): ServerType => {
+    return serve({ fetch: app.fetch, port });
   };
 
   const ship = async (
     agents: CreateAgentRoute["request"][]
-  ): Promise<{ launch: (port?: number) => Server }> => {
+  ): Promise<{ launch: (port?: number) => ServerType }> => {
     for (const agent of agents) {
       const response = await set(agent, context);
       if (response.success) {

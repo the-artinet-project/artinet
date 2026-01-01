@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { RequestAgentRoute, TestAgentRoute } from "./routes/index.js";
 import { CreateAgentRoute } from "./routes/create/index.js";
 

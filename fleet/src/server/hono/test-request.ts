@@ -4,7 +4,7 @@
  */
 
 import * as sdk from "@artinet/sdk";
-import express from "express";
+import * as hono from "hono";
 import {
   TestAgent,
   TestAgentRoute,
@@ -16,23 +16,23 @@ import { handleJSONRPCResponse } from "./rpc.js";
 import { generateRequestId } from "./utils.js";
 
 export type handler = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  ctx: hono.Context,
+  next: hono.Next,
   context: TestAgentRoute["context"],
   test?: TestAgentRoute["implementation"]
 ) => Promise<void>;
 
 export async function handle(
-  req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
+  ctx: hono.Context,
+  _next: hono.Next,
   context: TestAgentRoute["context"],
   test: TestAgentRoute["implementation"] = TestAgent
 ): Promise<void> {
+  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+  const req = sdk.safeParse(await ctx.req.text());
   let parsed: Omit<TestRequest, "method" | "params"> = await sdk.validateSchema(
     TestRequestSchema,
-    req?.body ?? {}
+    req
   );
 
   let id = parsed.id ?? uuidv4();
@@ -45,18 +45,17 @@ export async function handle(
 
   const response: TestAgentRoute["response"] = await test(request, context);
 
-  await handleJSONRPCResponse(res, String(id), request.method, response);
+  await handleJSONRPCResponse(ctx, String(id), request.method, response);
 }
 
 export const factory =
   (test: TestAgentRoute["implementation"] = TestAgent): handler =>
   async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
+    ctx: hono.Context,
+    next: hono.Next,
     context: TestAgentRoute["context"]
   ) =>
-    await handle(req, res, next, context, test);
+    await handle(ctx, next, context, test);
 
 const MAX_TEST_ID_ATTEMPTS = 10;
 const getTestId = async (
@@ -82,27 +81,29 @@ const getTestId = async (
 };
 
 export interface Params {
-  request: express.Request;
-  response: express.Response;
-  next: express.NextFunction;
+  ctx: hono.Context;
+  next: hono.Next;
   context: Omit<TestAgentRoute["context"], "agentId">;
   handler: handler;
-  user: (request: express.Request) => Promise<string>;
+  user: (ctx: hono.Context) => Promise<string>;
 }
 
 export async function request({
-  request: req,
-  response: res,
+  ctx,
   next,
   context,
   handler = handle,
   user,
-}: Params): Promise<void> {
+}: Params): Promise<hono.Context["res"]> {
+  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+  const reqId =
+    ctx.req.header("x-request-id") ?? sdk.safeParse(await ctx.req.text())?.id;
   const requestContext: TestAgentRoute["context"] = {
     ...context,
     agentId: await getTestId(context),
-    requestId: generateRequestId(context, req),
-    userId: await user?.(req),
+    requestId: generateRequestId(context, reqId),
+    userId: await user?.(ctx),
   };
-  return await handler(req, res, next, requestContext);
+  await handler(ctx, next, requestContext);
+  return ctx.res;
 }

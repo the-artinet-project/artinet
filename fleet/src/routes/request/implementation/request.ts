@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AgentConfiguration, AgentConfigurationSchema } from "agent-def";
 import * as sdk from "@artinet/sdk";
 import { RequestAgentRoute } from "../types/definitions.js";

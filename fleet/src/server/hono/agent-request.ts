@@ -4,7 +4,7 @@
  */
 
 import { INVALID_REQUEST } from "@artinet/sdk";
-import express from "express";
+import * as hono from "hono";
 import {
   RequestAgent,
   RequestAgentRoute,
@@ -17,26 +17,29 @@ import { generateRequestId } from "./utils.js";
 export const AGENT_FIELD_NAME = "agentId";
 
 export type handler = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  ctx: hono.Context,
+  next: hono.Next,
   context: RequestContext,
   request?: RequestAgentRoute["implementation"]
 ) => Promise<void>;
 
 export async function handle(
-  req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
+  ctx: hono.Context,
+  _next: hono.Next,
   context: RequestContext,
   request: RequestAgentRoute["implementation"] = RequestAgent
 ): Promise<void> {
-  const requestId: string = generateRequestId(context, req);
+  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+  const body = sdk.safeParse(await ctx.req.text());
+  const requestId: string = generateRequestId(
+    context,
+    ctx.req.header("x-request-id") ?? body?.id
+  );
   let parsed: sdk.A2A.A2ARequest;
 
   if (
-    req?.path?.endsWith("agent-card.json") ||
-    req?.path?.endsWith("agent.json")
+    ctx.req.path.endsWith("agent-card.json") ||
+    ctx.req.path.endsWith("agent.json")
   ) {
     parsed = {
       jsonrpc: "2.0",
@@ -45,10 +48,7 @@ export async function handle(
       params: null,
     } as unknown as sdk.A2A.A2ARequest;
   } else {
-    parsed = await sdk.validateSchema(
-      sdk.A2A.A2ARequestSchema,
-      req?.body ?? {}
-    );
+    parsed = await sdk.validateSchema(sdk.A2A.A2ARequestSchema, body ?? {});
   }
 
   const params: sdk.A2A.RequestParam = await sdk.validateSchema(
@@ -72,18 +72,13 @@ export async function handle(
       2
     )}`
   );
-  await handleJSONRPCResponse(res, requestId, parsed.method, response);
+  await handleJSONRPCResponse(ctx, requestId, parsed.method, response);
 }
 
 export const factory =
   (request: RequestAgentRoute["implementation"] = RequestAgent): handler =>
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-    context: RequestContext
-  ) =>
-    await handle(req, res, next, context, request);
+  async (ctx: hono.Context, next: hono.Next, context: RequestContext) =>
+    await handle(ctx, next, context, request);
 
 /**
  * Handler utilities for agent HTTP requests.
@@ -98,34 +93,34 @@ export const factory =
  */
 
 export interface Params {
-  request: express.Request;
-  response: express.Response;
-  next: express.NextFunction;
+  ctx: hono.Context;
+  next: hono.Next;
   context: Omit<RequestContext, "agentId">;
   handler: handler;
-  user: (request: express.Request) => Promise<string>;
+  user: (ctx: hono.Context) => Promise<string>;
 }
 
 export async function request({
-  request: req,
-  response: res,
+  ctx,
   next,
   context,
   handler = handle,
   user,
 }: Params): Promise<void> {
-  const agentId: string = req?.params?.[AGENT_FIELD_NAME];
+  const agentId: string = ctx.req.param(AGENT_FIELD_NAME);
   if (!agentId) {
-    return next(
-      INVALID_REQUEST({ message: `${AGENT_FIELD_NAME} is required` })
-    );
+    throw INVALID_REQUEST({ message: `${AGENT_FIELD_NAME} is required` });
   }
+  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+  const reqId =
+    ctx.req.header("x-request-id") ?? sdk.safeParse(await ctx.req.text())?.id;
+
   const requestContext: RequestContext = {
     ...context,
     agentId,
-    requestId: generateRequestId(context, req),
-    userId: await user?.(req),
+    requestId: await generateRequestId(context, reqId),
+    userId: await user?.(ctx),
   };
 
-  await handler(req, res, next, requestContext);
+  await handler(ctx, next, requestContext);
 }

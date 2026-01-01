@@ -1,3 +1,8 @@
+/**
+ * Copyright 2025 The Artinet Project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CreateAgentRoute } from "./routes/create/index.js";
 import * as sdk from "@artinet/sdk";
 import * as armada from "@artinet/armada";
@@ -11,7 +16,7 @@ export async function ship<T extends CreateAgentRoute["request"]>(
     armada.CreateAgentRequestSchema,
     request
   );
-  sdk.logger.warn(`deployAgent request: ${JSON.stringify(requestBody)}`);
+  sdk.logger.debug(`deployAgent request:`, { requestBody });
   const response = await fetch(`${fleetUrl}/deploy`, {
     method: "POST",
     headers: {
@@ -21,6 +26,6 @@ export async function ship<T extends CreateAgentRoute["request"]>(
   });
   return await sdk.validateSchema(
     API.CreateAgentResponseSchema,
-    response.json()
+    await response.json()
   );
 }
