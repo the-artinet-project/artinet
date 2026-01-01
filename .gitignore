@@ -1,5 +1,6 @@
 *
 !.gitignore
+!README.md
 !agent-def
 !agent-def/**
 !ask
@@ -8,6 +9,8 @@
 !create-agent/**
 !easy
 !easy/**
+!fleet
+!fleet/**
 !loader
 !loader/**
 !mcp
@@ -17,6 +20,8 @@
 !relay
 !relay/**
 !types
+!types/**
 !sdk
-!fleet
-!fleet/**
+!sdk/**
+!symphony
+!symphony/**

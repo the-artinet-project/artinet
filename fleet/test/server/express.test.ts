@@ -583,7 +583,7 @@ describe("Express Server", () => {
         const mockTest: TestAgentRoute["implementation"] = jest.fn(() =>
           Promise.resolve({
             type: "success" as const,
-            result: { kind: "task", id: "test-task-1" },
+            result: { kind: "task" as const, id: "test-task-1" },
           })
         );
 
@@ -694,7 +694,7 @@ describe("Express Server", () => {
         invoke: jest.fn(),
       };
 
-      const app = fleet(settings, {});
+      const { app } = fleet(settings, {});
 
       expect(app).toBeDefined();
       expect(typeof app.use).toBe("function");
@@ -713,7 +713,7 @@ describe("Express Server", () => {
         invoke: jest.fn(),
       };
 
-      const app = fleet(settings, { app: existingApp });
+      const { app } = fleet(settings, { app: existingApp });
 
       expect(app).toBe(existingApp);
     });
@@ -734,7 +734,7 @@ describe("Express Server", () => {
         invoke: jest.fn(),
       };
 
-      const app = fleet(settings, { authOnRetrieve: true });
+      const { app } = fleet(settings, { authOnRetrieve: true });
 
       expect(app).toBeDefined();
     });
@@ -753,7 +753,7 @@ describe("Express Server", () => {
         invoke: jest.fn(),
       };
 
-      const app = fleet(settings, { enableTesting: false });
+      const { app } = fleet(settings, { enableTesting: false });
 
       expect(app).toBeDefined();
     });
@@ -774,7 +774,7 @@ describe("Express Server", () => {
         invoke: jest.fn(),
       };
 
-      const app = fleet(settings, {});
+      const { app } = fleet(settings, {});
 
       expect(app).toBeDefined();
     });
@@ -799,7 +799,7 @@ describe("Express Server", () => {
         Promise.resolve({ agentId: "new-agent" })
       );
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: mockGet,
           set: mockSet,
@@ -820,7 +820,7 @@ describe("Express Server", () => {
         Promise.resolve({ agentId: "deployed-agent-123" })
       );
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: jest.fn(),
           set: mockSet,
@@ -858,7 +858,7 @@ describe("Express Server", () => {
     it("should deploy an agent and retrieve its card", async () => {
       const storage = new InMemoryStore();
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: RequestAgent,
           set: CreateAgent,
@@ -907,7 +907,7 @@ describe("Express Server", () => {
     it("should return error for non-existent agent", async () => {
       const storage = new InMemoryStore();
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: undefined as any,
           set: undefined as any,
@@ -939,7 +939,7 @@ describe("Express Server", () => {
         })
       );
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: mockGet,
           set: jest.fn() as any,
@@ -967,15 +967,15 @@ describe("Express Server", () => {
         Promise.resolve({
           type: "success" as const,
           result: {
-            kind: "task",
+            kind: "task" as const,
             id: "task-1",
             contextId: "ctx-1",
-            status: { state: "completed" },
+            status: { state: "completed" as const },
           },
         })
       );
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: mockGet,
           set: jest.fn() as any,
@@ -1011,7 +1011,7 @@ describe("Express Server", () => {
     it("should return JSON-RPC error for handler errors", async () => {
       const storage = new InMemoryStore();
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: RequestAgent, // Uses real implementation which will fail without agent in storage
           set: jest.fn() as any,
@@ -1034,7 +1034,7 @@ describe("Express Server", () => {
     it.skip("should deploy an agent and send a message to it", async () => {
       const storage = new InMemoryStore();
 
-      app = fleet(
+      const { app } = fleet(
         {
           get: RequestAgent,
           set: CreateAgent,

@@ -13,9 +13,9 @@
       "default": "./dist/index.js"
     },
     "./express": {
-      "types": "./dist/server/express/index.d.ts",
-      "import": "./dist/server/express/index.js",
-      "default": "./dist/server/express/index.js"
+      "types": "./dist/server/express/fleet.d.ts",
+      "import": "./dist/server/express/fleet.js",
+      "default": "./dist/server/express/fleet.js"
     }
   },
   "scripts": {

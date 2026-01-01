@@ -1,10 +1,14 @@
-import { errorHandler as rpcErrorHandler } from "@artinet/sdk";
+import { Server } from "http";
+import * as sdk from "@artinet/sdk";
 import express from "express";
+
+import { CreateAgentRoute } from "../../routes/create/index.js";
+import { Settings as FleetSettings } from "../../settings.js";
+import { DEFAULTS } from "../../default.js";
+
 import * as agent from "./agent-request.js";
 import * as testing from "./test-request.js";
 import * as deployment from "./deploy-request.js";
-import { Settings as FleetSettings } from "../../settings.js";
-import { DEFAULTS } from "../../default.js";
 import { AGENT_FIELD_NAME } from "./agent-request.js";
 
 export type Settings = FleetSettings & {
@@ -63,7 +67,13 @@ export function fleet(
     authOnRetrieve = false,
     enableTesting = true,
   }: Options = {}
-): express.Application {
+): {
+  app: express.Application;
+  launch: (port: number) => Server;
+  ship: (
+    agents: CreateAgentRoute["request"][]
+  ) => Promise<{ launch: (port?: number) => Server }>;
+} {
   const context = createContext(settings);
   const {
     basePath,
@@ -76,6 +86,7 @@ export function fleet(
     evaluate,
     deploy,
     retrieve,
+    set,
   } = context;
 
   const router = express.Router();
@@ -106,7 +117,7 @@ export function fleet(
           handler: evaluate,
           user,
         }),
-      rpcErrorHandler
+      sdk.errorHandler
     );
   }
 
@@ -141,7 +152,7 @@ export function fleet(
         handler: retrieve,
         user,
       }),
-    rpcErrorHandler
+    sdk.errorHandler
   );
 
   router.use(
@@ -159,9 +170,45 @@ export function fleet(
         handler: retrieve,
         user,
       }),
-    rpcErrorHandler
+    sdk.errorHandler
   );
 
   app.use(basePath, router);
-  return app;
+
+  const launch = (port: number = 3000): Server => {
+    return app.listen(port, () => {
+      sdk.logger.info(`Fleet server running on http://localhost:${port}`);
+    });
+  };
+
+  const ship = async (
+    agents: CreateAgentRoute["request"][]
+  ): Promise<{ launch: (port?: number) => Server }> => {
+    for (const agent of agents) {
+      const response = await set(agent, context);
+      if (response.success) {
+        sdk.logger.info(`Agent shipped: ${response.agentId}`);
+      }
+    }
+    return { launch };
+  };
+
+  return { app, launch, ship };
 }
+
+// const swarm = await fleet().ship([
+//   {
+//     config: {
+//       uri: "my-agent",
+//       name: "my-agent",
+//       description: "A helpful assistant",
+//       modelId: "gpt-4",
+//       instructions: "You are a helpful assistant.",
+//       version: "1.0.0",
+//       skills: [],
+//       capabilities: {},
+//       services: [],
+//     },
+//   },
+// ]);
+// swarm.launch(3000);
