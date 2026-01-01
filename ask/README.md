@@ -1,10 +1,13 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/ask.svg)](https://www.npmjs.com/package/@artinet/ask)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/ask.svg)](https://www.npmjs.com/package/@artinet/ask)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/ask/badge.svg)](https://snyk.io/test/npm/@artinet/ask)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/chat?style=social)](https://github.com/the-artinet-project/chat/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/ask"><img src="https://img.shields.io/npm/v/@artinet/ask?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/ask"><img src="https://img.shields.io/npm/dt/@artinet/ask?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/ask"><img src="https://snyk.io/test/npm/@artinet/ask/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
+
+<h1 align="center"><em>easy a2a</em></h1>
 
 # @artinet/ask
 
