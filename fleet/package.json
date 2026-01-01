@@ -1,6 +1,6 @@
 {
   "name": "@artinet/fleet",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-canary.4",
   "description": "A an agentic orchestration server for on premise deployment.",
   "type": "module",
   "main": "./dist/index.js",

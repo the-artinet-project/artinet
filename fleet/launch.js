@@ -68,19 +68,17 @@ process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at:", { promise, reason });
 });
 
-fleet({
-  storage: new SQLiteStore(db),
-  user: async () => USER,
-  defaultInstructions: DEFAULT_INSTRUCTIONS,
-  inferenceProviderUrl: INFERENCE_PROVIDER_URL,
-  basePath: BASE_PATH,
-})
-  .launch(PORT)
-  .then(() => {
-    logger.info(`Fleet running on port ${PORT}`);
-  })
-  .catch((error) => {
-    logger.error("Failed to start fleet:", error);
-    sqlite.close();
-    process.exit(1);
-  });
+try {
+  fleet({
+    storage: new SQLiteStore(db),
+    user: async () => USER,
+    defaultInstructions: DEFAULT_INSTRUCTIONS,
+    inferenceProviderUrl: INFERENCE_PROVIDER_URL,
+    basePath: BASE_PATH,
+  }).launch(PORT);
+  logger.info(`Fleet running on port ${PORT}`);
+} catch (error) {
+  logger.error("Failed to start fleet:", error);
+  sqlite.close();
+  process.exit(1);
+}

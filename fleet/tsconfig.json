@@ -11,7 +11,7 @@
     "declaration": true,
     "noImplicitAny": true,
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "./src",
     "lib": ["ES2022", "DOM"],
     "isolatedModules": true,
     "noUnusedLocals": true,
@@ -20,20 +20,18 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true
   },
-  "entry": "src/index.ts",
+  "entry": "./src/index.ts",
   "include": [
-    "src/routes/**/*",
-    "src/server/**/*",
-    "src/types/**/*",
-    "src/index.ts",
-    "archive/forward-request.ts",
-    "src/settings.ts"
+    "./src/routes/**/*",
+    "./src/server/**/*",
+    "./src/types/**/*",
+    "./src/index.ts",
+    "./src/settings.ts"
   ],
   "exclude": [
     "archive/private/**/*",
     "archive/**/*",
     "node_modules",
-    "base/**/*",
     "test",
     "dist",
     "examples"
