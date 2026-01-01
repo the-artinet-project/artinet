@@ -10,12 +10,16 @@ on:
       - "mcp/servers/**"
       - "orc8/**"
       - "fleet/**"
+      - "loader/**"
+      - "relay/**"
   pull_request:
     branches: ["main"]
     paths:
       - "mcp/servers/**"
       - "orc8/**"
       - "fleet/**"
+      - "loader/**"
+      - "relay/**"
 
 jobs:
   detect-changes:
@@ -36,6 +40,10 @@ jobs:
               - 'orc8/**'
             fleet:
               - 'fleet/**'
+            loader:
+              - 'loader/**'
+            relay:
+              - 'relay/**'
   build:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.packages != '[]' }}
