@@ -8,7 +8,8 @@ import { AgentConfiguration } from "agent-def";
 import { eq, like, or } from "drizzle-orm";
 import { BaseSQLiteDatabase, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-const CREATE_AGENTS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS fleet_agents (agentUri TEXT PRIMARY KEY, agentId TEXT NOT NULL, name TEXT NOT NULL, prompt TEXT NOT NULL, modelId TEXT NOT NULL, agents TEXT NOT NULL, version TEXT NOT NULL, updatedAt TEXT NOT NULL, status TEXT NOT NULL, visibility TEXT NOT NULL, owner TEXT NOT NULL, metadata TEXT NOT NULL)`;
+export const TABLE_NAME = "fleet_agents";
+const CREATE_AGENTS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (agentUri TEXT PRIMARY KEY, agentId TEXT NOT NULL, name TEXT NOT NULL, prompt TEXT NOT NULL, modelId TEXT NOT NULL, agents TEXT NOT NULL, version TEXT NOT NULL, updatedAt TEXT NOT NULL, status TEXT NOT NULL, visibility TEXT NOT NULL, owner TEXT NOT NULL, metadata TEXT NOT NULL)`;
 
 export const createAgentsTable = async (
   db: BaseSQLiteDatabase<`sync` | `async`, any, AgentsTable>
@@ -16,7 +17,7 @@ export const createAgentsTable = async (
   await db.run(CREATE_AGENTS_TABLE_SQL);
 };
 
-export const agentsTable = sqliteTable("fleet_agents", {
+export const agentsTable = sqliteTable(TABLE_NAME, {
   agentUri: text().primaryKey(),
   /**
    * @deprecated Use agentUri instead

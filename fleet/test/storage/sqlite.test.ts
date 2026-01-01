@@ -5,6 +5,7 @@ import {
   AgentsTable,
   SQLiteStore,
   createAgentsTable,
+  TABLE_NAME,
 } from "../../src/storage/sqlite.js";
 import { createValidStoredAgent } from "../mock.js";
 const sqlite = new Database(":memory:");
@@ -19,7 +20,7 @@ describe("SQLiteStore", () => {
     store = new SQLiteStore(db);
   });
   afterEach(() => {
-    sqlite.exec(`DELETE FROM agents_table`);
+    sqlite.exec(`DELETE FROM ${TABLE_NAME}`);
   });
   afterAll(() => {
     sqlite.close();
