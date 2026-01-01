@@ -10,12 +10,10 @@ Deploy AI agents on any infrastructure.
 
 Fleet is a lightweight server framework for hosting [A2A Protocol](https://github.com/google-a2a/A2A) agents with built-in orchestration, tool integration (MCP), and Agent2Agent communication.
 
-> 🚧 **More servers coming soon** — Hono, Bun, and standalone adapters are on the roadmap.
-
 ## Installation
 
 ```bash
-npm install @artinet/fleet express openai @modelcontextprotocol/sdk @a2a-js/sdk
+npm install @artinet/fleet openai @modelcontextprotocol/sdk @a2a-js/sdk
 ```
 
 **Requirements:** Node.js ≥ 18.9.1
@@ -26,11 +24,31 @@ npm install @artinet/fleet express openai @modelcontextprotocol/sdk @a2a-js/sdk
 
 Set an `OPENAI_API_KEY` in you environment variables, then start your Server.
 
+**Express**:
+
+```bash
+npm install express
+```
+
 ```typescript
 import { fleet } from "@artinet/fleet/express";
 
 const { app } = fleet().launch(3000);
 ```
+
+**Hono**:
+
+```bash
+npm install hono
+```
+
+```typescript
+import { fleet } from "@artinet/fleet/hono";
+
+const { app } = fleet().launch(3000);
+```
+
+> 🚧 **More servers coming soon** — Bun adapters and edge support are on the roadmap.
 
 That's it. You now have:
 
