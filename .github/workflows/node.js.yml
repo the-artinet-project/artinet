@@ -1,0 +1,63 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "mcp/servers/**"
+      - "orc8/**"
+      - "fleet/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "mcp/servers/**"
+      - "orc8/**"
+      - "fleet/**"
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            mcp/servers/bash:
+              - 'mcp/servers/bash/**'
+            mcp/servers/relay:
+              - 'mcp/servers/relay/**'
+            orc8:
+              - 'orc8/**'
+            fleet:
+              - 'fleet/**'
+  build:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.packages != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "${{ matrix.package }}/package.json"
+      - run: npm install
+        working-directory: ./${{ matrix.package }}
+      - run: npm run build --if-present
+        working-directory: ./${{ matrix.package }}
+      - run: npm test
+        working-directory: ./${{ matrix.package }}
