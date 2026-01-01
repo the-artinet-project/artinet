@@ -1,12 +1,12 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/bash-mcp?color=black)](https://www.npmjs.com/package/@artinet/bash-mcp)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/bash-mcp?color=black)](https://www.npmjs.com/package/@artinet/bash-mcp)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-black.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/bash-mcp/badge.svg)](https://snyk.io/test/npm/@artinet/bash-mcp)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/mcp?style=social&color=black)](https://github.com/the-artinet-project/mcp/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/bash-mcp"><img src="https://img.shields.io/npm/v/@artinet/bash-mcp?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/bash-mcp"><img src="https://img.shields.io/npm/dt/@artinet/bash-mcp?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/bash-mcp"><img src="https://snyk.io/test/npm/@artinet/bash-mcp/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
 
-# Bash MCP Server
+<h1 align="center"><em>bash mcp</em></h1>
 
 A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for executing bash commands in a persistent shell session. This implementation is based on Anthropic's [BashTool20250124](https://docs.claude.com/en/docs/agents-and-tools/tool-use/bash-tool) and optimized for use with the `InMemoryTransport`.
 
