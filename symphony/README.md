@@ -1,12 +1,12 @@
-[![Website](https://img.shields.io/badge/website-artinet.io-black)](https://artinet.io/)
-[![npm version](https://img.shields.io/npm/v/@artinet/symphony.svg)](https://www.npmjs.com/package/@artinet/symphony)
-[![npm downloads](https://img.shields.io/npm/dt/@artinet/symphony.svg)](https://www.npmjs.com/package/@artinet/symphony)
-[![Apache License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/npm/@artinet/symphony/badge.svg)](https://snyk.io/test/npm/@artinet/symphony)
-[![GitHub stars](https://img.shields.io/github/stars/the-artinet-project/cli?style=social)](https://github.com/the-artinet-project/cli/stargazers)
-[![Discord](https://dcbadge.limes.pink/api/server/DaxzSchmmX?style=flat)](https://discord.gg/DaxzSchmmX)
+<p align="center">
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://www.npmjs.com/package/@artinet/symphony"><img src="https://img.shields.io/npm/v/@artinet/symphony?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/symphony"><img src="https://img.shields.io/npm/dt/@artinet/symphony?color=black" alt="Downloads"></a>
+<a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
+<a href="https://snyk.io/test/npm/@artinet/symphony"><img src="https://snyk.io/test/npm/@artinet/symphony/badge.svg" alt="Known Vulnerabilities"></a>
+</p>
 
-# Symphony
+<h1 align="center"><em>Symphony</em></h1>
 
 An _experimental_ interactive command-line interface that uses the Agent2Agent (A2A) & Model Context Protocols (MCP) to manage multi-agent systems.
 
