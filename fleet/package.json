@@ -67,7 +67,7 @@
     "@artinet/types": "^0.0.9-alpha.4",
     "@sindresorhus/slugify": "^3.0.0",
     "agent-def": "^0.0.2-alpha.1",
-    "orc8": "^0.0.20-alpha.3",
+    "orc8": "^0.0.20-beta.1",
     "zod": "^3.25"
   },
   "peerDependencies": {

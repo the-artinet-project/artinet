@@ -1,7 +1,7 @@
 <p align="center">
 <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
 <a href="https://www.npmjs.com/package/orc8"><img src="https://img.shields.io/npm/v/orc8?color=black" alt="Version"></a>
-<a href="https://www.npmjs.com/package/orc8"><img src="https://img.shields.io/npm/dt/@artinet/router?color=black" alt="Downloads"></a>
+<a href="https://www.npmjs.com/package/orc8"><img src="https://img.shields.io/npm/dt/orc8?color=black" alt="Downloads"></a>
 <a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
 <a href="https://snyk.io/test/npm/orc8"><img src="https://snyk.io/test/npm/orc8/badge.svg" alt="Known Vulnerabilities"></a>
 </p>
