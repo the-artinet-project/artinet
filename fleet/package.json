@@ -67,7 +67,7 @@
     "@artinet/types": "^0.0.9-alpha.4",
     "@sindresorhus/slugify": "^3.0.0",
     "agent-def": "^0.0.2-alpha.1",
-    "orc8": "^0.0.20-alpha.2",
+    "orc8": "^0.0.20-alpha.3",
     "zod": "^3.25"
   },
   "peerDependencies": {
@@ -77,7 +77,8 @@
     "express": "^5.2.1",
     "hono": "^4.11.3",
     "openai": "^6.15.0",
-    "pino": "^10.1.0"
+    "pino": "^10.1.0",
+    "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
     "@a2a-js/sdk": "^0.3.7",

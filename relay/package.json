@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@a2a-js/sdk": "^0.3.7",
+    "@types/cors": "^2.8.17",
     "@types/node": "^20.17.50",
     "@types/portscanner": "^2.1.4",
     "@types/express": "^5.0.1",

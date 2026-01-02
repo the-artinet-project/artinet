@@ -57,6 +57,7 @@
   "devDependencies": {
     "@types/node": "^20.17.50",
     "@types/portscanner": "^2.1.4",
+    "@types/cors": "^2.8.17",
     "eslint": "^9.25.1",
     "jest": "^29.7.0",
     "rimraf": "^5.0.5",

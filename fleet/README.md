@@ -16,21 +16,6 @@ Fleet is a lightweight server framework for hosting [A2A Protocol](https://githu
 npm install @artinet/fleet openai @modelcontextprotocol/sdk @a2a-js/sdk
 ```
 
-## Configuration
-
-Copy the example and fill in your values:
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-Run:
-
-```bash
-docker run --env-file .env -v fleet-data:/data artinet-fleet
-```
-
 **Requirements:** Node.js ≥ 18.9.1
 
 ## Quick Start
@@ -185,6 +170,76 @@ for await (const update of client.sendStreamingMessage("Tell me a story")) {
 }
 ```
 
+### SQLite Storage
+
+Set up a SQLite Database with [drizzle](https://www.npmjs.com/package/drizzle-orm):
+
+```bash
+npm install drizzle-orm better-sqlite3
+```
+
+```typescript
+import { SQLiteStore, AgentsTable } from "@artinet/fleet/sqlite";
+import { fleet } from "@artinet/fleet/hono";
+/*Use any drizzle compatible Database*/
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+
+const sqlite = new Database("fleet.db");
+const db = drizzle<AgentsTable>(sqlite);
+
+fleet({
+  storage: new SQLiteStore(db),
+}).launch(3000);
+```
+
+### Logging
+
+Settup a custom logger via the [@artinet/sdk](https://www.npmjs.com/package/@artinet/sdk):
+
+```bash
+npm install @artinet/sdk pino pino-pretty
+```
+
+```typescript
+import { configure } from "@artinet/sdk";
+import { configurePino } from "@artinet/sdk/pino";
+import pino from "pino";
+
+configure({
+  logger: configurePino(
+    pino({
+      level: "info",
+      transport: {
+        target: "pino-pretty",
+        options: { colorize: true },
+      },
+    })
+  ),
+});
+```
+
+## [Docker Configuration](https://github.com/the-artinet-project/artinet/blob/main/fleet/dockerfile)
+
+Build the docker image:
+
+```bash
+docker build -t artinet-fleet .
+```
+
+Copy the example and fill in your values:
+
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+Run:
+
+```bash
+docker run --env-file .env -v fleet-data:/data -p 3000:3000 -e PORT=3000 artinet-fleet
+```
+
 <!-- ## Custom Handlers
 
 ```typescript
@@ -223,17 +278,17 @@ const app = fleet(
 app.listen(3000);
 ``` -->
 
-## Configuration
+## Settings
 
-| Option                 | Type         | Default         | Description                                                                                                                     |
-| ---------------------- | ------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `storage`              | `IDataStore` | `InMemoryStore` | Agent storage backend (storage adapters coming soon)                                                                            |
-| `basePath`             | `string`     | `"/"`           | Base path for all routes                                                                                                        |
-| `agentPath`            | `string`     | `"/agentId"`    | Agent interaction path                                                                                                          |
-| `deploymentPath`       | `string`     | `"/deploy"`     | Deployment endpoint                                                                                                             |
-| `testPath`             | `string`     | `"/test"`       | Test endpoint                                                                                                                   |
-| `inferenceProviderUrl` | `string`     | `undefined`     | An OpenAI API compatible endpoint                                                                                               |
-| `load`                 | `function`   | `loadAgent`     | Returns an A2A Protocol compliant agent wrapped in the [`@artinet/sdk`](<(https://github.com/the-artinet-project/artinet-sdk)>) |
+| Option                 | Type         | Default                        | Description                                                                                                                     |
+| ---------------------- | ------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`              | `IDataStore` | `InMemoryStore`, `SQLiteStore` | Agent storage backend (storage adapters coming soon)                                                                            |
+| `basePath`             | `string`     | `"/"`                          | Base path for all routes                                                                                                        |
+| `agentPath`            | `string`     | `"/agentId"`                   | Agent interaction path                                                                                                          |
+| `deploymentPath`       | `string`     | `"/deploy"`                    | Deployment endpoint                                                                                                             |
+| `testPath`             | `string`     | `"/test"`                      | Test endpoint                                                                                                                   |
+| `inferenceProviderUrl` | `string`     | `undefined`                    | An OpenAI API compatible endpoint                                                                                               |
+| `load`                 | `function`   | `loadAgent`                    | Returns an A2A Protocol compliant agent wrapped in the [`@artinet/sdk`](<(https://github.com/the-artinet-project/artinet-sdk)>) |
 
 ## API Reference
 
@@ -242,7 +297,7 @@ app.listen(3000);
 | Method | Path                                       | Description          |
 | ------ | ------------------------------------------ | -------------------- |
 | POST   | `/deploy`                                  | Deploy a new agent   |
-| POST   | `/test`                                    | Test an agent        |
+| POST   | `/test`                                    | Test a new agent     |
 | GET    | `/agentId/:id/.well-known/agent-card.json` | Get agent card       |
 | POST   | `/agentId/:id`                             | JSON-RPC interaction |
 
@@ -261,14 +316,14 @@ app.listen(3000);
 ```
 
 @artinet/fleet
-├── /express # Express adapter (current)
-├── /hono # Coming soon
+├── /express # Express adapter
+├── /hono # Hono adapter
 └── /bun # Coming soon
 
 Depends on:
 ├── @artinet/armada # Core business logic
 ├── @artinet/sdk # A2A protocol client/server
-├── orc8 # Agent orchestration
+├── orc8 # Agent/Tool orchestration
 ├── agent-def # Standardized Agent Definitions
 ├── openai # OpenAI API Client
 └── @mcp # @modelcontextprotocol/sdk
