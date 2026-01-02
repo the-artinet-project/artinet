@@ -69,10 +69,12 @@
     "zod": "^3.25"
   },
   "peerDependencies": {
+    "@a2a-js/sdk": "^0.3.7",
     "@modelcontextprotocol/sdk": "^1.24.3",
     "openai": "^6.15.0"
   },
   "devDependencies": {
+    "@a2a-js/sdk": "^0.3.7",
     "@cfworker/json-schema": "^4.1.1",
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@modelcontextprotocol/server-everything": "^2025.9.25",

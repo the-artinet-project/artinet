@@ -13,7 +13,7 @@ Dynamic orchestration for A2A agents and MCP tools.
 ## Installation
 
 ```bash
-npm install orc8 @modelcontextprotocol/sdk openai
+npm install orc8 @modelcontextprotocol/sdk openai @a2a-js/sdk
 ```
 
 ## Quick Start

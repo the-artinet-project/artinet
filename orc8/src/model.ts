@@ -170,7 +170,7 @@ export class Model
    * Creates a new Model instance.
    * Use the static {@link Model.create} factory method for public instantiation.
    *
-   * @param modelId - The identifier for the underlying LLM model (default: "deepseek-r1")
+   * @param modelId - The identifier for the underlying LLM model (default: "openai/gpt-4o-mini")
    * @param abortSignal - Signal for cancelling in-flight operations
    * @param _provider - The API provider function for LLM communication
    * @param _data - Initial map of registered callable services
@@ -179,7 +179,7 @@ export class Model
    * @param _events - Event monitor for publishing updates and errors
    */
   protected constructor(
-    private readonly modelId: string = "deepseek-r1",
+    private readonly modelId: string = "openai/gpt-4o-mini",
     readonly abortSignal: AbortSignal = new AbortController().signal,
     protected _provider: util.APIProvider = artinetProvider,
     _data: Map<string, Callable.Agent | Callable.Tool> = new Map(),
@@ -551,7 +551,7 @@ export class Model
    */
   static create(
     params: CreateModelParams = {
-      modelId: "deepseek-r1",
+      modelId: "openai/gpt-4o-mini",
       provider: artinetProvider,
       services: [],
       abortSignal: new AbortController().signal,
