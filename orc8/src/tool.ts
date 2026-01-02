@@ -244,7 +244,7 @@ export class Tool
     });
     // Monitor the error stream for updates during initialization
     const handle = (data: Buffer) =>
-      logger.warn(`[${uri}]: tool update: `, data.toString());
+      logger.info(`[${uri}]: tool update: `, data.toString());
 
     (transport as StdioClientTransport)?.stderr?.on("data", handle);
     const client = await Utils.initClient(transport, uri);

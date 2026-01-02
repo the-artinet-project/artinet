@@ -112,7 +112,7 @@ function getImplementation(client: MCPClient): MCP.Implementation {
 function getInstructions(client: MCPClient): string | undefined {
   const instructions: string | undefined = client.getInstructions();
   if (!instructions) {
-    logger.warn("getInstructions: Server instructions not found");
+    logger.info("getInstructions: Server instructions not found");
   }
   return instructions;
 }
