@@ -286,6 +286,7 @@ export class Model
     if (this._addPromise) {
       await this._addPromise;
     }
+    request.options = await util.options(this.values, request.options);
 
     const parentTaskId: string = options?.parentTaskId ?? uuidv4();
     const abortSignal: AbortSignal = options?.abortSignal ?? this.abortSignal;
@@ -364,8 +365,9 @@ export class Model
       const request: API.ConnectRequest = util.request(
         self.modelId,
         messages,
-        await util.options(self.values)
+        {}
       );
+
       const response: API.ConnectResponse = await self.execute({
         request,
         options: {
@@ -374,6 +376,7 @@ export class Model
           callback: util.bindResponses(context).bind(context),
         },
       });
+
       yield sdk.describe.update.completed({
         taskId: context.taskId,
         contextId: context.contextId,
@@ -385,7 +388,7 @@ export class Model
       });
 
       return;
-    };
+    }.bind(this);
   }
 
   /**
@@ -453,8 +456,8 @@ export class Model
     }
     this.addPromise(
       this._add(service, uri)
-        .then((callable) => {
-          super.set(callable.uri, callable);
+        .then(async (callable) => {
+          await super.set(callable.uri, callable);
         })
         .catch((error) => {
           logger.error(
@@ -507,7 +510,7 @@ export class Model
     const request: API.ConnectRequest = util.request(
       this.modelId,
       messages,
-      await util.options(this.values, options)
+      await util.options([], options)
     );
 
     const response: API.ConnectResponse = await this.execute({

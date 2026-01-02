@@ -17,10 +17,10 @@ const DEFAULT_INSTRUCTIONS =
 const INFERENCE_PROVIDER_URL = process.env.INFERENCE_PROVIDER_URL || undefined;
 const BASE_PATH = process.env.BASE_PATH || "/";
 const DB_PATH = process.env.DB_PATH || "fleet.db";
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const USER = process.env.USER || "default";
-
 const LOG_LEVEL = process.env.LOG_LEVEL || "warn";
+
 const baseLogger = configurePino(
   pinoCaller(
     pino({

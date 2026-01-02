@@ -150,7 +150,6 @@ export async function options(
   callables: (Callable.Agent | Callable.Tool)[],
   options?: API.ConnectOptions
 ): Promise<API.ConnectOptions> {
-  //todo convert to async
   const targets = await Promise.all(
     callables.map(async (callable) => await callable?.getTarget?.())
   );

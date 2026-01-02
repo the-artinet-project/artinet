@@ -1,6 +1,6 @@
 {
   "name": "@artinet/fleet",
-  "version": "0.1.0-canary.4",
+  "version": "0.1.0-canary.6",
   "description": "A an agentic orchestration server for on premise deployment.",
   "type": "module",
   "main": "./dist/index.js",
@@ -63,7 +63,7 @@
   "rootDir": ".",
   "dependencies": {
     "@artinet/armada": "^0.1.0-alpha.1",
-    "@artinet/sdk": "^0.6.0-preview.2",
+    "@artinet/sdk": "^0.6.0-preview.3",
     "@artinet/types": "^0.0.9-alpha.4",
     "@sindresorhus/slugify": "^3.0.0",
     "agent-def": "^0.0.2-alpha.1",

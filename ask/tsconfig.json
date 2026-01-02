@@ -6,6 +6,7 @@
     "strict": true,
     "rootDir": ".",
     "declaration": true,
+    "skipLibCheck": true,
     "declarationDir": "./dist",
     "outDir": "./dist",
     "lib": ["ES2022", "DOM"],

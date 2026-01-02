@@ -1,29 +1,21 @@
-import {
-  A2AClient,
-  AgentCard,
-  Message,
-  TaskStatusUpdateEvent,
-  Task,
-  TaskState,
-  getContent,
-  UpdateEvent,
-  Kind,
-} from "@artinet/sdk";
+import * as sdk from "@artinet/sdk";
 import chalk from "chalk";
 import prompts from "prompts";
 import { v4 as uuidv4 } from "uuid";
 
-function getTaskState(update: UpdateEvent): TaskState | undefined {
-  const state: TaskState | undefined =
-    (update as TaskStatusUpdateEvent)?.status?.state ??
-    (update as Task)?.status?.state ??
+// sdk.applyDefaults();
+
+function getTaskState(update: sdk.A2A.Update): sdk.A2A.TaskState | undefined {
+  const state: sdk.A2A.TaskState | undefined =
+    (update as sdk.A2A.TaskStatusUpdateEvent)?.status?.state ??
+    (update as sdk.A2A.Task)?.status?.state ??
     undefined;
   return state;
 }
 
 function createBanner(
-  kind: Kind,
-  state: TaskState | undefined,
+  kind: sdk.A2A.Kind,
+  state: sdk.A2A.TaskState | undefined,
   verbose: boolean = false
 ): string {
   let banner = "";
@@ -41,31 +33,31 @@ function createBanner(
 
   if (state) {
     switch (state) {
-      case TaskState.canceled:
+      case sdk.A2A.TaskState.canceled:
         banner = chalk.bgYellowBright(`${state.toUpperCase()}`);
         break;
-      case TaskState.failed:
+      case sdk.A2A.TaskState.failed:
         banner = chalk.bgRed(`${state.toUpperCase()}`);
         break;
-      case TaskState.rejected:
+      case sdk.A2A.TaskState.rejected:
         banner = chalk.bgRed(`${state.toUpperCase()}`);
         break;
-      case TaskState["auth-required"]:
+      case sdk.A2A.TaskState["auth-required"]:
         banner = chalk.bgMagenta(`${state.toUpperCase()}`);
         break;
-      case TaskState.unknown:
+      case sdk.A2A.TaskState.unknown:
         banner = chalk.bgRedBright(`${state.toUpperCase()}`);
         break;
-      case TaskState.submitted:
+      case sdk.A2A.TaskState.submitted:
         banner = chalk.bgYellow(chalk.black(`${state.toUpperCase()}`));
         break;
-      case TaskState["input-required"]:
+      case sdk.A2A.TaskState["input-required"]:
         banner = chalk.bgMagenta(chalk.black(`${state.toUpperCase()}`));
         break;
-      case TaskState.working:
+      case sdk.A2A.TaskState.working:
         banner = chalk.bgBlueBright(`${state.toUpperCase()}`);
         break;
-      case TaskState.completed:
+      case sdk.A2A.TaskState.completed:
         banner = chalk.bgGreen(`${state.toUpperCase()}`);
         break;
     }
@@ -77,15 +69,15 @@ function createBanner(
 }
 
 async function sendMessage(
-  client: A2AClient,
+  client: sdk.A2AClient,
   message: string,
   taskId: string,
   verbose: boolean = false
 ) {
-  const msg: Message = {
+  const msg: sdk.A2A.Message = {
     messageId: uuidv4(),
     taskId: taskId,
-    kind: "message",
+    kind: sdk.A2A.Kind.message,
     role: "user",
     parts: [{ text: message, kind: "text" }],
   };
@@ -96,9 +88,10 @@ async function sendMessage(
     );
   }
 
-  const agentResponseSource: Message | Task | null = await client.sendMessage({
-    message: msg,
-  });
+  const agentResponseSource: sdk.A2A.Message | sdk.A2A.Task | null =
+    await client.sendMessage({
+      message: msg,
+    });
 
   if (!agentResponseSource) {
     console.error(chalk.red("No response from agent"));
@@ -111,13 +104,15 @@ async function sendMessage(
     verbose
   );
 
-  console.log(banner + chalk.gray("Agent: ") + getContent(agentResponseSource));
+  console.log(
+    banner + chalk.gray("Agent: ") + sdk.getContent(agentResponseSource)
+  );
   console.log();
 }
 
 export async function chat(
-  agentCard: AgentCard,
-  client: A2AClient,
+  agentCard: sdk.A2A.AgentCard,
+  client: sdk.A2AClient,
   taskId: string = uuidv4(),
   verbose: boolean = false,
   message: string | undefined = undefined
@@ -159,10 +154,10 @@ export async function chat(
       break;
     }
 
-    const msg: Message = {
+    const msg: sdk.A2A.Message = {
       messageId: uuidv4(),
       taskId: taskId,
-      kind: "message",
+      kind: sdk.A2A.Kind.message,
       role: "user",
       parts: [{ text: response.message, kind: "text" }],
     };
@@ -173,14 +168,16 @@ export async function chat(
       );
     }
     try {
-      const agentResponseSource = client.sendStreamingMessage({ message: msg });
+      const agentResponseSource = client.sendStreamingMessage({
+        message: msg,
+      });
       for await (const update of agentResponseSource) {
         const banner = createBanner(update.kind, getTaskState(update), verbose);
 
         if ((update.kind === "message" || update.kind === "task") && !verbose) {
           continue;
         }
-        const response: string = getContent(update) ?? "No response";
+        const response: string = sdk.getContent(update) ?? "No response";
         if (response) {
           console.log(banner + chalk.gray("Agent: ") + response);
         } else if (verbose && banner.length > 0) {

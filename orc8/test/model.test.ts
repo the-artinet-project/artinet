@@ -7,7 +7,12 @@ import { API } from "@artinet/types";
 import { Model } from "../src/model.js";
 import { Monitor } from "../src/monitor.js";
 import { echoAgentEngine, testAgentCard } from "./agents/echo-agent.js";
-import { createMockAgentRequest, createMockProvider } from "./utils.js";
+import {
+  createMockAgentRequest,
+  createMockProvider,
+  MOCK_CONNECT_RESPONSE,
+} from "./utils.js";
+// import * as util from "../src/model-util.js";
 import * as sdk from "@artinet/sdk";
 jest.setTimeout(60000);
 // sdk.applyDefaults();
@@ -93,6 +98,7 @@ describe("Model Tests", () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(model.count).toBe(1);
+      await model.stop();
     });
     it("should call an agent service", async () => {
       const mockProvider = createMockProvider(
@@ -146,6 +152,7 @@ describe("Model Tests", () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
       await model.connect("Hello!");
       expect(called).toBe(true);
+      await model.stop();
     });
 
     it("should chain multiple add calls", async () => {
@@ -170,6 +177,7 @@ describe("Model Tests", () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(model.count).toBe(2);
+      await model.stop();
     });
   });
 
@@ -184,6 +192,7 @@ describe("Model Tests", () => {
 
       const response = await model.connect("Hello!");
       expect(response).toBe("Hello, World!");
+      await model.stop();
     });
 
     it("should connect with a message object", async () => {
@@ -201,6 +210,7 @@ describe("Model Tests", () => {
 
       const response = await model.connect(message);
       expect(response).toBe("Response to message");
+      await model.stop();
     });
 
     it("should connect with a session array", async () => {
@@ -219,6 +229,7 @@ describe("Model Tests", () => {
 
       const response = await model.connect(session);
       expect(response).toBe("Session response");
+      await model.stop();
     });
   });
 
@@ -233,6 +244,7 @@ describe("Model Tests", () => {
 
       expect(model.events).toBeDefined();
       expect(model.events).toBeInstanceOf(Monitor);
+      await model.stop();
     });
   });
 
@@ -248,6 +260,7 @@ describe("Model Tests", () => {
       const agent = model.agent;
       expect(agent).toBeDefined();
       expect(agent.agentCard.name).toBe("test-model-agent");
+      await model.stop();
     });
     it("should call the model as an A2A agent", async () => {
       const mockProvider = createMockProvider("Agent response");
@@ -262,6 +275,49 @@ describe("Model Tests", () => {
         kind: "text",
         text: "Agent response",
       });
+      await model.stop();
+    });
+    it("Should wait for add to complete before executing", async () => {
+      const mockProvider = jest.fn(async () =>
+        MOCK_CONNECT_RESPONSE("Agent response")
+      );
+
+      const model = Model.create({
+        modelId: "test-model",
+        provider: mockProvider,
+      });
+
+      model.add(
+        {
+          command: "npx",
+          args: ["-y", "@modelcontextprotocol/server-everything@2025.11.25"],
+        },
+        "everything-server"
+      );
+
+      const response = (await model.agent.sendMessage(
+        "Hello!"
+      )) as sdk.A2A.Task;
+
+      // const services = Array.from(model.values);
+      // expect(services.length).toBeGreaterThan(0);
+      expect(mockProvider).toHaveBeenCalledWith(
+        expect.objectContaining({
+          options: expect.objectContaining({
+            tools: expect.objectContaining({
+              services: expect.arrayContaining([
+                expect.objectContaining({
+                  uri: "everything-server",
+                }),
+              ]),
+            }),
+          }),
+        }),
+        expect.anything()
+      );
+      const responseMessage = response.status.message?.parts[0];
+      expect((responseMessage as sdk.A2A.TextPart).text).toBe("Agent response");
+      await model.stop();
     });
   });
 });

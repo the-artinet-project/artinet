@@ -55,7 +55,8 @@ const createRequestContext = (context: Settings) => {
     target: undefined,
     defaultInstructions: undefined,
     agentId: undefined,
-    agents: undefined,
+    /**cache agents in memory so we don't have to load them from storage on every request */
+    // agents: undefined,
     requestId: undefined,
     timestamp: undefined,
   };
