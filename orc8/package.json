@@ -1,5 +1,5 @@
 {
-  "version": "0.0.20-alpha.2",
+  "version": "0.0.20-alpha.3",
   "name": "orc8",
   "description": "A dynamic orchestration library for A2A enabled AI agents that can call MCP servers.",
   "author": "artinet",
@@ -25,10 +25,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/orc8.git"
+    "url": "git+https://github.com/the-artinet-project/artinet.git"
   },
   "issues": {
-    "url": "https://github.com/the-artinet-project/orc8/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
   "type": "module",
   "main": "./dist/index.js",
