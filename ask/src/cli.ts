@@ -25,7 +25,6 @@ program
   .option("-m, --message <message>", "Send a single message and exit")
   .action(async (options) => {
     let client: sdk.A2AClient | undefined;
-    console.log(options?.endpoint);
     try {
       client = new sdk.A2AClient(
         options?.endpoint ?? "http://localhost:3000/a2a",
