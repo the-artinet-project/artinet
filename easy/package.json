@@ -37,10 +37,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/the-artinet-project/easy-a2a"
+    "url": "https://github.com/the-artinet-project/artinet"
   },
   "bugs": {
-    "url": "https://github.com/the-artinet-project/easy-a2a/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
   "homepage": "https://artinet.io",
   "dependencies": {

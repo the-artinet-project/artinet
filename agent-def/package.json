@@ -32,12 +32,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/agent-def.git"
+    "url": "git+https://github.com/the-artinet-project/artinetgit"
   },
   "bugs": {
-    "url": "https://github.com/the-artinet-project/agent-def/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
-  "homepage": "https://github.com/the-artinet-project/agent-def#readme",
+  "homepage": "https://github.com/the-artinet-project/artinet#readme",
   "files": [
     "./dist/**/*",
     "./package.json",

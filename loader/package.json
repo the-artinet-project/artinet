@@ -6,10 +6,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/loader.git"
+    "url": "git+https://github.com/the-artinet-project/artinetit"
   },
   "issues": {
-    "url": "https://github.com/the-artinet-project/loader/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
   "files": [
     "dist",

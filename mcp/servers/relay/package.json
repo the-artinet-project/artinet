@@ -6,10 +6,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/mcp.git#main"
+    "url": "git+https://github.com/the-artinet-project/artinet.git#main"
   },
   "issues": {
-    "url": "https://github.com/the-artinet-project/mcp/issues"
+    "url": "https://github.com/the-artinet-project/artinet/issues"
   },
   "files": [
     "dist",
