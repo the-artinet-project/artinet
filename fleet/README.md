@@ -33,7 +33,7 @@ npm install express
 ```typescript
 import { fleet } from "@artinet/fleet/express";
 
-const { app } = fleet().launch(3000);
+fleet().launch(3000);
 ```
 
 **Hono**:
@@ -45,7 +45,7 @@ npm install hono
 ```typescript
 import { fleet } from "@artinet/fleet/hono";
 
-const { app } = fleet().launch(3000);
+fleet().launch(3000);
 ```
 
 > 🚧 **More servers coming soon** — Bun adapters and edge support are on the roadmap.
@@ -76,7 +76,7 @@ const myFleet = await fleet().ship([
 myFleet.launch(3000);
 ```
 
-**Ship**:
+**Post Launch, Ship**:
 
 ```typescript
 import { ship } from "@artinet/fleet";
