@@ -1,4 +1,4 @@
-<p align="center"> <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a> <a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a> <a href="https://reddit.com/r/artinet"><img src="https://img.shields.io/reddit/subreddit-subscribers/theartinet?label=reddit&style=flat&color=black" alt="Subreddit"></a>
+<p align="center"> <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a> <a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a> <a href="https://reddit.com/r/theartinet"><img src="https://img.shields.io/reddit/subreddit-subscribers/theartinet?label=reddit&style=flat&color=black" alt="Subreddit"></a>
 </p>
 
 <h1 align="center"><em>artinet</em></h1>
