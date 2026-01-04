@@ -54,7 +54,7 @@ export const agentsTable = sqliteTable(TABLE_NAME, {
 });
 
 export type AgentsTable = typeof agentsTable.$inferSelect;
-
+//TODO: Extend Manager for caching
 export class SQLiteStore implements armada.IDataStore<armada.StoredAgent> {
   constructor(
     private db: BaseSQLiteDatabase<`sync` | `async`, any, AgentsTable>
@@ -86,16 +86,17 @@ export class SQLiteStore implements armada.IDataStore<armada.StoredAgent> {
   }
 
   async search(query: string): Promise<armada.StoredAgent[]> {
+    const trimmedQuery = query.trim();
     return await this.db
       .select()
       .from(agentsTable)
       .where(
         or(
-          eq(agentsTable.agentUri, query),
-          like(agentsTable.name, `%${query}%`),
-          like(agentsTable.prompt, `%${query}%`),
-          like(agentsTable.modelId, `%${query}%`),
-          like(agentsTable.metadata, `%${query}%`)
+          eq(agentsTable.agentUri, trimmedQuery),
+          like(agentsTable.name, `%${trimmedQuery}%`),
+          like(agentsTable.prompt, `%${trimmedQuery}%`),
+          like(agentsTable.modelId, `%${trimmedQuery}%`),
+          like(agentsTable.metadata, `%${trimmedQuery}%`)
         )
       )
       .execute();
