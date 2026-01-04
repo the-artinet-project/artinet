@@ -145,7 +145,6 @@ export async function callAgent(
       : createMessageSendParams({ message: request.call });
 
   _session(uri, parentTaskId, tasks, callParams);
-  logger.error("agent", { agent, uri, request, callParams });
   const result: A2A.SendMessageSuccessResult | undefined | null = await (
     agent as AbortableSender
   )

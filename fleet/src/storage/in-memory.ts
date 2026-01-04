@@ -15,7 +15,7 @@ export class InMemoryStore
       (value) =>
         value.uri.includes(query) ||
         value.name.includes(query) ||
-        value.configuration?.instructions.includes(query)
+        value.configuration?.instructions?.includes?.(query)
     );
   }
 }
