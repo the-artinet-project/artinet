@@ -10,12 +10,12 @@ import { RequestAgentRoute } from "../types/definitions.js";
 
 export const GetAgents: RequestAgentRoute["intercept"] = {
   trigger: ({ context }: RequestAgentRoute["input"]): boolean =>
-    !!context.target && (context.target.agentIds?.length ?? 0) > 0,
+    !!context.target && (context.target.agentUris?.length ?? 0) > 0,
   action: async ({
     request,
     context,
   }: RequestAgentRoute["input"]): Promise<RequestAgentRoute["request"]> => {
-    for (const agentId of context.target?.agentIds ?? []) {
+    for (const uri of context.target?.agentUris ?? []) {
       await armada.TryFindBase<
         typeof armada.StoredAgentSchema,
         RequestAgentRoute["request"],
@@ -24,24 +24,21 @@ export const GetAgents: RequestAgentRoute["intercept"] = {
       >(
         { request, context },
         {
-          uri: agentId,
+          uri,
           throwNotFound: false,
           storage: context.storage,
           find: armada.FindAgent,
         }
       );
-      if (!context.found || !context.found.results[agentId]) {
+      if (!context.found || !context.found.results[uri]) {
         continue;
       }
 
       const agentConfig: AgentConfiguration | null = await sdk
-        .validateSchema(
-          AgentConfigurationSchema,
-          context.found.results[agentId]
-        )
+        .validateSchema(AgentConfigurationSchema, context.found.results[uri])
         .catch((error) => {
           sdk.logger.error(
-            `Failed to validate agent configuration: ${agentId}`,
+            `Failed to validate agent configuration: ${uri}`,
             error
           );
           return null;
@@ -58,7 +55,7 @@ export const GetAgents: RequestAgentRoute["intercept"] = {
 
       context.agents = {
         ...context.agents,
-        [agentId]: agent,
+        [uri]: agent,
       };
     }
     return request;

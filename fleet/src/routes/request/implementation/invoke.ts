@@ -13,8 +13,8 @@ import {
 } from "../types/definitions.js";
 import { assert } from "console";
 
-function isClient(agent: unknown): agent is sdk.A2AClient {
-  return agent instanceof sdk.A2AClient;
+function isAgentMessenger(agent: unknown): agent is sdk.AgentMessenger {
+  return agent instanceof sdk.AgentMessenger;
 }
 
 export const invoke = async (
@@ -127,7 +127,7 @@ export const callAgent = async (
       );
     }
     case "task/pushNotificationConfig/set": {
-      if (!isClient(agent)) {
+      if (!isAgentMessenger(agent)) {
         throw sdk.PUSH_NOTIFICATION_NOT_SUPPORTED({
           data: {
             message: "Push notifications are not supported for clients",
@@ -138,13 +138,13 @@ export const callAgent = async (
       return await invoke(
         "success",
         request,
-        agent.setTaskPushNotification(
+        agent.setTaskPushNotificationConfig(
           params as sdk.A2A.TaskPushNotificationConfig
         )
       );
     }
     case "task/pushNotificationConfig/get": {
-      if (!isClient(agent)) {
+      if (!isAgentMessenger(agent)) {
         throw sdk.PUSH_NOTIFICATION_NOT_SUPPORTED({
           data: {
             message: "Push notifications are not supported for clients",
@@ -156,7 +156,7 @@ export const callAgent = async (
       return await invoke(
         "success",
         request,
-        agent.getTaskPushNotification(params as sdk.A2A.TaskIdParams)
+        agent.getTaskPushNotificationConfig(params as sdk.A2A.TaskIdParams)
       );
     }
     case "task/pushNotificationConfig/list": {
@@ -203,15 +203,15 @@ export const invokeAgent: invokeFunction = async (
   );
 
   /* Support for A2AClient requests TBD */
-  assert(!isClient(_agent), "A2AClient requests are not supported");
+  assert(!isAgentMessenger(_agent), "A2AClient requests are not supported");
   //TODO: This proxy pattern is temporary until we align the A2AClient with the latest protocol changes
   let agent: sdk.A2A.Service = _agent as sdk.A2A.Service;
-  if (isClient(_agent)) {
+  if (isAgentMessenger(_agent)) {
     sdk.logger.debug(`invokeAgent[${request.method}]: creating proxy client`);
     agent = {
       ..._agent,
       streamMessage: async function* (params: sdk.A2A.MessageSendParams) {
-        yield* _agent.sendStreamingMessage(params);
+        yield* _agent.sendMessageStream(params);
       },
       resubscribe: async function* (params: sdk.A2A.TaskIdParams) {
         yield* _agent.resubscribeTask(params);

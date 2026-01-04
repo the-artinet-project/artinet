@@ -27,7 +27,7 @@ export type AgentResponse = ResultOrError<
   sdk.A2A.Update
 >;
 
-export type Agent = sdk.Agent | sdk.A2AClient;
+export type Agent = sdk.Agent | sdk.AgentMessenger;
 
 export type loadFunction = (
   config: AgentConfiguration,

@@ -9,7 +9,14 @@ import { eq, like, or } from "drizzle-orm";
 import { BaseSQLiteDatabase, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const TABLE_NAME = "fleet_agents";
-const CREATE_AGENTS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (agentUri TEXT PRIMARY KEY, agentId TEXT NOT NULL, name TEXT NOT NULL, prompt TEXT NOT NULL, modelId TEXT NOT NULL, agents TEXT NOT NULL, version TEXT NOT NULL, updatedAt TEXT NOT NULL, status TEXT NOT NULL, visibility TEXT NOT NULL, owner TEXT NOT NULL, metadata TEXT NOT NULL)`;
+const CREATE_AGENTS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (uri TEXT PRIMARY KEY, \
+name TEXT NOT NULL, \
+version TEXT NOT NULL, \
+updatedAt TEXT NOT NULL, \
+status TEXT NOT NULL, \
+visibility TEXT NOT NULL, \
+owner TEXT NOT NULL, \
+configuration TEXT NOT NULL)`;
 
 export const createAgentsTable = async (
   db: BaseSQLiteDatabase<`sync` | `async`, any, AgentsTable>
@@ -18,27 +25,8 @@ export const createAgentsTable = async (
 };
 
 export const agentsTable = sqliteTable(TABLE_NAME, {
-  agentUri: text().primaryKey(),
-  /**
-   * @deprecated Use agentUri instead
-   */
-  agentId: text().notNull().default(""),
+  uri: text().primaryKey(),
   name: text().notNull(),
-  /**
-   * @deprecated Use metadata instead
-   */
-  prompt: text().notNull().default(""),
-  /**
-   * @deprecated Use metadata instead
-   */
-  modelId: text().notNull().default(""),
-  /**
-   * @deprecated Use metadata instead
-   */
-  agents: text("agents", { mode: "json" })
-    .$type<string[]>()
-    .notNull()
-    .default([]),
   version: text().notNull(),
   updatedAt: text().notNull(),
   status: text("status", { mode: "json" })
@@ -48,9 +36,9 @@ export const agentsTable = sqliteTable(TABLE_NAME, {
     .$type<"PUBLIC" | "PRIVATE">()
     .notNull(),
   owner: text().notNull(),
-  metadata: text("metadata", { mode: "json" })
-    .$type<AgentConfiguration>()
-    .notNull(),
+  configuration: text("configuration", {
+    mode: "json",
+  }).$type<AgentConfiguration>(),
 });
 
 export type AgentsTable = typeof agentsTable.$inferSelect;
@@ -66,23 +54,22 @@ export class SQLiteStore implements armada.IDataStore<armada.StoredAgent> {
     return await this.db
       .select()
       .from(agentsTable)
-      .where(eq(agentsTable.agentUri, id))
+      .where(eq(agentsTable.uri, id))
       .get();
   }
 
   async set(id: string, data: armada.StoredAgent): Promise<void> {
+    if (id !== data.uri) {
+      throw new Error("URI mismatch");
+    }
     await this.db
       .insert(agentsTable)
-      /**forcing this until we sync the schemas properly */
-      .values({ ...(data as any), agentUri: id })
+      .values({ ...data, uri: id })
       .execute();
   }
 
   async delete(id: string): Promise<void> {
-    await this.db
-      .delete(agentsTable)
-      .where(eq(agentsTable.agentUri, id))
-      .execute();
+    await this.db.delete(agentsTable).where(eq(agentsTable.uri, id)).execute();
   }
 
   async search(query: string): Promise<armada.StoredAgent[]> {
@@ -92,11 +79,9 @@ export class SQLiteStore implements armada.IDataStore<armada.StoredAgent> {
       .from(agentsTable)
       .where(
         or(
-          eq(agentsTable.agentUri, trimmedQuery),
+          eq(agentsTable.uri, trimmedQuery),
           like(agentsTable.name, `%${trimmedQuery}%`),
-          like(agentsTable.prompt, `%${trimmedQuery}%`),
-          like(agentsTable.modelId, `%${trimmedQuery}%`),
-          like(agentsTable.metadata, `%${trimmedQuery}%`)
+          like(agentsTable.configuration, `%${trimmedQuery}%`)
         )
       )
       .execute();

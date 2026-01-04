@@ -1,5 +1,5 @@
 {
-  "version": "0.0.20-beta.1",
+  "version": "0.0.20",
   "name": "orc8",
   "description": "A dynamic orchestration library for A2A enabled AI agents that can call MCP servers.",
   "author": "artinet",
@@ -62,8 +62,8 @@
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "dependencies": {
-    "@artinet/sdk": "^0.6.0-preview.3",
-    "@artinet/types": "^0.0.9-alpha.3",
+    "@artinet/sdk": "^0.6.0",
+    "@artinet/types": "^0.0.9",
     "eventemitter3": "^5.0.1",
     "p-limit": "^7.1.1",
     "uuid": "^11.1.0",

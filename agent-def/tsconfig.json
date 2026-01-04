@@ -12,6 +12,7 @@
     "noImplicitAny": true,
     "outDir": "./dist",
     "rootDir": ".",
+    "skipLibCheck": true,
     "lib": ["ES2022", "DOM"],
     "isolatedModules": true,
     "noUnusedLocals": true,

@@ -20,7 +20,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import {
-  A2AClient,
+  AgentMessenger,
   CreateAgentParams,
   Agent as A2A_Agent,
   Service as A2A_Service,
@@ -267,7 +267,7 @@ export function response(response: API.ConnectResponse): string {
  */
 export type CallableService =
   | A2A_Agent
-  | A2AClient
+  | AgentMessenger
   | Omit<CreateAgentParams, "contexts">
   | StdioServerParameters;
 
@@ -302,7 +302,7 @@ export async function add<T extends CallableService = CallableService>(
   uri?: string
 ): Promise<Callable.Agent | Callable.Tool> {
   let callable: Callable.Agent | Callable.Tool | undefined = undefined;
-  if (service instanceof A2A_Service || service instanceof A2AClient) {
+  if (service instanceof A2A_Service || service instanceof AgentMessenger) {
     callable = Agent.from(service, uri);
   } else if (typeof service === "object" && "engine" in service) {
     callable = Agent.create(service, uri);

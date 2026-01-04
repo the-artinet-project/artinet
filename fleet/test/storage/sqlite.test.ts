@@ -7,7 +7,7 @@ import {
   createAgentsTable,
   TABLE_NAME,
 } from "../../src/storage/sqlite.js";
-import { createValidStoredAgent } from "../mock.js";
+import { createValidAgentConfig, createValidStoredAgent } from "../mock.js";
 const sqlite = new Database(":memory:");
 const db = drizzle<AgentsTable>(sqlite);
 
@@ -30,56 +30,63 @@ describe("SQLiteStore", () => {
     expect(result).toBeUndefined();
   });
   it("should set an agent", async () => {
-    await store.set("test-agent", createValidStoredAgent());
+    await store.set(
+      "test-agent",
+      createValidStoredAgent({
+        uri: "test-agent",
+        configuration: createValidAgentConfig({ instructions: "test-prompt" }),
+      })
+    );
     const result = await store.get("test-agent");
     expect(result).toBeDefined();
-    expect(result?.agentId).toBe("test-agent-id");
-    expect(result?.name).toBe("test-agent");
-    expect(result?.prompt).toBe("test-prompt");
-    expect(result?.modelId).toBe("test-model-id");
+    expect(result?.uri).toBe("test-agent");
+    expect(result?.configuration?.instructions).toBe("test-prompt");
     expect(result?.version).toBe("1.0.0");
     expect(result?.updatedAt).toBeDefined();
   });
   it("should search for an agent", async () => {
-    await store.set("test-agent", createValidStoredAgent());
+    await store.set(
+      "test-agent-id",
+      createValidStoredAgent({ uri: "test-agent-id" })
+    );
     await store.set(
       "test-agent-2",
-      createValidStoredAgent({ name: "test-agent-2", agentId: "number2" })
+      createValidStoredAgent({ uri: "test-agent-2" })
     );
     await store.set(
       "test-agent-3",
-      createValidStoredAgent({ name: "test-agent-3", agentId: "number3" })
+      createValidStoredAgent({ uri: "test-agent-3" })
     );
     const result = await store.search("test-agent");
     expect(result).toBeDefined();
     expect(result?.length).toBe(3);
-    expect(result?.[0]?.agentId).toBe("test-agent-id");
-    expect(result?.[1]?.agentId).toBe("number2");
-    expect(result?.[2]?.agentId).toBe("number3");
+    expect(result?.[0]?.uri).toBe("test-agent-id");
+    expect(result?.[1]?.uri).toBe("test-agent-2");
+    expect(result?.[2]?.uri).toBe("test-agent-3");
   });
   it("should search for specific agent", async () => {
     await store.set(
       "test-lucky-agent",
-      createValidStoredAgent({ agentId: "number1" })
+      createValidStoredAgent({ uri: "test-lucky-agent" })
     );
     await store.set(
       "test-agent-2",
-      createValidStoredAgent({ name: "test-agent-2", agentId: "number2" })
+      createValidStoredAgent({ uri: "test-agent-2" })
     );
     await store.set(
       "test-agent-3",
-      createValidStoredAgent({ name: "test-agent-3" })
+      createValidStoredAgent({ uri: "test-agent-3" })
     );
     const result = await store.search("test-lucky-agent");
     expect(result).toBeDefined();
     expect(result?.length).toBe(1);
-    expect(result?.[0]?.agentId).toBe("number1");
+    expect(result?.[0]?.uri).toBe("test-lucky-agent");
   });
 
   it("should delete an agent", async () => {
     await store.set(
       "test-lucky-agent",
-      createValidStoredAgent({ agentId: "number1" })
+      createValidStoredAgent({ uri: "test-lucky-agent" })
     );
     const set = await store.get("test-lucky-agent");
     expect(set).toBeDefined();

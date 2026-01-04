@@ -490,7 +490,7 @@ describe("Express Server", () => {
         // CreateAgentRequestSchema requires a 'config' field containing the agent configuration
         const req = createMockRequest({
           body: {
-            config: {
+            config: createValidAgentConfig({
               name: "my-agent",
               description: "A new agent",
               modelId: "gpt-4",
@@ -498,13 +498,13 @@ describe("Express Server", () => {
               uri: "test-uri",
               skills: [],
               version: "1.0.0",
-              toolIds: [],
+              toolUris: [],
               groupIds: [],
               services: [],
               capabilities: {},
               defaultInputModes: ["text"],
               defaultOutputModes: ["text"],
-            },
+            }),
           },
         });
 
@@ -795,7 +795,7 @@ describe("Express Server", () => {
         })
       );
       const mockSet: CreateAgentRoute["implementation"] = jest.fn(() =>
-        Promise.resolve({ agentId: "new-agent" })
+        Promise.resolve({ uri: "new-agent" })
       );
 
       const { app } = fleet(
@@ -816,7 +816,7 @@ describe("Express Server", () => {
 
     it("should handle deployment requests at deploymentPath", async () => {
       const mockSet: CreateAgentRoute["implementation"] = jest.fn(() =>
-        Promise.resolve({ agentId: "deployed-agent-123" })
+        Promise.resolve({ uri: "deployed-agent-123" })
       );
 
       const { app } = fleet(
@@ -835,7 +835,7 @@ describe("Express Server", () => {
       const response = await request(app)
         .post("/deploy")
         .send({
-          config: {
+          config: createValidAgentConfig({
             name: "my-agent",
             description: "Test agent",
             modelId: "gpt-4",
@@ -843,16 +843,16 @@ describe("Express Server", () => {
             uri: "test-uri",
             skills: [],
             version: "1.0.0",
-            toolIds: [],
+            toolUris: [],
             groupIds: [],
             services: [],
             capabilities: {},
             defaultInputModes: ["text"],
             defaultOutputModes: ["text"],
-          },
+          }),
         });
       expect(mockSet).toHaveBeenCalled();
-      expect(response.body).toEqual({ agentId: "deployed-agent-123" });
+      expect(response.body).toEqual({ uri: "deployed-agent-123" });
     });
     it("should deploy an agent and retrieve its card", async () => {
       const storage = new InMemoryStore();
@@ -874,7 +874,7 @@ describe("Express Server", () => {
       const deployResponse = await request(app)
         .post("/deploy")
         .send({
-          config: {
+          config: createValidAgentConfig({
             name: "integration-test-agent",
             description: "An agent for integration testing",
             modelId: "gpt-4",
@@ -882,13 +882,13 @@ describe("Express Server", () => {
             uri: "integration-test",
             skills: [],
             version: "1.0.0",
-            toolIds: [],
+            toolUris: [],
             groupIds: [],
             services: [],
             capabilities: { streaming: false },
             defaultInputModes: ["text"],
             defaultOutputModes: ["text"],
-          },
+          }),
         });
       expect(deployResponse.status).toBe(200);
       const { agentId } = deployResponse.body;
@@ -1049,7 +1049,7 @@ describe("Express Server", () => {
       const deployResponse = await request(app)
         .post("/deploy")
         .send({
-          config: {
+          config: createValidAgentConfig({
             name: "integration-test-agent",
             description: "An agent for integration testing",
             modelId: "gpt-4",
@@ -1057,20 +1057,20 @@ describe("Express Server", () => {
             uri: "integration-test",
             skills: [],
             version: "1.0.0",
-            toolIds: [],
+            toolUris: [],
             groupIds: [],
             services: [],
             capabilities: { streaming: false },
             defaultInputModes: ["text"],
             defaultOutputModes: ["text"],
-          },
+          }),
         });
       expect(deployResponse.status).toBe(200);
-      const { agentId } = deployResponse.body;
-      expect(agentId).toBeDefined();
+      const { uri } = deployResponse.body;
+      expect(uri).toBeDefined();
 
       const messageResponse = await request(app)
-        .post(`/agentId/${agentId}`)
+        .post(`/agentId/${uri}`)
         .send({
           jsonrpc: "2.0",
           id: "req-1",

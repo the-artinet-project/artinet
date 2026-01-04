@@ -21,8 +21,9 @@
  */
 import {
   A2A,
+  AgentMessenger,
   Agent as A2Agent,
-  A2AClient,
+  MessageSender,
   createMessageSendParams,
   logger,
 } from "@artinet/sdk";
@@ -30,6 +31,12 @@ import { Runtime } from "@artinet/types";
 import * as Callable from "./types.js";
 import { v4 as uuidv4 } from "uuid";
 
+export interface AbortableSender extends MessageSender {
+  sendMessage(
+    params: A2A.MessageSendParams,
+    options?: { signal?: AbortSignal }
+  ): Promise<A2A.SendMessageSuccessResult>;
+}
 /**
  * Manages session state for agent calls within a parent task context.
  *
@@ -121,7 +128,7 @@ const _response = (
  * ```
  */
 export async function callAgent(
-  agent: A2Agent | A2AClient,
+  agent: AgentMessenger | A2Agent,
   uri: string,
   request: Runtime.AgentRequest,
   {
@@ -138,11 +145,11 @@ export async function callAgent(
       : createMessageSendParams({ message: request.call });
 
   _session(uri, parentTaskId, tasks, callParams);
-
-  const result: A2A.SendMessageSuccessResult | undefined | null = await agent
-    .sendMessage(callParams, undefined, {
-      abortSignal: abortSignal,
-    })
+  logger.error("agent", { agent, uri, request, callParams });
+  const result: A2A.SendMessageSuccessResult | undefined | null = await (
+    agent as AbortableSender
+  )
+    .sendMessage(callParams, { signal: abortSignal })
     .catch((error) => {
       logger.error(
         `[${request.id}:${parentTaskId}]error sending message to agent[${uri}]: `,
@@ -151,5 +158,6 @@ export async function callAgent(
       _error = error as Error;
       return undefined;
     });
+
   return _response(request, result, _error);
 }

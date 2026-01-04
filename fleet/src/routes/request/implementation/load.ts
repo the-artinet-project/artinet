@@ -19,14 +19,14 @@ const requiredAgentsNotLoaded = (
 ) => {
   return (
     (!context.agents || !context.agents.length) &&
-    config.agentIds &&
-    config.agentIds.length > 0
+    config.agentUris &&
+    config.agentUris.length > 0
   );
 };
 
 const missingAgents = (config: AgentConfiguration, context: RequestContext) => {
   return (
-    config.agentIds?.filter((id) => !context.agents?.[id]).join(", ") ?? null
+    config.agentUris?.filter((id) => !context.agents?.[id]).join(", ") ?? null
   );
 };
 

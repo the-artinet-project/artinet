@@ -69,7 +69,7 @@ function createBanner(
 }
 
 async function sendMessage(
-  client: sdk.A2AClient,
+  client: sdk.AgentMessenger,
   message: string,
   taskId: string,
   verbose: boolean = false
@@ -112,7 +112,7 @@ async function sendMessage(
 
 export async function chat(
   agentCard: sdk.A2A.AgentCard,
-  client: sdk.A2AClient,
+  client: sdk.AgentMessenger,
   taskId: string = uuidv4(),
   verbose: boolean = false,
   message: string | undefined = undefined
@@ -168,7 +168,7 @@ export async function chat(
       );
     }
     try {
-      const agentResponseSource = client.sendStreamingMessage({
+      const agentResponseSource = client.sendMessageStream({
         message: msg,
       });
       for await (const update of agentResponseSource) {

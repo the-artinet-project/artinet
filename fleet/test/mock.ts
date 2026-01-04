@@ -123,6 +123,7 @@ export const createMockAgent = (
 export const createValidAgentConfig = (
   overrides: Partial<AgentConfiguration> = {}
 ): AgentConfiguration => ({
+  schemaVersion: "0.1.0",
   uri: "test-agent-uri",
   name: "test-agent",
   description: "A test agent",
@@ -137,7 +138,7 @@ export const createValidAgentConfig = (
     },
   ],
   version: "1.0.0",
-  toolIds: [],
+  toolUris: [],
   groupIds: [],
   services: [],
   capabilities: { streaming: false },
@@ -149,18 +150,14 @@ export const createValidAgentConfig = (
 export const createValidStoredAgent = (
   overrides: Partial<armada.StoredAgent> = {}
 ): armada.StoredAgent => ({
-  agentId: "test-agent-id",
+  uri: "test-agent-id",
   name: "test-agent",
-  prompt: "test-prompt",
-  modelId: "test-model-id",
+  configuration: createValidAgentConfig(),
   version: "1.0.0",
   updatedAt: new Date().toISOString(),
   status: "ACTIVE",
   visibility: "PUBLIC",
   owner: "test-owner",
-  metadata: createValidAgentConfig(),
-  agents: [],
-  servers: [],
   ...overrides,
 });
 /**

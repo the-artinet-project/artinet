@@ -1,6 +1,6 @@
 {
   "name": "@artinet/ask",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A lightweight command-line chat client for connecting to A2A Servers.",
   "author": "artinet",
   "license": "Apache-2.0",
@@ -50,7 +50,7 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.1",
-    "@artinet/sdk": "^0.6.0-preview.3",
+    "@artinet/sdk": "^0.6.0",
     "prompts": "^2.4.2",
     "uuid": "^13.0.0"
   },

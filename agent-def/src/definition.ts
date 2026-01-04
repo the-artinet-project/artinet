@@ -50,16 +50,16 @@ export type Group = z.output<typeof GroupSchema>;
  * id: backend-architect
  * name: Backend System Architect
  * description: Design RESTful APIs and microservice architectures
- * model: openai/gpt-4
+ * modelId: openai/gpt-4
  * version: "1.0.0"
- * toolIds:
- *   - filesystem
- *   - database-analyzer
+ * toolUris:
+ *   - mcp:filesystem
+ *   - mcp:database-analyzer
  * groupIds:
- *   - team:backend
+ *   - us:east:1:team:backend
  *   - project:api-v2
- * agentIds:
- *   - database-specialist
+ * agentUris:
+ *   - agents:example:database-specialist
  *   - security-auditor
  * instructions: |
  *   You are a backend system architect specializing in scalable API design...
@@ -72,147 +72,112 @@ export const AgentDefinitionSchema = Runtime.AgentInfoSchema.partial({
   capabilities: true,
   defaultInputModes: true,
   defaultOutputModes: true,
-}).extend({
-  /**
-   * Optional agent ID - will be generated if not provided
-   *
-   * Use kebab-case for consistency (e.g., 'backend-architect', 'code-reviewer')
-   */
-  id: z.string().optional().describe("Unique agent identifier"),
+})
+  .required({
+    uri: true,
+  })
+  .extend({
+    schemaVersion: z
+      .literal("0.1.0")
+      .describe("The schema version of the agent definition"),
 
-  /**
-   * Optional model specification
-   *
-   * Specifies the LLM model to use for this agent.
-   *
-   * @example "openai/gpt-4o-mini"
-   * @example "anthropic/claude-3-opus-20241022"
-   * @example "deepseek-ai/DeepSeek-R1"
-   */
-  modelId: z.string().optional().describe("Model identifier"),
-  /**
-   * Optional model specification
-   *
-   * Specifies the LLM model to use for this agent.
-   *
-   * @example "openai/gpt-4o-mini"
-   * @example "anthropic/claude-3-opus-20241022"
-   * @example "deepseek-ai/DeepSeek-R1"
-   */
-  modelUri: z.string().optional().describe(`"Model URI"`),
+    /**
+     * Optional agent ID - will be generated if not provided
+     *
+     * Use kebab-case for consistency (e.g., 'backend-architect', 'code-reviewer')
+     */
+    id: z.string().optional().describe("Unique agent identifier"),
 
-  /**
-   * Tool IDs that this agent can use
-   *
-   * A flexible list of tool identifiers that reference MCP servers, in-memory
-   * functions, or any other tool providers available in the runtime environment.
-   * Tools are resolved by the agent runtime based on these IDs.
-   *
-   * @example ["filesystem", "web-search", "code-analyzer"]
-   * @example ["mcp-server-git", "mcp-server-postgres", "custom-api-client"]
-   * @deprecated use toolUris instead
-   */
-  toolIds: z
-    .array(z.string())
-    .optional()
-    .describe("List of tool ids that this agent can use"),
+    /**
+     * Optional model specification
+     *
+     * Specifies the LLM model to use for this agent.
+     *
+     * @example "openai/gpt-4o-mini"
+     * @example "anthropic/claude-3-opus-20241022"
+     * @example "deepseek-ai/DeepSeek-R1"
+     */
+    modelId: z.string().optional().describe("Model identifier"),
 
-  /**
-   * Tool IDs that this agent can use
-   *
-   * A flexible list of tool identifiers that reference MCP servers, in-memory
-   * functions, or any other tool providers available in the runtime environment.
-   * Tools are resolved by the agent runtime based on these IDs.
-   *
-   * @example ["filesystem", "web-search", "code-analyzer"]
-   * @example ["mcp-server-git", "mcp-server-postgres", "custom-api-client"]
-   */
-  toolUris: z
-    .array(z.string())
-    .optional()
-    .describe("List of tool ids that this agent can use"),
+    /**
+     * Tool IDs that this agent can use
+     *
+     * A flexible list of tool identifiers that reference MCP servers, in-memory
+     * functions, or any other tool providers available in the runtime environment.
+     * Tools are resolved by the agent runtime based on these IDs.
+     *
+     * @example ["filesystem", "web-search", "code-analyzer"]
+     * @example ["mcp-server-git", "mcp-server-postgres", "custom-api-client"]
+     */
+    toolUris: z
+      .array(z.string())
+      .optional()
+      .describe("List of tool ids that this agent can use"),
 
-  /**
-   * Agent IDs that this agent can call
-   *
-   * Explicitly defines which other agents this agent has permission to invoke.
-   * These could be local agent instances, remote agent servers, or any agent
-   * accessible in the runtime environment. This provides explicit access control
-   * separate from group membership.
-   *
-   * @example ["database-specialist", "security-auditor", "code-reviewer"]
-   * @example ["agent://team-lead", "https://agents.example.com/research"]
-   * @deprecated use agentUris instead
-   */
-  agentIds: z
-    .array(z.string())
-    .optional()
-    .describe("The agent ids that this agent can call"),
+    /**
+     * Agent IDs that this agent can call
+     *
+     * Explicitly defines which other agents this agent has permission to invoke.
+     * These could be local agent instances, remote agent servers, or any agent
+     * accessible in the runtime environment. This provides explicit access control
+     * separate from group membership.
+     *
+     * @example ["database-specialist", "security-auditor", "code-reviewer"]
+     * @example ["agent://team-lead", "https://agents.example.com/research"]
+     */
+    agentUris: z
+      .array(z.string())
+      .optional()
+      .describe("The agent ids that this agent can call"),
 
-  /**
-   * Agent IDs that this agent can call
-   *
-   * Explicitly defines which other agents this agent has permission to invoke.
-   * These could be local agent instances, remote agent servers, or any agent
-   * accessible in the runtime environment. This provides explicit access control
-   * separate from group membership.
-   *
-   * @example ["database-specialist", "security-auditor", "code-reviewer"]
-   * @example ["agent://team-lead", "https://agents.example.com/research"]
-   */
-  agentUris: z
-    .array(z.string())
-    .optional()
-    .describe("The agent ids that this agent can call"),
+    /**
+     * Groups that this agent belongs to
+     *
+     * Defines organizational membership for discovery, coordination, and management.
+     * Groups can represent teams, projects, clusters, departments, or any arbitrary
+     * organizational structure. Supports both simple string IDs and rich objects
+     * with properties.
+     *
+     * @example
+     * // Simple string references
+     * ["team:backend", "project:api-v2", "cluster:production"]
+     *
+     * @example
+     * // Rich objects with properties
+     * [
+     *   { id: "team:backend", properties: { role: "lead", tier: "senior" } },
+     *   { id: "project:api-v2", properties: { status: "active", priority: 1 } }
+     * ]
+     */
+    groupIds: z
+      .array(z.union([z.string(), GroupSchema]))
+      .optional()
+      .describe("List of group ids that this agent belongs to"),
 
-  /**
-   * Groups that this agent belongs to
-   *
-   * Defines organizational membership for discovery, coordination, and management.
-   * Groups can represent teams, projects, clusters, departments, or any arbitrary
-   * organizational structure. Supports both simple string IDs and rich objects
-   * with properties.
-   *
-   * @example
-   * // Simple string references
-   * ["team:backend", "project:api-v2", "cluster:production"]
-   *
-   * @example
-   * // Rich objects with properties
-   * [
-   *   { id: "team:backend", properties: { role: "lead", tier: "senior" } },
-   *   { id: "project:api-v2", properties: { status: "active", priority: 1 } }
-   * ]
-   */
-  groupIds: z
-    .array(z.union([z.string(), GroupSchema]))
-    .optional()
-    .describe("List of group ids that this agent belongs to"),
-
-  /**
-   * System instructions for the agent
-   *
-   * The core prompt that defines the agent's behavior, expertise, methodology,
-   * and output format. This is typically provided in the markdown body of an
-   * agent.md file and defines the agent's persona and capabilities.
-   *
-   * @example
-   * ```
-   * You are a backend system architect specializing in scalable API design.
-   *
-   * ## Focus Areas
-   * - RESTful API design with proper versioning
-   * - Microservice boundaries and communication patterns
-   * - Database schema design and optimization
-   *
-   * ## Methodology
-   * 1. Analyze requirements and constraints
-   * 2. Design contract-first APIs
-   * 3. Consider scalability from day one
-   * ```
-   */
-  instructions: z.string().describe("System prompt for the agent"),
-});
+    /**
+     * System instructions for the agent
+     *
+     * The core prompt that defines the agent's behavior, expertise, methodology,
+     * and output format. This is typically provided in the markdown body of an
+     * agent.md file and defines the agent's persona and capabilities.
+     *
+     * @example
+     * ```
+     * You are a backend system architect specializing in scalable API design.
+     *
+     * ## Focus Areas
+     * - RESTful API design with proper versioning
+     * - Microservice boundaries and communication patterns
+     * - Database schema design and optimization
+     *
+     * ## Methodology
+     * 1. Analyze requirements and constraints
+     * 2. Design contract-first APIs
+     * 3. Consider scalability from day one
+     * ```
+     */
+    instructions: z.string().describe("System prompt for the agent"),
+  });
 export type AgentDefinition = z.output<typeof AgentDefinitionSchema>;
 
 /**

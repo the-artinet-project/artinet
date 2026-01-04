@@ -13,9 +13,9 @@ export class InMemoryStore
   async search(query: string): Promise<armada.StoredAgent[]> {
     return Array.from(this.data.values()).filter(
       (value) =>
-        value.agentId.includes(query) ||
+        value.uri.includes(query) ||
         value.name.includes(query) ||
-        value.prompt.includes(query)
+        value.configuration?.instructions.includes(query)
     );
   }
 }

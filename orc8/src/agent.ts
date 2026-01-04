@@ -37,7 +37,7 @@
  */
 import {
   Agent as A2Agent,
-  A2AClient,
+  AgentMessenger,
   CreateAgentParams,
   createAgent,
 } from "@artinet/sdk";
@@ -75,7 +75,7 @@ export class Agent implements Callable.Agent {
    * @param _id - Internal instance ID for tracking
    */
   protected constructor(
-    private readonly _agent: A2Agent | A2AClient,
+    private readonly _agent: A2Agent | AgentMessenger,
     private readonly _uri: string,
     private readonly _id: string = uuidv4()
   ) {}
@@ -111,7 +111,7 @@ export class Agent implements Callable.Agent {
   /**
    * The underlying A2A agent or client instance.
    */
-  get agent(): A2AClient | A2Agent {
+  get agent(): AgentMessenger | A2Agent {
     return this._agent;
   }
 
@@ -186,7 +186,7 @@ export class Agent implements Callable.Agent {
    * Only applies to local agents; A2A clients are not stopped.
    */
   async stop(): Promise<void> {
-    if (!(this.agent instanceof A2AClient)) {
+    if (!(this.agent instanceof AgentMessenger)) {
       await this.agent.stop();
     }
   }
@@ -223,7 +223,7 @@ export class Agent implements Callable.Agent {
    * const wrapped = Agent.from(existingAgent, "my-agent-uri");
    * ```
    */
-  static from(agent: A2Agent | A2AClient, uri: string = uuidv4()): Agent {
+  static from(agent: A2Agent | AgentMessenger, uri: string = uuidv4()): Agent {
     const _agent = new Agent(agent, uri, uuidv4());
     _agent.getInfo();
     return _agent;

@@ -443,7 +443,7 @@ describe("Hono Server", () => {
       it("should parse request body and call deploy", async () => {
         const { ctx } = createMockHonoContext({
           body: {
-            config: {
+            config: createValidAgentConfig({
               name: "my-agent",
               description: "A new agent",
               modelId: "gpt-4",
@@ -451,18 +451,18 @@ describe("Hono Server", () => {
               uri: "test-uri",
               skills: [],
               version: "1.0.0",
-              toolIds: [],
+              toolUris: [],
               groupIds: [],
               services: [],
               capabilities: {},
               defaultInputModes: ["text"],
               defaultOutputModes: ["text"],
-            },
+            }),
           },
         });
         const next = jest.fn() as unknown as Next;
         const mockDeploy = jest.fn(() =>
-          Promise.resolve({ agentId: "new-agent-123" })
+          Promise.resolve({ uri: "new-agent-123" })
         ) as unknown as CreateAgentRoute["implementation"];
 
         const context: CreateAgentRoute["context"] = {
@@ -479,14 +479,14 @@ describe("Hono Server", () => {
           }),
           expect.any(Object)
         );
-        expect(ctx.json).toHaveBeenCalledWith({ agentId: "new-agent-123" });
+        expect(ctx.json).toHaveBeenCalledWith({ uri: "new-agent-123" });
       });
     });
 
     describe("factory", () => {
       it("should create a handler with the provided implementation", () => {
         const mockImpl = jest.fn(() =>
-          Promise.resolve({ agentId: "test" })
+          Promise.resolve({ uri: "test" })
         ) as unknown as CreateAgentRoute["implementation"];
 
         const handler = deployRequest.factory(mockImpl);
@@ -728,7 +728,7 @@ describe("Hono Server", () => {
         })
       ) as unknown as RequestAgentRoute["implementation"];
       const mockSet = jest.fn(() =>
-        Promise.resolve({ agentId: "new-agent" })
+        Promise.resolve({ uri: "new-agent" })
       ) as unknown as CreateAgentRoute["implementation"];
 
       const { app } = fleet(
@@ -749,7 +749,7 @@ describe("Hono Server", () => {
 
     it("should handle deployment requests at deploymentPath", async () => {
       const mockSet = jest.fn(() =>
-        Promise.resolve({ agentId: "deployed-agent-123" })
+        Promise.resolve({ uri: "deployed-agent-123" })
       ) as unknown as CreateAgentRoute["implementation"];
 
       const { app } = fleet(
@@ -768,7 +768,7 @@ describe("Hono Server", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          config: {
+          config: createValidAgentConfig({
             name: "my-agent",
             description: "Test agent",
             modelId: "gpt-4",
@@ -776,18 +776,18 @@ describe("Hono Server", () => {
             uri: "test-uri",
             skills: [],
             version: "1.0.0",
-            toolIds: [],
+            toolUris: [],
             groupIds: [],
             services: [],
             capabilities: {},
             defaultInputModes: ["text"],
             defaultOutputModes: ["text"],
-          },
+          }),
         }),
       });
       expect(mockSet).toHaveBeenCalled();
       const body = await res.json();
-      expect(body).toEqual({ agentId: "deployed-agent-123" });
+      expect(body).toEqual({ uri: "deployed-agent-123" });
     });
 
     it("should deploy an agent and retrieve its card", async () => {
@@ -811,7 +811,7 @@ describe("Hono Server", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          config: {
+          config: createValidAgentConfig({
             name: "integration-test-agent",
             description: "An agent for integration testing",
             modelId: "gpt-4",
@@ -819,13 +819,13 @@ describe("Hono Server", () => {
             uri: "integration-test",
             skills: [],
             version: "1.0.0",
-            toolIds: [],
+            toolUris: [],
             groupIds: [],
             services: [],
             capabilities: { streaming: false },
             defaultInputModes: ["text"],
             defaultOutputModes: ["text"],
-          },
+          }),
         }),
       });
       const deployBody = await deployRes.json();
