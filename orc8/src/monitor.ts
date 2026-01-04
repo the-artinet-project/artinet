@@ -38,7 +38,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { A2A, Contexts } from "@artinet/sdk";
-import { EventEmitter } from "events";
+import { EventEmitter } from "eventemitter3";
 import { Runtime } from "@artinet/types";
 
 /**

@@ -64,6 +64,7 @@
   "dependencies": {
     "@artinet/sdk": "^0.6.0-preview.3",
     "@artinet/types": "^0.0.9-alpha.3",
+    "eventemitter3": "^5.0.1",
     "p-limit": "^7.1.1",
     "uuid": "^11.1.0",
     "zod": "^3.25"
