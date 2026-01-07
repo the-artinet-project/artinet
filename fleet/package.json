@@ -53,7 +53,7 @@
   "bugs": {
     "url": "https://github.com/the-artinet-project/artinet/issues"
   },
-  "homepage": "https://github.com/the-artinet-project/artinet#readme",
+  "homepage": "https://artinet.io",
   "files": [
     "dist",
     "package.json",
