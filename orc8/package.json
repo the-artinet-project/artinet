@@ -1,5 +1,5 @@
 {
-  "version": "0.0.20",
+  "version": "0.1.0",
   "name": "orc8",
   "description": "A dynamic orchestration library for A2A enabled AI agents that can call MCP servers.",
   "author": "artinet",
@@ -66,20 +66,18 @@
     "@artinet/types": "^0.0.9",
     "eventemitter3": "^5.0.1",
     "p-limit": "^7.1.1",
-    "uuid": "^11.1.0",
-    "zod": "^3.25"
+    "uuid": "^13.0.0",
+    "zod": "^3.25",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "@a2a-js/sdk": "^0.3.7"
   },
   "peerDependencies": {
-    "@a2a-js/sdk": "^0.3.7",
-    "@modelcontextprotocol/sdk": "^1.24.3",
-    "openai": "^6.15.0"
+    "openai": "^6.15.0",
+    "express": "^5.1.0"
   },
   "devDependencies": {
-    "@a2a-js/sdk": "^0.3.7",
     "@cfworker/json-schema": "^4.1.1",
-    "@modelcontextprotocol/sdk": "^1.24.3",
-    "@modelcontextprotocol/server-everything": "^2025.9.25",
-    "@trpc/server": "^11.8.1",
+    "@modelcontextprotocol/server-everything": "^2025.11.25",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^29.5.12",

@@ -1,6 +1,6 @@
 {
   "name": "agent-def",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A standardized definition for collaborative agents.",
   "main": "dist/src/definition.js",
   "module": "dist/src/definition.js",
@@ -18,7 +18,7 @@
     "generate:schema": "tsx ./scripts/generate-schema.ts",
     "lint": "eslint .",
     "clean": "rimraf dist",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run clean && npm i && npm run generate:schema && npm run build"
   },
   "keywords": [
     "artinet",

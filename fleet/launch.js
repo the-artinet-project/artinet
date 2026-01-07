@@ -10,7 +10,6 @@ import { configure, logger } from "@artinet/sdk";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import pino from "pino";
-import pinoCaller from "pino-caller";
 
 const DEFAULT_INSTRUCTIONS =
   process.env.DEFAULT_INSTRUCTIONS || "You are a helpful assistant.";
@@ -22,15 +21,13 @@ const USER = process.env.USER || "default";
 const LOG_LEVEL = process.env.LOG_LEVEL || "warn";
 
 const baseLogger = configurePino(
-  pinoCaller(
-    pino({
-      level: LOG_LEVEL,
-      transport: {
-        target: "pino-pretty",
-        options: { colorize: true },
-      },
-    })
-  )
+  pino({
+    level: LOG_LEVEL,
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true },
+    },
+  })
 );
 
 if (OTEL_ENDPOINT) {

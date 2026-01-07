@@ -1,5 +1,5 @@
 <p align="center">
- <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
+<a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
 <a href="https://www.npmjs.com/package/@artinet/fleet"><img src="https://img.shields.io/npm/v/@artinet/fleet?color=black" alt="Downloads"></a>
 <a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
 <a href="https://snyk.io/test/npm/@artinet/fleet"><img src="https://snyk.io/test/npm/@artinet/fleet/badge.svg" alt="Known Vulnerabilities"></a>
@@ -110,7 +110,6 @@ curl -X POST http://localhost:3000/deploy \
         "type": "mcp",
         "uri": "everything-server-1",
         "info": {
-          "uri": "everything-server-1",
           "implementation": {
             "version": "0.0.1",
             "name": "everything"
@@ -155,17 +154,19 @@ curl -X POST http://localhost:3000/agentId/my-agent \
 or via the [sdk](https://github.com/the-artinet-project/artinet-sdk):
 
 ```typescript
-import { A2AClient } from "@artinet/sdk";
+import { createMessenger } from "@artinet/sdk";
 
-const client = new A2AClient("http://localhost:3000/agentId/my-agent");
+const messenger = createMessenger({
+  baseUrl: "http://localhost:3000/agentId/my-agent",
+});
 
 // Send a message
-const response = await client.sendMessage("Hello!");
+const response = await messenger.sendMessage("Hello!");
 
 console.log(response);
 
 // Or stream the response
-for await (const update of client.sendStreamingMessage("Tell me a story")) {
+for await (const update of messenger.sendMessageStream("Tell me a story")) {
   console.log(update);
 }
 ```
@@ -195,7 +196,7 @@ fleet({
 
 ### Logging
 
-Settup a custom logger via the [@artinet/sdk](https://www.npmjs.com/package/@artinet/sdk):
+Setup a custom logger via the [@artinet/sdk](https://www.npmjs.com/package/@artinet/sdk):
 
 ```bash
 npm install @artinet/sdk pino pino-pretty
