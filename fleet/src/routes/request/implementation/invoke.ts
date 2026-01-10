@@ -12,6 +12,7 @@ import {
   AgentError,
 } from "../types/definitions.js";
 import { assert } from "console";
+import { A2AError } from "@a2a-js/sdk/server";
 
 function isAgentMessenger(agent: unknown): agent is sdk.AgentMessenger {
   return agent instanceof sdk.AgentMessenger;
@@ -44,9 +45,24 @@ export const invoke = async (
       )}`,
       { error }
     );
+
+    let jsonRPCError: sdk.MCP.JSONRPCErrorResponse["error"];
+    if (error instanceof A2AError || error instanceof sdk.SystemError) {
+      jsonRPCError = {
+        code: error.code,
+        message: error.message,
+        data: error.data,
+      };
+    } else {
+      jsonRPCError = A2AError.internalError(
+        (error as Error)?.message ?? "Internal error",
+        { cause: (error as any)?.stack }
+      ).toJSONRPCError();
+    }
+
     return {
       type: "error",
-      error: error as any,
+      error: jsonRPCError,
     };
   }
 
@@ -67,6 +83,7 @@ export const invoke = async (
       result: result as sdk.A2A.ResponseResult | sdk.A2A.AgentCard,
     };
   }
+
   if (type === "stream") {
     return {
       type: "stream",
