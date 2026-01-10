@@ -30,7 +30,8 @@ import { RequestAgent } from "../../src/routes/request/index.js";
 import { CreateAgent } from "../../src/routes/create/index.js";
 import { applyDefaults } from "@artinet/sdk";
 import { describe as des6 } from "@artinet/sdk";
-// applyDefaults();
+import { Middleware } from "../../src/routes/intercept.js";
+applyDefaults();
 describe("Express Server", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -393,6 +394,49 @@ describe("Express Server", () => {
         );
 
         const handler = agentRequest.factory(mockImpl);
+
+        expect(typeof handler).toBe("function");
+      });
+      it.skip("should pass intercepts to the handler", async () => {
+        const mockImpl: RequestAgentRoute["implementation"] = jest.fn(() =>
+          Promise.resolve({
+            type: "success" as const,
+            result: { name: "test" },
+          })
+        );
+
+        const request: RequestAgentRoute["request"] = {
+          method: "message/send",
+          params: {
+            message: {
+              messageId: "msg-1",
+              kind: "message",
+              role: "user",
+              parts: [{ kind: "text", text: "Hello" }],
+            },
+          },
+        };
+
+        const agentConfig = createValidAgentConfig();
+        const expectedResponse: RequestAgentRoute["response"] = {
+          type: "success",
+          result: {
+            kind: "task",
+            id: "task-1",
+            contextId: "context-1",
+            status: { state: "completed" },
+            artifacts: [],
+            history: [],
+          },
+        };
+        const requestSpy = jest.fn(() => Promise.resolve(request));
+        const responseSpy = jest.fn(() => Promise.resolve(expectedResponse));
+        const intercepts: RequestAgentRoute["intercept"][] = new Middleware()
+          .request(requestSpy)
+          .response(responseSpy)
+          .build();
+
+        const handler = agentRequest.factory(mockImpl, intercepts);
 
         expect(typeof handler).toBe("function");
       });
@@ -945,6 +989,70 @@ describe("Express Server", () => {
           storage,
           load: loadAgent,
           invoke: invokeAgent,
+        },
+        {}
+      );
+
+      const response = await request(app).get(
+        "/agentId/test-agent/.well-known/agent-card.json"
+      );
+
+      expect(response.status).toBe(200);
+      expect(mockGet).toHaveBeenCalled();
+      // Verify the handler received correct method
+      const callArgs = (mockGet as jest.Mock).mock.calls[0];
+      expect(callArgs[0].method).toBe("agentcard/get");
+    });
+
+    it("should pass intercepts to the handler", async () => {
+      const storage = new InMemoryStore();
+      const mockGet: RequestAgentRoute["implementation"] = jest.fn(
+        (request, context, intercepts) => {
+          expect(intercepts).toBeDefined();
+          expect((intercepts as RequestAgentRoute["intercept"][])?.length).toBe(
+            2
+          );
+          return Promise.resolve({
+            type: "success" as const,
+            result: {
+              name: "test-agent",
+            },
+          });
+        }
+      );
+
+      const mockRequest: RequestAgentRoute["request"] = {
+        method: "agentcard/get",
+        params: null,
+      };
+      const expectedResponse: RequestAgentRoute["response"] = {
+        type: "success",
+        result: {
+          name: "test-agent",
+          url: "http://localhost/agent/test",
+          version: "1.0.0",
+          protocolVersion: "0.3.0",
+          description: "Test agent",
+          capabilities: { streaming: false },
+          signatures: [],
+          skills: [],
+          defaultInputModes: ["text"],
+          defaultOutputModes: ["text"],
+        },
+      };
+      const requestSpy = jest.fn(() => Promise.resolve(mockRequest));
+      const responseSpy = jest.fn(() => Promise.resolve(expectedResponse));
+
+      const { app } = fleet(
+        {
+          get: mockGet,
+          set: jest.fn() as any,
+          storage,
+          load: loadAgent,
+          invoke: invokeAgent,
+          middleware: new Middleware()
+            .request(requestSpy)
+            .response(responseSpy),
         },
         {}
       );

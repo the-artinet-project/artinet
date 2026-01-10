@@ -26,7 +26,7 @@ import { InMemoryStore } from "../../src/storage/in-memory.js";
 import { RequestAgent } from "../../src/routes/request/index.js";
 import { CreateAgent } from "../../src/routes/create/index.js";
 import { describe as des6, applyDefaults } from "@artinet/sdk";
-
+import { Middleware } from "../../src/routes/intercept.js";
 // applyDefaults();
 /**
  * Creates a mock Hono Context for testing
@@ -972,7 +972,69 @@ describe("Hono Server", () => {
       const body = (await res.json()) as { error?: unknown };
       expect(body.error).toBeDefined();
     });
+    it("should pass intercepts to the handler", async () => {
+      const storage = new InMemoryStore();
+      const mockGet: RequestAgentRoute["implementation"] = jest.fn(
+        (request, context, intercepts) => {
+          expect(intercepts).toBeDefined();
+          expect((intercepts as RequestAgentRoute["intercept"][])?.length).toBe(
+            2
+          );
+          return Promise.resolve({
+            type: "success" as const,
+            result: {
+              name: "test-agent",
+            },
+          });
+        }
+      );
 
+      const mockRequest: RequestAgentRoute["request"] = {
+        method: "agentcard/get",
+        params: null,
+      };
+      const expectedResponse: RequestAgentRoute["response"] = {
+        type: "success",
+        result: {
+          name: "test-agent",
+          url: "http://localhost/agent/test",
+          version: "1.0.0",
+          protocolVersion: "0.3.0",
+          description: "Test agent",
+          capabilities: { streaming: false },
+          signatures: [],
+          skills: [],
+          defaultInputModes: ["text"],
+          defaultOutputModes: ["text"],
+        },
+      };
+      const requestSpy = jest.fn(() => Promise.resolve(mockRequest));
+      const responseSpy = jest.fn(() => Promise.resolve(expectedResponse));
+
+      const { app } = fleet(
+        {
+          get: mockGet,
+          set: jest.fn() as any,
+          storage,
+          load: loadAgent,
+          invoke: invokeAgent,
+          middleware: new Middleware()
+            .request(requestSpy)
+            .response(responseSpy),
+        },
+        {}
+      );
+
+      const response = await app.request(
+        "/agentId/test-agent/.well-known/agent-card.json"
+      );
+
+      expect(response.status).toBe(200);
+      expect(mockGet).toHaveBeenCalled();
+      // Verify the handler received correct method
+      const callArgs = (mockGet as jest.Mock).mock.calls[0];
+      expect(callArgs[0].method).toBe("agentcard/get");
+    });
     it.skip("should deploy an agent and send a message to it", async () => {
       const storage = new InMemoryStore();
 

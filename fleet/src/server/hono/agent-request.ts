@@ -13,21 +13,22 @@ import {
 import * as sdk from "@artinet/sdk";
 import { handleJSONRPCResponse } from "./rpc.js";
 import { generateRequestId } from "./utils.js";
-
 export const AGENT_FIELD_NAME = "agentId";
 
 export type handler = (
   ctx: hono.Context,
   next: hono.Next,
   context: RequestContext,
-  request?: RequestAgentRoute["implementation"]
+  request?: RequestAgentRoute["implementation"],
+  intercepts?: RequestAgentRoute["intercept"][]
 ) => Promise<void>;
 
 export async function handle(
   ctx: hono.Context,
   _next: hono.Next,
   context: RequestContext,
-  request: RequestAgentRoute["implementation"] = RequestAgent
+  request: RequestAgentRoute["implementation"] = RequestAgent,
+  intercepts?: RequestAgentRoute["intercept"][]
 ): Promise<void> {
   /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
   const body = sdk.safeParse(await ctx.req.text());
@@ -61,24 +62,34 @@ export async function handle(
     params: params,
   };
 
-  const response: RequestAgentRoute["response"] = await request(
-    agentRequest,
-    context
-  );
   sdk.logger.info(
-    `handle agent request completed:${parsed.method}:response:${JSON.stringify(
-      response,
-      null,
-      2
+    `handle agent request received:${parsed.method}:params:${sdk.formatJson(
+      agentRequest
     )}`
   );
+
+  const response: RequestAgentRoute["response"] = await request(
+    agentRequest,
+    context,
+    intercepts
+  );
+
+  sdk.logger.info(
+    `handle agent request completed:${parsed.method}:response:${sdk.formatJson(
+      response
+    )}`
+  );
+
   await handleJSONRPCResponse(ctx, requestId, parsed.method, response);
 }
 
 export const factory =
-  (request: RequestAgentRoute["implementation"] = RequestAgent): handler =>
+  (
+    request: RequestAgentRoute["implementation"] = RequestAgent,
+    intercepts?: RequestAgentRoute["intercept"][]
+  ): handler =>
   async (ctx: hono.Context, next: hono.Next, context: RequestContext) =>
-    await handle(ctx, next, context, request);
+    await handle(ctx, next, context, request, intercepts);
 
 /**
  * Handler utilities for agent HTTP requests.

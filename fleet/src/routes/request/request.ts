@@ -9,10 +9,13 @@ import { FetchAgent } from "./interceptors/fetch-agent.js";
 import { GetAgents } from "./interceptors/get-agents.js";
 import { requestImplementation } from "./implementation/request.js";
 
+const DEFAULT_INTERCEPTS = [FetchAgent, GetAgents];
+
 export const requestAgent = (
   request: RequestAgentRoute["request"],
   context: RequestAgentRoute["context"],
-  requestFn: RequestAgentRoute["implementation"] = requestImplementation
+  requestFn: RequestAgentRoute["implementation"] = requestImplementation,
+  intercepts: RequestAgentRoute["intercept"][] = []
 ): Promise<RequestAgentRoute["response"]> =>
   armada.entry<
     RequestAgentRoute["request"],
@@ -21,15 +24,16 @@ export const requestAgent = (
   >({
     request,
     implementation: requestFn,
-    intercepts: [FetchAgent, GetAgents],
+    intercepts: [...DEFAULT_INTERCEPTS, ...intercepts],
     context,
   });
 
 export const RequestAgent: RequestAgentRoute["implementation"] = (
   request: RequestAgentRoute["request"],
-  context: RequestAgentRoute["context"]
+  context: RequestAgentRoute["context"],
+  intercepts: RequestAgentRoute["intercept"][] = []
 ): Promise<RequestAgentRoute["response"]> =>
-  requestAgent(request, context, requestImplementation);
+  requestAgent(request, context, requestImplementation, intercepts);
 
 /**
  * Test agent implementation.

@@ -15,13 +15,15 @@ import {
   createMockContext,
   createValidAgentConfig,
   createMockAgent,
+  MockStore,
 } from "../mock.js";
+import { RequestAgent } from "../../src/routes/request/request.js";
+import { Middleware } from "../../src/routes/intercept.js";
 // sdk.applyDefaults();
 describe("Request Route", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
   describe("requestImplementation", () => {
     it("should throw error when target is not set", async () => {
       const request: RequestAgentRoute["request"] = {
@@ -407,12 +409,60 @@ describe("Request Route", () => {
       const context = createMockContext({
         target: agentConfig,
         invoke: jest.fn(() => Promise.resolve(expectedResponse)),
+        load: jest.fn(() => Promise.resolve(createMockAgent())),
       });
 
-      // Call requestImplementation directly
-      const result = await requestImplementation(request, context);
+      const result = await RequestAgent(request, context);
 
       expect(result).toEqual(expectedResponse);
+      expect(context.load).toHaveBeenCalled();
+      expect(context.invoke).toHaveBeenCalled();
+    });
+
+    it("should use middleware", async () => {
+      const request: RequestAgentRoute["request"] = {
+        method: "message/send",
+        params: {
+          message: {
+            messageId: "msg-1",
+            kind: "message",
+            role: "user",
+            parts: [{ kind: "text", text: "Hello" }],
+          },
+        },
+      };
+
+      const agentConfig = createValidAgentConfig();
+      const expectedResponse: RequestAgentRoute["response"] = {
+        type: "success",
+        result: {
+          kind: "task",
+          id: "task-1",
+          contextId: "context-1",
+          status: { state: "completed" },
+          artifacts: [],
+          history: [],
+        },
+      };
+      const requestSpy = jest.fn(() => Promise.resolve(request));
+      const responseSpy = jest.fn(() => Promise.resolve(expectedResponse));
+      const middleware = new Middleware();
+      const steps = middleware
+        .request(requestSpy)
+        .response(responseSpy)
+        .build();
+
+      const context = createMockContext({
+        target: agentConfig,
+        invoke: jest.fn(() => Promise.resolve(expectedResponse)),
+        load: jest.fn(() => Promise.resolve(createMockAgent())),
+      });
+
+      const result = await RequestAgent(request, context, steps);
+
+      expect(result).toEqual(expectedResponse);
+      expect(requestSpy).toHaveBeenCalled();
+      expect(responseSpy).toHaveBeenCalled();
       expect(context.load).toHaveBeenCalled();
       expect(context.invoke).toHaveBeenCalled();
     });
@@ -503,6 +553,43 @@ describe("Request Route", () => {
       const result = await loadAgent(config, context);
       expect(result).toBeDefined();
       expect((await result?.getAgentCard())?.name).toBe(config.name);
+    });
+
+    it("should use tasks from RequestContext", async () => {
+      const tasks = new sdk.Tasks(
+        new Map([
+          [
+            "task-1",
+            {
+              id: "task-1",
+              contextId: "context-1",
+              status: { state: "completed" },
+              kind: "task",
+              history: [
+                {
+                  messageId: "msg-1",
+                  kind: "message",
+                  role: "user",
+                  parts: [{ kind: "text", text: "Hello" }],
+                },
+              ],
+            } as sdk.A2A.Task,
+          ],
+        ])
+      );
+      expect(tasks.get("task-1")).toBeDefined();
+      const config = createValidAgentConfig();
+      const context = createMockContext({
+        tasks: tasks,
+      });
+      const agent = await loadAgent(config, context);
+      expect(agent).toBeDefined();
+      const task = await agent?.getTask({ id: "task-1" });
+      expect(task).toBeDefined();
+      expect(task?.id).toBe("task-1");
+      expect(task?.contextId).toBe("context-1");
+      expect(task?.status?.state).toBe("completed");
+      expect(task?.kind).toBe("task");
     });
   });
 
@@ -675,6 +762,14 @@ describe("Request Route", () => {
           data: { message: "Custom error" },
         })
       );
+    });
+  });
+
+  describe("middleware", () => {
+    it("should have correct number of intercepts", async () => {
+      const middleware = new Middleware();
+      const steps = middleware.request(jest.fn()).response(jest.fn()).build();
+      expect(steps.length).toBe(2);
     });
   });
 });

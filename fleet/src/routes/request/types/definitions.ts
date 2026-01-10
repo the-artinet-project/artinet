@@ -6,11 +6,12 @@
 import * as armada from "@artinet/armada";
 import { AgentConfiguration } from "agent-def";
 import * as sdk from "@artinet/sdk";
+import { API } from "@artinet/types";
 import { z } from "zod/v4";
 
 import { ResultOrError } from "../../../types.js";
 
-export type AgentRequest = {
+export type AgentRequest = API.APIRequest & {
   method: string;
   params: sdk.A2A.RequestParam;
 };
@@ -21,11 +22,12 @@ export type AgentError = {
   data?: unknown;
 };
 
-export type AgentResponse = ResultOrError<
-  sdk.A2A.ResponseResult | sdk.A2A.AgentCard,
-  AgentError,
-  sdk.A2A.Update
->;
+export type AgentResponse = API.APIResponse &
+  ResultOrError<
+    sdk.A2A.ResponseResult | sdk.A2A.AgentCard,
+    AgentError,
+    sdk.A2A.Update
+  >;
 
 export type Agent = sdk.Agent | sdk.AgentMessenger;
 
@@ -42,7 +44,9 @@ export type invokeFunction = <Req extends AgentRequest = AgentRequest>(
 
 export interface RequestContext
   extends armada.StorageContext<typeof armada.StoredAgentSchema>,
-    armada.FindContext<typeof armada.StoredAgentSchema> {
+    armada.FindContext<typeof armada.StoredAgentSchema>,
+    /**If passing `contexts` to the `orc8` loader, be aware that it requires a Monitored Context Manager */
+    Pick<sdk.CreateAgentParams, "contexts" | "tasks"> {
   agentId: string;
   headers?: Record<string, string>;
   agents?: Record<string, Agent>;

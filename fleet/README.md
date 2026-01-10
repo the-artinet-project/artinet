@@ -1,6 +1,7 @@
 <p align="center">
 <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
-<a href="https://www.npmjs.com/package/@artinet/fleet"><img src="https://img.shields.io/npm/v/@artinet/fleet?color=black" alt="Downloads"></a>
+<a href="https://www.npmjs.com/package/@artinet/fleet"><img src="https://img.shields.io/npm/v/@artinet/fleet?color=black" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@artinet/fleet"><img src="https://img.shields.io/npm/dt/@artinet/fleet?color=black" alt="Downloads"></a>
 <a><img src="https://img.shields.io/badge/License-Apache_2.0-black.svg" alt="License"></a>
 <a href="https://snyk.io/test/npm/@artinet/fleet"><img src="https://snyk.io/test/npm/@artinet/fleet/badge.svg" alt="Known Vulnerabilities"></a>
 </p>
@@ -8,7 +9,7 @@
 
 Deploy AI agents on any infrastructure.
 
-Fleet is a lightweight server framework for hosting [A2A Protocol](https://github.com/google-a2a/A2A) agents with built-in orchestration, tool integration (MCP), and Agent2Agent communication.
+Fleet is a lightweight server framework for hosting agents with built-in orchestration, tool integration (MCP), and Agent2Agent communication.
 
 ## Installation
 
@@ -220,6 +221,37 @@ configure({
 });
 ```
 
+### Middleware
+
+Intercept and transform agent requests and responses by adding `Middleware`:
+
+```typescript
+import { fleet } from "@artinet/fleet/express";
+import { Middleware } from "@artinet/fleet";
+
+fleet({
+  middleware: new Middleware()
+    .request(async ({ request, context }) => {
+      // Inspect or transform incoming requests
+      console.log("Incoming request:", request);
+      return request;
+    })
+    .response(
+      async ({ response, context }) => {
+        // Inspect or transform outgoing responses
+        console.log("Outgoing response:", response);
+        return response;
+      },
+      // Use a trigger function to determine if the middleware should fire (defaults to `true` for every request/response)
+      ({ response, context }) => {
+        return true;
+      }
+    ),
+}).launch(3000);
+```
+
+The middleware chain is composable & sequential; add multiple `request` or `response` handlers as needed. Each handler receives the current request/response and context, and must return the (optionally modified) value.
+
 ## [Docker Configuration](https://github.com/the-artinet-project/artinet/blob/main/fleet/dockerfile)
 
 Build the docker image:
@@ -290,6 +322,7 @@ app.listen(3000);
 | `testPath`             | `string`     | `"/test"`                      | Test endpoint                                                                                                                   |
 | `inferenceProviderUrl` | `string`     | `undefined`                    | An OpenAI API compatible endpoint                                                                                               |
 | `load`                 | `function`   | `loadAgent`                    | Returns an A2A Protocol compliant agent wrapped in the [`@artinet/sdk`](<(https://github.com/the-artinet-project/artinet-sdk)>) |
+| `middleware`           | `Middleware` | `undefined`                    | Request/response interceptors for the agent route                                                                               |
 
 ## API Reference
 

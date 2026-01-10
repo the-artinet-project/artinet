@@ -13,7 +13,6 @@ import {
 import * as sdk from "@artinet/sdk";
 import { handleJSONRPCResponse } from "./rpc.js";
 import { generateRequestId } from "./utils.js";
-
 export const AGENT_FIELD_NAME = "agentId";
 
 export type handler = (
@@ -21,7 +20,8 @@ export type handler = (
   res: express.Response,
   next: express.NextFunction,
   context: RequestContext,
-  request?: RequestAgentRoute["implementation"]
+  request?: RequestAgentRoute["implementation"],
+  intercepts?: RequestAgentRoute["intercept"][]
 ) => Promise<void>;
 
 export async function handle(
@@ -29,7 +29,8 @@ export async function handle(
   res: express.Response,
   _next: express.NextFunction,
   context: RequestContext,
-  request: RequestAgentRoute["implementation"] = RequestAgent
+  request: RequestAgentRoute["implementation"] = RequestAgent,
+  intercepts?: RequestAgentRoute["intercept"][]
 ): Promise<void> {
   const requestId: string = generateRequestId(context, req);
   let parsed: sdk.A2A.A2ARequest;
@@ -61,29 +62,38 @@ export async function handle(
     params: params,
   };
 
+  sdk.logger.info(
+    `handle agent request received:${parsed.method}:params:${sdk.formatJson(
+      agentRequest
+    )}`
+  );
+
   const response: RequestAgentRoute["response"] = await request(
     agentRequest,
-    context
+    context,
+    intercepts
   );
+
   sdk.logger.info(
-    `handle agent request completed:${parsed.method}:response:${JSON.stringify(
-      response,
-      null,
-      2
+    `handle agent request completed:${parsed.method}:response:${sdk.formatJson(
+      response
     )}`
   );
   await handleJSONRPCResponse(res, requestId, parsed.method, response);
 }
 
 export const factory =
-  (request: RequestAgentRoute["implementation"] = RequestAgent): handler =>
+  (
+    request: RequestAgentRoute["implementation"] = RequestAgent,
+    intercepts?: RequestAgentRoute["intercept"][]
+  ): handler =>
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
     context: RequestContext
   ) =>
-    await handle(req, res, next, context, request);
+    await handle(req, res, next, context, request, intercepts);
 
 /**
  * Handler utilities for agent HTTP requests.

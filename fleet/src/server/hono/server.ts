@@ -35,7 +35,11 @@ const createContext = (settings: Partial<Settings>) => {
   const _settings = {
     ...DEFAULTS,
     ...settings,
-    retrieve: agent.factory(settings.get ?? DEFAULTS.get),
+    retrieve: agent.factory(
+      settings.get ?? DEFAULTS.get,
+      /**Middleware addons are currently only supported on the agent request route */
+      settings.middleware?.build() ?? []
+    ),
     deploy: deployment.factory(settings.set ?? DEFAULTS.set),
     evaluate: testing.factory(settings.test ?? DEFAULTS.test),
     user: settings.user
