@@ -129,5 +129,5 @@ Contributions welcome! Please open an issue or PR on [GitHub](https://github.com
 ## Links
 
 - 🌐 [Website](https://artinet.io)
-- 👥 [Reddit](https://www.reddit.com/r/artinet/)
+- 👥 [Reddit](https://www.reddit.com/r/theartinet/)
 - 💬 [Discord](https://discord.gg/DaxzSchmmX)
