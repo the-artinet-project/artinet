@@ -45,6 +45,7 @@ export const loadAgent: loadFunction = async (
       message: "Context not found",
     });
   }
+
   const o8 = orc8.create({
     ...(config as Partial<
       Omit<Orc8Params, "modelId" | "instructions" | "services" | "provider">
@@ -55,6 +56,7 @@ export const loadAgent: loadFunction = async (
       context.defaultInstructions ??
       DEFAULT_INSTRUCTIONS,
     provider,
+    tasks: context.tasks,
   });
 
   if (requiredAgentsNotLoaded(config, context)) {
