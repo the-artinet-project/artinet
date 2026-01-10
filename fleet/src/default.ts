@@ -20,5 +20,5 @@ export const DEFAULTS = {
   load: loadAgent,
   invoke: invokeAgent,
   storage: new InMemoryStore(),
-  baseUrl: "https://localhost:3000",
+  baseUrl: "http://localhost:3000",
 };
