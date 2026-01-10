@@ -4,10 +4,10 @@
  */
 
 import * as armada from "@artinet/armada";
-import * as SDK from "@artinet/sdk";
+import * as sdk from "@artinet/sdk";
 
 export class InMemoryStore
-  extends SDK.Manager<armada.StoredAgent>
+  extends sdk.Manager<armada.StoredAgent>
   implements armada.IDataStore<armada.StoredAgent>
 {
   async search(query: string): Promise<armada.StoredAgent[]> {
