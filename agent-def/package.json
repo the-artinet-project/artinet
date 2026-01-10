@@ -32,12 +32,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-artinet-project/artinetgit"
+    "url": "git+https://github.com/the-artinet-project/artinet.git"
   },
   "bugs": {
     "url": "https://github.com/the-artinet-project/artinet/issues"
   },
-  "homepage": "https://github.com/the-artinet-project/artinet#readme",
+  "homepage": "https://artinet.io",
   "files": [
     "./dist/**/*",
     "./package.json",
