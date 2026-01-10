@@ -10,7 +10,7 @@ import {
   CreateAgentRequestSchema,
 } from "../../routes/create/index.js";
 import { generateRequestId, generateRegistrationId } from "./utils.js";
-import { logger, validateSchema } from "@artinet/sdk";
+import { logger, validateSchema, formatJson } from "@artinet/sdk";
 
 export type handler = (
   req: express.Request,
@@ -27,11 +27,14 @@ export async function handle(
   context: CreateAgentRoute["context"],
   deploy: CreateAgentRoute["implementation"] = CreateAgent
 ): Promise<void> {
-  logger.warn(`handle deploy request with body: ${JSON.stringify(req.body)}`);
   const request: CreateAgentRoute["request"] = await validateSchema(
     CreateAgentRequestSchema,
     req?.body ?? {}
   );
+
+  logger.info(`deploying agent: ${request.config.name}`);
+  logger.debug(`deploying agent: ${formatJson(request)}`);
+
   context.registrationId = generateRegistrationId(request.config.uri);
   const result: CreateAgentRoute["response"] = await deploy(request, context);
   res.json(result);
@@ -55,6 +58,7 @@ export interface Params {
   handler: handler;
   user: (req: express.Request) => Promise<string>;
 }
+
 export async function request({
   request: req,
   response: res,

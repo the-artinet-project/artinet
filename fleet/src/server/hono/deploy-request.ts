@@ -27,11 +27,14 @@ export async function handle(
 ): Promise<void> {
   /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
   const req = sdk.safeParse(await ctx.req.text());
-  sdk.logger.warn(`handle deploy request with body: ${JSON.stringify(req)}`);
   const request: CreateAgentRoute["request"] = await sdk.validateSchema(
     CreateAgentRequestSchema,
     req
   );
+
+  sdk.logger.info(`deploying agent: ${request.config.name}`);
+  sdk.logger.debug(`deploying agent: ${sdk.formatJson(request)}`);
+
   context.registrationId = generateRegistrationId(request.config.uri);
   const result: CreateAgentRoute["response"] = await deploy(request, context);
   ctx.res = ctx.json(result);
