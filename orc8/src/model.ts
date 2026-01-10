@@ -73,9 +73,10 @@ type ServiceRequest = {
  */
 export interface CreateModelParams
   extends Omit<
-    Partial<sdk.A2A.AgentCard & { uri: string }>,
-    "provider" | "skills"
-  > {
+      Partial<sdk.A2A.AgentCard & { uri: string }>,
+      "provider" | "skills"
+    >,
+    Pick<sdk.CreateAgentParams, "tasks"> {
   /**
    * The identifier for the underlying LLM model.
    * This is passed to the API provider to select the appropriate model.
@@ -421,6 +422,7 @@ export class Model
       },
       engine: this.engine,
       contexts: this._events,
+      tasks: this._params.tasks,
     });
   }
 
