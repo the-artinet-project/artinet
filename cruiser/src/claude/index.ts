@@ -167,6 +167,7 @@ export const park: Park<ClaudeAgent, never> = async (
         };
       }
     } catch (error) {
+      sdk.logger.error("error", error);
       yield sdk.describe.update.failed({
         taskId: context.taskId,
         contextId: context.contextId,
