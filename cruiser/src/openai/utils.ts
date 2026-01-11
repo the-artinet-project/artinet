@@ -47,7 +47,7 @@ async function convertToolsToSkills(
  * Builds an {@link sdk.A2A.AgentCard} from {@link OpenAIAgent} configuration.
  *
  * Creates a standardized AgentCard that describes the OpenAI agent's
- * identity, capabilities, and skills in the artinet format.
+ * identity, capabilities, and skills.
  *
  * @param params - Configuration parameters
  * @param params.agent - The {@link OpenAIAgent} to extract metadata from

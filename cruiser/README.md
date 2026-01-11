@@ -9,14 +9,14 @@
 <h1 align="center"><em>cruiser</em></h1>
 
 <p align="center">
-Universal adapters for multi-agent interoperability via the <strong>Agent2Agent (A2A) Protocol</strong>.
+Universal adapters for multi-agent interoperability.
 </p>
 
 > ⚠️ **Experimental**: This library is under active development. APIs may change between versions.
 
 ## Overview
 
-**Cruiser** provides "park" adapters that bridge popular AI agent frameworks to the [Agent2Agent (A2A) Protocol](https://github.com/google-a2a/A2A), enabling seamless multi-agent communication through the [`@artinet/sdk`](https://www.npmjs.com/package/@artinet/sdk).
+**Cruiser** provides "park" adapters that bridge popular AI agent frameworks to enable multi-agent communication through the [`@artinet/sdk`](https://www.npmjs.com/package/@artinet/sdk).
 
 ### Supported Frameworks
 
@@ -57,6 +57,8 @@ npm install @strands-agents/sdk
 
 ### Single Agent
 
+Create an agent from any of the supported frameworks and park it on artinet:
+
 ```typescript
 import { Agent } from "@openai/agents";
 import { park } from "@artinet/cruiser/openai";
@@ -68,25 +70,26 @@ const agent = new Agent({
   instructions: "You are a helpful assistant",
 });
 
-// 2. Park it into the A2A ecosystem
+// 2. Park it onto artinet
 const artinetAgent = await park(agent, { name: "My Assistant" });
 
-// 3. Deploy
+// 3. Spin it up as an A2A compatible Server
 serve({ agent: artinetAgent, port: 3000 });
 ```
 
 ### Multi-Agent System
 
-Create interoperable agents from different frameworks:
+Create interoperable multi-agent systems:
 
 ```typescript
-import { Agent as OpenAIAgent } from "@openai/agents";
-import { Agent as MastraAgent } from "@mastra/core/agent";
-import { park as parkOpenAI } from "@artinet/cruiser/openai";
+import { serve, cr8 } from "@artinet/sdk";
 import { park as parkMastra } from "@artinet/cruiser/mastra";
-import { serve, A2AClient } from "@artinet/sdk";
+import { park as parkOpenAI } from "@artinet/cruiser/openai";
+import { Agent as MastraAgent } from "@mastra/core/agent";
+import { Agent as OpenAIAgent } from "@openai/agents";
+import { MastraModel } from "./mastra-model";
 
-// Park agents from different frameworks
+// Use agents from different frameworks
 const researcher = await parkOpenAI(
   new OpenAIAgent({ name: "researcher", instructions: "Research topics" }),
   { name: "Researcher" }
@@ -97,19 +100,20 @@ const writer = await parkMastra(
   { name: "Writer" }
 );
 
-// Deploy on different ports
-serve({ agent: researcher, port: 3001 });
-serve({ agent: writer, port: 3002 });
+// Chain them together
+const agent = cr8("Orchestrator Agent")
+  // The researcher will receive the incoming user message
+  .sendMessage(researcher)
+  // The results are passed to the writer with additional instructions
+  .sendMessage(
+    writer,
+    "use the research results to create a publishable article"
+  ).agent;
 
-// Agents can now communicate via A2A protocol
-const client = new A2AClient("http://localhost:3001");
-const result = await client.sendMessage({
-  message: {
-    role: "user",
-    parts: [{ kind: "text", text: "Research AI trends" }],
-  },
-});
+console.log(await agent.sendMessage("I want to learn about the Roman Empire."));
 ```
+
+- For more information on how to chain agent requests see the [artinet-sdk](https://github.com/the-artinet-project/artinet-sdk/blob/main/docs/create.md#agent-orchestration)
 
 ## API Reference
 
@@ -117,15 +121,15 @@ const result = await client.sendMessage({
 
 Each adapter exports a `park` function with the same signature:
 
-| Parameter | Type               | Description                         |
-| --------- | ------------------ | ----------------------------------- |
-| `agent`   | Framework-specific | The agent instance to park          |
-| `card`    | `AgentCardParams`  | Optional A2A identity configuration |
-| `options` | Framework-specific | Optional execution options          |
+| Parameter | Type               | Description                |
+| --------- | ------------------ | -------------------------- |
+| `agent`   | Framework-specific | The agent instance to park |
+| `card`    | `AgentCardParams`  | Optional identity details  |
+| `options` | Framework-specific | Optional execution options |
 
-**Returns**: `Promise<sdk.Agent>` - An A2A-compatible agent
+**Returns**: `Promise<Agent>` - An artinet-compatible agent
 
-### Example with Full Configuration
+### Describe your agent
 
 ```typescript
 import { park } from "@artinet/cruiser/openai";
@@ -141,6 +145,7 @@ const artinetAgent = await park(
     ],
   },
   {
+    // Most adapters allow for framework specific options to be passed
     maxTurns: 10,
     signal: abortController.signal,
   }
@@ -151,33 +156,32 @@ const artinetAgent = await park(
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Your Application                         │
+│                     Your Application                        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    @artinet/cruiser                          │
+│                    @artinet/cruiser                         │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────┐ │
 │  │ OpenAI  │ │ Mastra  │ │ Claude  │ │LangChain│ │ Strands│ │
 │  │  park   │ │  park   │ │  park   │ │  park   │ │  park  │ │
 │  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └───┬────┘ │
-│       │           │           │           │          │       │
-│       └───────────┴───────────┴───────────┴──────────┘       │
-│                              │                               │
-│                              ▼                               │
-│                    Unified Park Interface                    │
+│       │           │           │           │          │      │
+│       └───────────┴───────────┴───────────┴──────────┘      │
+│                              │                              │
+│                              ▼                              │
+│                       Unified Interface                     │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      @artinet/sdk                            │
-│               A2A Protocol Implementation                    │
+│                      @artinet/sdk                           │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Agent2Agent Network                        │
-│              (Multi-Agent Communication)                     │
+│                         artinet                             │
+│              (Multi-Agent Communication)                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
