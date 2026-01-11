@@ -1,6 +1,7 @@
 *
 !.gitignore
 !README.md
+!CHANGELOG
 !agent-def
 !agent-def/**
 !ask
