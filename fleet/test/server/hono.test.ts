@@ -252,7 +252,8 @@ describe("Hono Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "agentcard/get" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         expect(ctx.json).toHaveBeenCalledWith({ name: "test-agent" });
       });
@@ -280,7 +281,8 @@ describe("Hono Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "agentcard/get" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         expect(ctx.json).toHaveBeenCalledWith({
           name: "test-agent",
@@ -348,7 +350,8 @@ describe("Hono Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "message/send" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         expect(ctx.json).toHaveBeenCalled();
       });

@@ -31,7 +31,7 @@ import { CreateAgent } from "../../src/routes/create/index.js";
 import { applyDefaults } from "@artinet/sdk";
 import { describe as des6 } from "@artinet/sdk";
 import { Middleware } from "../../src/routes/intercept.js";
-applyDefaults();
+// applyDefaults();
 describe("Express Server", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -268,7 +268,8 @@ describe("Express Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "agentcard/get" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         // agentcard/get returns plain JSON, not JSON-RPC wrapped
         expect(res.json).toHaveBeenCalledWith({ name: "test-agent" });
@@ -301,7 +302,8 @@ describe("Express Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "agentcard/get" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         expect(res.json).toHaveBeenCalledWith({
           name: "test-agent",
@@ -378,7 +380,8 @@ describe("Express Server", () => {
 
         expect(mockHandler).toHaveBeenCalledWith(
           expect.objectContaining({ method: "message/send" }),
-          expect.any(Object)
+          expect.any(Object),
+          undefined
         );
         expect(res.json).toHaveBeenCalled();
       });
