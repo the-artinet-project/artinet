@@ -208,7 +208,7 @@ export function extractA2AMessage<TAgent extends ReactAgent>(
     });
   }
 
-  let parts: sdk.A2A.Part[] = [];
+  const parts: sdk.A2A.Part[] = [];
 
   if (typeof result === "string") {
     parts.push(sdk.describe.part.text(result));

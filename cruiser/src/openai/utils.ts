@@ -195,7 +195,7 @@ export function extractA2AMessage(
       parts: [sdk.describe.part.text(text)],
     });
   }
-  let parts: sdk.A2A.Part[] = [];
+  const parts: sdk.A2A.Part[] = [];
 
   if (typeof result.finalOutput === "string") {
     parts.push(sdk.describe.part.text(result.finalOutput));

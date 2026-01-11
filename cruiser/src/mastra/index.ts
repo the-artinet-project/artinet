@@ -129,7 +129,7 @@ export const park: Park<
     );
     const task = await context.getTask();
 
-    let messages: sdk.A2A.Message[] = sdk.getLatestHistory(task);
+    const messages: sdk.A2A.Message[] = sdk.getLatestHistory(task);
 
     const resourceId =
       (task.metadata?.resourceId as string) ??
