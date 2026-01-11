@@ -12,6 +12,7 @@ on:
       - "fleet/**"
       - "loader/**"
       - "relay/**"
+      - "cruiser/**"
   pull_request:
     branches: ["main"]
     paths:
@@ -20,6 +21,7 @@ on:
       - "fleet/**"
       - "loader/**"
       - "relay/**"
+      - "cruiser/**"
 
 jobs:
   detect-changes:
@@ -44,6 +46,8 @@ jobs:
               - 'loader/**'
             relay:
               - 'relay/**'
+            cruiser:
+              - 'cruiser/**'
   build:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.packages != '[]' }}
