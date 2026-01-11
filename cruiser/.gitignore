@@ -6,6 +6,7 @@
 !eslint.config.js
 !jest.config.js
 !README.md
+!CODE_OF_CONDUCT.md
 !src
 !src/**
 !tests
