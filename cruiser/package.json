@@ -16,6 +16,26 @@
       "types": "./dist/mastra/index.d.ts",
       "import": "./dist/mastra/index.js",
       "default": "./dist/mastra/index.js"
+    },
+    "./langchain": {
+      "types": "./dist/langchain/index.d.ts",
+      "import": "./dist/langchain/index.js",
+      "default": "./dist/langchain/index.js"
+    },
+    "./claude": {
+      "types": "./dist/claude/index.d.ts",
+      "import": "./dist/claude/index.js",
+      "default": "./dist/claude/index.js"
+    },
+    "./openai": {
+      "types": "./dist/openai/index.d.ts",
+      "import": "./dist/openai/index.js",
+      "default": "./dist/openai/index.js"
+    },
+    "./strands": {
+      "types": "./dist/strands/index.d.ts",
+      "import": "./dist/strands/index.js",
+      "default": "./dist/strands/index.js"
     }
   },
   "rootDir": ".",
