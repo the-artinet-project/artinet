@@ -63,7 +63,11 @@
     "ai",
     "agent",
     "artificial intelligence",
-    "mastra"
+    "mastra",
+    "langchain",
+    "claude",
+    "openai",
+    "strands"
   ],
   "author": "artinet",
   "license": "Apache-2.0",
