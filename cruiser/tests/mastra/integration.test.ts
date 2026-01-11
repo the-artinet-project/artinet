@@ -1,0 +1,101 @@
+/**
+ * Mastra Agent Integration Tests
+ *
+ * These tests hit real LLMs using OPENAI_API_KEY and optionally INFERENCE_PROVIDER_URL
+ * for OpenRouter or other OpenAI-compatible APIs.
+ * They are skipped if the API key is not available.
+ */
+import { describe, it, expect, beforeAll } from "@jest/globals";
+import { Agent as MastraAgent } from "@mastra/core/agent";
+import { createOpenAI } from "@ai-sdk/openai";
+import { park } from "../../src/mastra";
+import { INTEGRATION_TIMEOUT } from "../setup";
+
+const hasApiKey = !!process.env.OPENAI_API_KEY;
+const baseURL = process.env.INFERENCE_PROVIDER_URL;
+
+describe("Mastra Integration", () => {
+  beforeAll(() => {
+    if (!hasApiKey) {
+      console.log("Skipping Mastra integration tests: OPENAI_API_KEY not set");
+    }
+    if (baseURL) {
+      console.log(`Using custom inference provider: ${baseURL}`);
+    }
+  });
+
+  it(
+    "should create and run a Mastra agent with real LLM",
+    async () => {
+      if (!hasApiKey) {
+        console.log("Skipping: OPENAI_API_KEY not set");
+        return;
+      }
+
+      const openai = createOpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+        ...(baseURL && { baseURL }),
+      });
+
+      // Use OpenRouter model format if using custom provider
+      const modelName = baseURL ? "openai/gpt-4o-mini" : "gpt-4o-mini";
+
+      const agent = new MastraAgent({
+        name: "test-mastra-agent",
+        instructions: "You are a helpful assistant. Respond briefly.",
+        model: openai(modelName),
+      });
+
+      const artinetAgent = await park(agent);
+      const result = await artinetAgent.sendMessage(
+        "What is 3 + 5? Reply with just the number."
+      );
+      expect(result).toBeDefined();
+      expect(result.status.message?.parts).toBeDefined();
+      expect(result.status.message?.parts.length).toBeGreaterThan(0);
+
+      const lastMessage =
+        result.status.message?.parts[result.status.message?.parts.length - 1];
+      expect(lastMessage?.kind).toBe("text");
+      expect(lastMessage?.text).toBeDefined();
+      expect(lastMessage?.text).toMatch(/8/);
+    },
+    INTEGRATION_TIMEOUT
+  );
+
+  it(
+    "should include usage metadata in response",
+    async () => {
+      if (!hasApiKey) {
+        console.log("Skipping: OPENAI_API_KEY not set");
+        return;
+      }
+
+      const openai = createOpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+        ...(baseURL && { baseURL }),
+      });
+
+      const modelName = baseURL ? "openai/gpt-4o-mini" : "gpt-4o-mini";
+
+      const agent = new MastraAgent({
+        name: "usage-test-agent",
+        instructions: "You are a helpful assistant.",
+        model: openai(modelName),
+      });
+
+      const artinetAgent = await park(agent);
+      const result = await artinetAgent.sendMessage("Say hello");
+
+      expect(result).toBeDefined();
+      expect(result.status.message?.parts).toBeDefined();
+      expect(result.status.message?.parts.length).toBeGreaterThan(0);
+      expect(result.status.message?.metadata).toBeDefined();
+      expect(result.status.message?.metadata?.execution?.usage).toBeDefined();
+      expect(
+        result.status.message?.metadata?.execution?.finishReason
+      ).toBeDefined();
+    },
+    INTEGRATION_TIMEOUT
+  );
+});

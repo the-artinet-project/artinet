@@ -1,0 +1,15 @@
+*
+!.gitignore
+!.npmignore
+!package.json
+!tsconfig.json
+!eslint.config.js
+!jest.config.js
+!README.md
+!src
+!src/**
+!tests
+!tests/**
+
+# .github
+

@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationDir": "./dist",
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "lib": ["ES2022", "DOM"],
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "baseUrl": "."
+  },
+  "include": ["./src/**/*"],
+  "exclude": [
+    "node_modules",
+    "deps/**/*",
+    "dist",
+    "tests",
+    "examples",
+    "**/*.test.ts",
+    ".external",
+    "src/browser.ts"
+  ]
+}

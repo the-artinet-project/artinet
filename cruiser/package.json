@@ -1,0 +1,117 @@
+{
+  "name": "@artinet/cruiser",
+  "version": "0.1.0",
+  "description": "A library for building A2A enabled runtime Agents.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mastra": {
+      "types": "./dist/mastra/index.d.ts",
+      "import": "./dist/mastra/index.js",
+      "default": "./dist/mastra/index.js"
+    }
+  },
+  "rootDir": ".",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "clean": "rimraf dist",
+    "rebuild": "rimraf dist node_modules/ package-lock.json && npm i && npm run build:all",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run rebuild && npm run lint && npm test",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+  },
+  "keywords": [
+    "agent2agent",
+    "a2a",
+    "artinet",
+    "ai",
+    "agent",
+    "artificial intelligence",
+    "mastra"
+  ],
+  "author": "artinet",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-artinet-project/artinet.git"
+  },
+  "bugs": {
+    "url": "https://github.com/the-artinet-project/artinet/issues"
+  },
+  "homepage": "https://artinet.io",
+  "dependencies": {
+    "@artinet/sdk": "^0.6.2",
+    "@artinet/types": "^0.0.9",
+    "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "@a2a-js/sdk": "^0.3.7",
+    "express": "^5.1.0",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "openai": "^6.15.0",
+    "langchain": "^1.2.7",
+    "@mastra/core": "^0.24.9",
+    "@mastra/server": "^0.24.9",
+    "@strands-agents/sdk": "^0.1.4",
+    "@anthropic-ai/claude-agent-sdk": "^0.2.2",
+    "@anthropic-ai/sdk": "^0.71.2"
+  },
+  "peerDependenciesMeta": {
+    "@a2a-js/sdk": {
+      "optional": false
+    },
+    "express": {
+      "optional": false
+    },
+    "@modelcontextprotocol/sdk": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "@a2a-js/sdk": "^0.3.7",
+    "@ai-sdk/openai": "^2.0.53",
+    "@anthropic-ai/claude-agent-sdk": "^0.2.2",
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@eslint/js": "^9.25.1",
+    "@langchain/openai": "^1.2.1",
+    "@mastra/core": "^0.24.9",
+    "@mastra/server": "^0.24.9",
+    "@openai/agents": "^0.3.7",
+    "@strands-agents/sdk": "^0.1.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "@types/uuid": "^11.0.0",
+    "ai": "^4.3.19",
+    "eslint": "^9.25.1",
+    "globals": "^17.0.0",
+    "jest": "^30.2.0",
+    "langchain": "^1.2.7",
+    "rimraf": "^6.1.2",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.20.4",
+    "typescript": "^5.2.2",
+    "typescript-eslint": "^8.31.0"
+  },
+  "engines": {
+    "node": ">=18.9.1"
+  },
+  "directories": {
+    "test": "tests"
+  }
+}
