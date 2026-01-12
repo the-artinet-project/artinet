@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeAll } from "@jest/globals";
 import { Agent as MastraAgent } from "@mastra/core/agent";
 import { createOpenAI } from "@ai-sdk/openai";
-import { park } from "../../src/mastra";
+import { dock } from "../../src/mastra";
 import { INTEGRATION_TIMEOUT } from "../setup";
 
 const hasApiKey = !!process.env.OPENAI_API_KEY;
@@ -46,7 +46,7 @@ describe("Mastra Integration", () => {
         model: openai(modelName),
       });
 
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result = await artinetAgent.sendMessage(
         "What is 3 + 5? Reply with just the number."
       );
@@ -84,7 +84,7 @@ describe("Mastra Integration", () => {
         model: openai(modelName),
       });
 
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result = await artinetAgent.sendMessage("Say hello");
 
       expect(result).toBeDefined();

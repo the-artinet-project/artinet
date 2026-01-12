@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "@jest/globals";
 import * as langchain from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
 import { INTEGRATION_TIMEOUT } from "../setup";
-import { park } from "../../src/langchain";
+import { dock } from "../../src/langchain";
 import * as artinet from "@artinet/sdk";
 
 const hasApiKey = !!process.env.OPENAI_API_KEY;
@@ -43,7 +43,7 @@ describe("LangChain Integration", () => {
         name: "test-langchain-agent",
       });
 
-      const artinetAgent: artinet.Agent = await park(langchainAgent);
+      const artinetAgent: artinet.Agent = await dock(langchainAgent);
 
       const result: artinet.A2A.Task | artinet.A2A.Message =
         await artinetAgent.sendMessage(
@@ -87,7 +87,7 @@ describe("LangChain Integration", () => {
       });
 
       // First turn
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result1 = await artinetAgent.sendMessage(
         "My favorite color is blue. Remember this."
       );

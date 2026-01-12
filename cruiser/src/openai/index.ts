@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/openai
  * @description
- * This adapter "parks" {@link OpenAIAgent | OpenAI Agents} (from `@openai/agents`) into the
+ * This adapter "docks" {@link OpenAIAgent | OpenAI Agents} (from `@openai/agents`) into the
  * artinet, enabling them to participate in multi-agent workflows.
  *
  * ## Design Decisions
@@ -24,7 +24,7 @@
  *
  * ```typescript
  * import { Agent } from "@openai/agents";
- * import { park } from "@artinet/cruiser/openai";
+ * import { dock } from "@artinet/cruiser/openai";
  * import { serve } from "@artinet/sdk";
  *
  * const openaiAgent = new Agent({
@@ -32,7 +32,7 @@
  *   instructions: "You are a helpful assistant",
  * });
  *
- * const artinetAgent = await park(openaiAgent, { name: "My Assistant" });
+ * const artinetAgent = await dock(openaiAgent, { name: "My Assistant" });
  * serve({ agent: artinetAgent, port: 3000 });
  * ```
  *
@@ -46,7 +46,7 @@ import {
   TextOutput,
 } from "@openai/agents";
 import * as sdk from "@artinet/sdk";
-import { Park } from "../corsair.js";
+import { Dock, Park } from "../corsair.js";
 import {
   getAgentCard,
   convertToAgentInputItem,
@@ -61,23 +61,28 @@ import {
  *
  * @see {@link NonStreamRunOptions} from `@openai/agents`
  */
-export type OpenAIParkOptions = NonStreamRunOptions<unknown>;
+export type OpenAIDockOptions = NonStreamRunOptions<unknown>;
 
 /**
- * Parks an {@link OpenAIAgent} onto artinet.
+ * @deprecated Use {@link OpenAIDockOptions} instead.
+ */
+export type OpenAIParkOptions = OpenAIDockOptions;
+
+/**
+ * Docks an {@link OpenAIAgent} onto artinet.
  *
  * Transforms an OpenAI Agent instance into an {@link sdk.Agent | A2A-compatible agent}
  * that can be deployed on artinet and communicate with other A2A agents.
  *
- * @param agent - The {@link OpenAIAgent} to park
+ * @param agent - The {@link OpenAIAgent} to dock
  * @param card - Optional {@link sdk.A2A.AgentCardParams} configuration to customize identity and capabilities
- * @param options - Optional {@link OpenAIParkOptions} (maxTurns, signal, hooks, etc.)
+ * @param options - Optional {@link OpenAIDockOptions} (maxTurns, signal, hooks, etc.)
  *
  * @returns A Promise resolving to an {@link sdk.Agent} ready for deployment
  *
  * @example Basic Usage
  * ```typescript
- * import { park } from "@artinet/cruiser/openai";
+ * import { dock } from "@artinet/cruiser/openai";
  * import { Agent } from "@openai/agents";
  *
  * const agent = new Agent({
@@ -85,12 +90,12 @@ export type OpenAIParkOptions = NonStreamRunOptions<unknown>;
  *   instructions: "You are a helpful assistant",
  * });
  *
- * const artinetAgent = await park(agent, { name: "Helper Bot" });
+ * const artinetAgent = await dock(agent, { name: "Helper Bot" });
  * ```
  *
  * @example With Tools
  * ```typescript
- * import { park } from "@artinet/cruiser/openai";
+ * import { dock } from "@artinet/cruiser/openai";
  * import { Agent, tool } from "@openai/agents";
  * import { z } from "zod";
  *
@@ -107,12 +112,12 @@ export type OpenAIParkOptions = NonStreamRunOptions<unknown>;
  *   tools: [searchTool],
  * });
  *
- * const artinetAgent = await park(agent, { name: "Research Bot" });
+ * const artinetAgent = await dock(agent, { name: "Research Bot" });
  * ```
  *
  * @example With Execution Options
  * ```typescript
- * import { park } from "@artinet/cruiser/openai";
+ * import { dock } from "@artinet/cruiser/openai";
  * import { Agent } from "@openai/agents";
  *
  * const agent = new Agent({
@@ -120,7 +125,7 @@ export type OpenAIParkOptions = NonStreamRunOptions<unknown>;
  *   instructions: "You are a helpful assistant",
  * });
  *
- * const artinetAgent = await park(
+ * const artinetAgent = await dock(
  *   agent,
  *   { name: "Limited Agent" },
  *   {
@@ -130,10 +135,10 @@ export type OpenAIParkOptions = NonStreamRunOptions<unknown>;
  * );
  * ```
  */
-export const park: Park<OpenAIAgent, OpenAIParkOptions> = async (
+export const dock: Dock<OpenAIAgent, OpenAIDockOptions> = async (
   agent: OpenAIAgent<unknown, TextOutput>,
   card?: sdk.A2A.AgentCardParams,
-  options?: OpenAIParkOptions
+  options?: OpenAIDockOptions
 ): Promise<sdk.Agent> => {
   const agentCard = await getAgentCard({ agent, card });
   sdk.logger.debug(`OpenAI[${agent.name}]:[card:${JSON.stringify(agentCard)}]`);
@@ -174,3 +179,8 @@ export const park: Park<OpenAIAgent, OpenAIParkOptions> = async (
     yield completedUpdate;
   });
 };
+
+/**
+ * @deprecated Use {@link dock} instead.
+ */
+export const park: Park<OpenAIAgent, OpenAIDockOptions> = dock;

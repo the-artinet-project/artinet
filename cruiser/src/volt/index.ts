@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/volt
  * @description
- * This adapter "parks" Volt agents onto the Artinet A2A protocol.
+ * This adapter "docks" Volt agents onto the Artinet A2A protocol.
  *
  * ## Status
  *

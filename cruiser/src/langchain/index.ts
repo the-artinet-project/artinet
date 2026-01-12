@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/langchain
  * @description
- * This adapter "parks" LangChain agents ({@link ReactAgent} and compatible types) onto
+ * This adapter "docks" LangChain agents ({@link ReactAgent} and compatible types) onto
  * artinet, enabling them to participate in multi-agent workflows.
  *
  * ## Design Decisions
@@ -24,7 +24,7 @@
  *
  * ```typescript
  * import { createAgent } from "langchain";
- * import { park } from "@artinet/cruiser/langchain";
+ * import { dock } from "@artinet/cruiser/langchain";
  * import { serve } from "@artinet/sdk";
  *
  * const langchainAgent = await createAgent({
@@ -32,7 +32,7 @@
  *   tools: [searchTool, calculatorTool],
  * });
  *
- * const artinetAgent = await park(langchainAgent, { name: "Research Assistant" });
+ * const artinetAgent = await dock(langchainAgent, { name: "Research Assistant" });
  * serve({ agent: artinetAgent, port: 3000 });
  * ```
  *
@@ -42,7 +42,7 @@
 import { ReactAgent } from "langchain";
 import { RunnableConfig } from "@langchain/core/runnables";
 import * as sdk from "@artinet/sdk";
-import { Park } from "../corsair.js";
+import { Dock, Park } from "../corsair.js";
 import {
   getAgentCard,
   convertToLangChainMessage,
@@ -51,12 +51,12 @@ import {
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 /**
- * Parks a LangChain agent onto artinet.
+ * Docks a LangChain agent onto artinet.
  *
  * Transforms a {@link ReactAgent} (or compatible agent type) into an
  * {@link sdk.Agent | artinet-compatible agent} that can be deployed on artinet.
  *
- * @param agent - The {@link ReactAgent} to park
+ * @param agent - The {@link ReactAgent} to dock
  * @param card - Optional {@link sdk.A2A.AgentCardParams} configuration to customize identity and capabilities
  * @param options - Optional {@link RunnableConfig} for execution options
  *
@@ -64,18 +64,18 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
  *
  * @example Basic Usage
  * ```typescript
- * import { park } from "@artinet/cruiser/langchain";
+ * import { dock } from "@artinet/cruiser/langchain";
  * import { createAgent } from "langchain";
  *
  * const agent = await createAgent({ model, tools });
- * const artinetAgent = await park(agent, { name: "My Agent" });
+ * const artinetAgent = await dock(agent, { name: "My Agent" });
  * ```
  *
  * @example With Runnable Configuration
  * ```typescript
- * import { park } from "@artinet/cruiser/langchain";
+ * import { dock } from "@artinet/cruiser/langchain";
  *
- * const artinetAgent = await park(
+ * const artinetAgent = await dock(
  *   myAgent,
  *   { name: "Configured Agent" },
  *   {
@@ -88,9 +88,9 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
  *
  * @example With Custom Agent Card
  * ```typescript
- * import { park } from "@artinet/cruiser/langchain";
+ * import { dock } from "@artinet/cruiser/langchain";
  *
- * const artinetAgent = await park(myAgent, {
+ * const artinetAgent = await dock(myAgent, {
  *   name: "Research Bot",
  *   description: "AI-powered research assistant",
  *   skills: [
@@ -100,7 +100,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
  * });
  * ```
  */
-export const park: Park<ReactAgent, RunnableConfig> = async (
+export const dock: Dock<ReactAgent, RunnableConfig> = async (
   agent: ReactAgent,
   card?: sdk.A2A.AgentCardParams,
   options?: RunnableConfig
@@ -147,3 +147,8 @@ export const park: Park<ReactAgent, RunnableConfig> = async (
     });
   });
 };
+
+/**
+ * @deprecated Use {@link dock} instead.
+ */
+export const park: Park<ReactAgent, RunnableConfig> = dock;

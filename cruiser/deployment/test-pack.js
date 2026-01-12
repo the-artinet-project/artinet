@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { park as parkMastra } from "@artinet/cruiser/mastra";
-import { park as parkOpenAI } from "@artinet/cruiser/openai";
-import { park as parkClaude } from "@artinet/cruiser/claude";
-import { park as parkLangchain } from "@artinet/cruiser/langchain";
-import { park as parkStrands } from "@artinet/cruiser/strands";
+import { dock as dockMastra } from "@artinet/cruiser/mastra";
+import { dock as dockOpenAI } from "@artinet/cruiser/openai";
+import { dock as dockClaude } from "@artinet/cruiser/claude";
+import { dock as dockLangchain } from "@artinet/cruiser/langchain";
+import { dock as dockStrands } from "@artinet/cruiser/strands";
 import { Agent as MastraAgent } from "@mastra/core/agent";
 import { Agent as OpenAIAgent } from "@openai/agents";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -24,45 +24,45 @@ const langchainAgent = langchain.createAgent({
   name: "test-langchain-agent",
 });
 
-const LangChainAgent = await parkLangchain(langchainAgent)
+const LangChainAgent = await dockLangchain(langchainAgent)
   .catch((error) => {
-    console.error("Error parking LangChain agent:", error);
+    console.error("Error docking LangChain agent:", error);
     return null;
   })
   .catch((error) => {
-    console.error("Error parking LangChain agent:", error);
+    console.error("Error docking LangChain agent:", error);
     return null;
   });
 if (LangChainAgent) {
-  console.log("✔️ Langchain agent parked successfully");
+  console.log("✔️ Langchain agent docked successfully");
 }
 
-const ClaudeAgent = await parkClaude(
+const ClaudeAgent = await dockClaude(
   {
     model: "claude-sonnet-4-20250514",
     maxTurns: 1,
   },
   { name: "TestBot" }
 ).catch((error) => {
-  console.error("Error parking Claude agent:", error);
+  console.error("Error docking Claude agent:", error);
   return null;
 });
 
 if (ClaudeAgent) {
-  console.log("✔️ Claude agent parked successfully");
+  console.log("✔️ Claude agent docked successfully");
 }
 
 // Use agents from different frameworks
-const researcher = await parkOpenAI(
+const researcher = await dockOpenAI(
   new OpenAIAgent({ name: "researcher", instructions: "Research topics" }),
   { name: "Researcher" }
 ).catch((error) => {
-  console.error("Error parking OpenAI agent:", error);
+  console.error("Error docking OpenAI agent:", error);
   return null;
 });
 
 if (researcher) {
-  console.log("✔️ OpenAI agent parked successfully");
+  console.log("✔️ OpenAI agent docked successfully");
 }
 
 const openai = createOpenAI({
@@ -72,7 +72,7 @@ const openai = createOpenAI({
 
 const openaiModel = openai("gpt-4o-mini");
 
-const writer = await parkMastra(
+const writer = await dockMastra(
   new MastraAgent({
     name: "writer",
     instructions: "Write content",
@@ -80,12 +80,12 @@ const writer = await parkMastra(
   }),
   { name: "Writer" }
 ).catch((error) => {
-  console.error("Error parking Mastra agent:", error);
+  console.error("Error docking Mastra agent:", error);
   return null;
 });
 
 if (writer) {
-  console.log("✔️ Mastra agent parked successfully");
+  console.log("✔️ Mastra agent docked successfully");
 }
 
 const strandsModel = new OpenAIModel({
@@ -100,14 +100,14 @@ const strandsAgent = new StrandsAgent({
   systemPrompt: "You are a helpful assistant. Respond briefly.",
 });
 
-const strandsArtinetAgent = await parkStrands(strandsAgent).catch((error) => {
-  console.error("Error parking Strands agent:", error);
+const strandsArtinetAgent = await dockStrands(strandsAgent).catch((error) => {
+  console.error("Error docking Strands agent:", error);
   return null;
 });
 
 if (strandsArtinetAgent) {
-  console.log("✔️ Strands agent parked successfully");
+  console.log("✔️ Strands agent docked successfully");
 }
 
-console.log("✅ All agents parked");
+console.log("✅ All agents docked");
 process.exit(0);

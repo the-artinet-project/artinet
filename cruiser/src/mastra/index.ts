@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/mastra
  * @description
- * This adapter "parks" {@link MastraAgent | Mastra agents} onto artinet,
+ * This adapter "docks" {@link MastraAgent | Mastra agents} onto artinet,
  * enabling them to participate in multi-agent workflows. Mastra is a TypeScript-first
  * AI framework with built-in memory, workflows, and tool support.
  *
@@ -25,7 +25,7 @@
  *
  * ```typescript
  * import { Agent } from "@mastra/core/agent";
- * import { park } from "@artinet/cruiser/mastra";
+ * import { dock } from "@artinet/cruiser/mastra";
  * import { serve } from "@artinet/sdk";
  *
  * const mastraAgent = new Agent({
@@ -34,7 +34,7 @@
  *   model: openai("gpt-4"),
  * });
  *
- * const artinetAgent = await park(mastraAgent, { name: "My Assistant" });
+ * const artinetAgent = await dock(mastraAgent, { name: "My Assistant" });
  * serve({ agent: artinetAgent, port: 3000 });
  * ```
  *
@@ -49,16 +49,16 @@ import {
 import * as sdk from "@artinet/sdk";
 import { getAgentCard, convertToCoreMessage } from "./utils.js";
 import { v4 as uuidv4 } from "uuid";
-import { Park } from "../corsair.js";
+import { Dock, Park } from "../corsair.js";
 
 /**
- * Parks a Mastra agent onto artinet.
+ * Docks a Mastra agent onto artinet.
  *
  * Transforms a {@link MastraAgent} instance into an {@link sdk.Agent | A2A-compatible agent}
  * that can be deployed on artinet. Preserves Mastra's thread-based memory by
  * mapping context IDs to Mastra thread IDs.
  *
- * @param agent - The {@link MastraAgent} instance to park
+ * @param agent - The {@link MastraAgent} instance to dock
  * @param card - Optional {@link sdk.A2A.AgentCardParams} configuration to customize identity and capabilities
  * @param options - Optional {@link AgentExecutionOptions} for execution (output schema, format, etc.)
  *
@@ -66,7 +66,7 @@ import { Park } from "../corsair.js";
  *
  * @example Basic Usage
  * ```typescript
- * import { park } from "@artinet/cruiser/mastra";
+ * import { dock } from "@artinet/cruiser/mastra";
  * import { Agent } from "@mastra/core/agent";
  *
  * const agent = new Agent({
@@ -75,12 +75,12 @@ import { Park } from "../corsair.js";
  *   model: openai("gpt-4"),
  * });
  *
- * const artinetAgent = await park(agent, { name: "Helper Bot" });
+ * const artinetAgent = await dock(agent, { name: "Helper Bot" });
  * ```
  *
  * @example With Structured Output
  * ```typescript
- * import { park } from "@artinet/cruiser/mastra";
+ * import { dock } from "@artinet/cruiser/mastra";
  * import { z } from "zod";
  *
  * const responseSchema = z.object({
@@ -88,7 +88,7 @@ import { Park } from "../corsair.js";
  *   confidence: z.number(),
  * });
  *
- * const artinetAgent = await park(
+ * const artinetAgent = await dock(
  *   myAgent,
  *   { name: "Structured Agent" },
  *   { output: responseSchema }
@@ -97,7 +97,7 @@ import { Park } from "../corsair.js";
  *
  * @example With Tools
  * ```typescript
- * import { park } from "@artinet/cruiser/mastra";
+ * import { dock } from "@artinet/cruiser/mastra";
  *
  * const agentWithTools = new Agent({
  *   name: "research-bot",
@@ -106,13 +106,13 @@ import { Park } from "../corsair.js";
  *   tools: { webSearch, summarize, saveNote },
  * });
  *
- * const artinetAgent = await park(agentWithTools, {
+ * const artinetAgent = await dock(agentWithTools, {
  *   name: "Research Assistant",
  *   description: "AI-powered research helper",
  * });
  * ```
  */
-export const park: Park<
+export const dock: Dock<
   MastraAgent,
   AgentExecutionOptions<OutputSchema | undefined, "aisdk" | "mastra">
 > = async (
@@ -166,3 +166,11 @@ export const park: Park<
     yield completedUpdate;
   });
 };
+
+/**
+ * @deprecated Use {@link dock} instead.
+ */
+export const park: Park<
+  MastraAgent,
+  AgentExecutionOptions<OutputSchema | undefined, "aisdk" | "mastra">
+> = dock;

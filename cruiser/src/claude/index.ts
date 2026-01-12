@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/claude
  * @description
- * This adapter "parks" {@link ClaudeAgent | Claude agents} (from `@anthropic-ai/claude-agent-sdk`) onto
+ * This adapter "docks" {@link ClaudeAgent | Claude agents} (from `@anthropic-ai/claude-agent-sdk`) onto
  * artinet, enabling them to participate in multi-agent workflows.
  *
  * 1. **Execution Model**: claude agents use the `query({ prompt })` function for execution.
@@ -18,15 +18,15 @@
  * 4. **Simple Interface**: claude agents have a straightforward API, making this
  *    adapter relatively simple compared to other frameworks.
  * 
- * 5. **Options Passthrough**: Unlike other parks we need to build the query request manually, 
- *    to ensure that we have access to required parameters that are needed to scaffold the {@link park}.
+ * 5. **Options Passthrough**: Unlike other docks we need to build the query request manually, 
+ *    to ensure that we have access to required parameters that are needed to scaffold the {@link dock}.
  *    The {@link Options} object is passed through to the claude agent SDK during execution.
  *
  * ## Usage
  *
  * ```typescript
  * import { Options } from "@anthropic-ai/claude-agent-sdk";
- * import { park } from "@artinet/cruiser/claude";
+ * import { dock } from "@artinet/cruiser/claude";
  * import { serve } from "@artinet/sdk";
  *
  * const claudeConfig: Options = {
@@ -34,7 +34,7 @@
     maxTurns: 1,
  * };
  *
- * const artinetAgent = await park(claudeConfig, { name: "Claude Coder" });
+ * const artinetAgent = await dock(claudeConfig, { name: "Claude Coder" });
  * serve({ agent: artinetAgent, port: 3000 });
  * ```
  *
@@ -42,7 +42,7 @@
  */
 
 import * as sdk from "@artinet/sdk";
-import { Park } from "../corsair.js";
+import { Dock, Park } from "../corsair.js";
 import * as claude from "@anthropic-ai/claude-agent-sdk";
 import type { Options } from "@anthropic-ai/claude-agent-sdk";
 import { type ClaudeAgent, getAgentCard, extractA2AMessage } from "./utils.js";
@@ -51,15 +51,20 @@ import { type ClaudeAgent, getAgentCard, extractA2AMessage } from "./utils.js";
  * Configuration options passed to the Claude Agent SDK during execution.
  * @see {@link Options} from `@anthropic-ai/claude-agent-sdk`
  */
-export type ParkOptions = Options;
+export type DockOptions = Options;
 
 /**
- * Parks a Claude Agent onto artinet.
+ * @deprecated Use {@link DockOptions} instead.
+ */
+export type ParkOptions = DockOptions;
+
+/**
+ * Docks a Claude Agent onto artinet.
  *
  * Transforms a {@link ClaudeAgent} instance into an {@link sdk.Agent | artinet-compatible agent}
  * that can be deployed on artinet and communicate with other artinet agents.
  *
- * @param agent - The {@link ClaudeAgent} configuration (Options) to park
+ * @param agent - The {@link ClaudeAgent} configuration (Options) to dock
  * @param card - Optional {@link sdk.A2A.AgentCardParams} configuration to customize identity and capabilities
  * @param _options - Reserved for future use (currently unused)
  *
@@ -67,9 +72,9 @@ export type ParkOptions = Options;
  *
  * @example Basic Usage
  * ```typescript
- * import { park } from "@artinet/cruiser/claude";
+ * import { dock } from "@artinet/cruiser/claude";
  *
- * const a2agent = await park(
+ * const a2agent = await dock(
  *   { model: "claude-sonnet-4-20250514", maxTurns: 1 },
  *   { name: "My Claude Agent" }
  * );
@@ -77,9 +82,9 @@ export type ParkOptions = Options;
  *
  * @example With Custom System Prompt
  * ```typescript
- * import { park } from "@artinet/cruiser/claude";
+ * import { dock } from "@artinet/cruiser/claude";
  *
- * const a2agent = await park(
+ * const a2agent = await dock(
  *   {
  *     cwd: "./my-project",
  *     model: "claude-sonnet-4-20250514",
@@ -94,9 +99,9 @@ export type ParkOptions = Options;
  *
  * @example With Working Directory for Code Tasks
  * ```typescript
- * import { park } from "@artinet/cruiser/claude";
+ * import { dock } from "@artinet/cruiser/claude";
  *
- * const a2agent = await park(
+ * const a2agent = await dock(
  *   {
  *     cwd: "./my-project",
  *     model: "claude-sonnet-4-20250514",
@@ -106,7 +111,7 @@ export type ParkOptions = Options;
  * );
  * ```
  */
-export const park: Park<ClaudeAgent, never> = async (
+export const dock: Dock<ClaudeAgent, never> = async (
   agent: ClaudeAgent,
   card?: sdk.A2A.AgentCardParams,
   _options?: never
@@ -207,3 +212,8 @@ export const park: Park<ClaudeAgent, never> = async (
 
 // Re-export the ClaudeAgent type for convenience
 export type { ClaudeAgent } from "./utils.js";
+
+/**
+ * @deprecated Use {@link dock} instead.
+ */
+export const park: Park<ClaudeAgent, never> = dock;

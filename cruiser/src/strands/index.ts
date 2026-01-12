@@ -3,7 +3,7 @@
  *
  * @module @artinet/cruiser/strands
  * @description
- * This adapter "parks" {@link StrandsAgent | Strands Agents} (from `@strands-agents/sdk`) into the
+ * This adapter "docks" {@link StrandsAgent | Strands Agents} (from `@strands-agents/sdk`) into the
  * artinet, enabling them to participate in multi-agent workflows.
  * Strands is AWS's open-source agent framework with native Bedrock integration.
  *
@@ -25,7 +25,7 @@
  *
  * ```typescript
  * import { Agent } from "@strands-agents/sdk";
- * import { park } from "@artinet/cruiser/strands";
+ * import { dock } from "@artinet/cruiser/strands";
  * import { serve } from "@artinet/sdk";
  *
  * const strandsAgent = new Agent({
@@ -33,7 +33,7 @@
  *   systemPrompt: "You are a helpful assistant",
  * });
  *
- * const artinetAgent = await park(strandsAgent, { name: "Strands Bot" });
+ * const artinetAgent = await dock(strandsAgent, { name: "Strands Bot" });
  * serve({agent: artinetAgent, port: 3000 });
  * ```
  *
@@ -46,23 +46,23 @@ import {
   Message as StrandsMessage,
 } from "@strands-agents/sdk";
 import * as sdk from "@artinet/sdk";
-import { Park } from "../corsair.js";
+import { Dock, Park } from "../corsair.js";
 import { getAgentCard, createStrandsMessage } from "./utils.js";
 
 /**
- * Parks a {@link StrandsAgent} into artinet.
+ * Docks a {@link StrandsAgent} into artinet.
  *
  * Transforms a Strands Agent instance into an {@link sdk.Agent | A2A-compatible agent}
  * that can be deployed on artinet.
  *
- * @param agent - The {@link StrandsAgent} to park
+ * @param agent - The {@link StrandsAgent} to dock
  * @param card - Optional {@link sdk.A2A.AgentCardParams} configuration to customize identity and capabilities
  *
  * @returns A Promise resolving to an {@link sdk.Agent} ready for deployment
  *
  * @example Basic Usage
  * ```typescript
- * import { park } from "@artinet/cruiser/strands";
+ * import { dock } from "@artinet/cruiser/strands";
  * import { Agent } from "@strands-agents/sdk";
  *
  * const agent = new Agent({
@@ -70,12 +70,12 @@ import { getAgentCard, createStrandsMessage } from "./utils.js";
  *   systemPrompt: "Be helpful and concise",
  * });
  *
- * const artinetAgent = await park(agent, { name: "Quick Helper" });
+ * const artinetAgent = await dock(agent, { name: "Quick Helper" });
  * ```
  *
  * @example With Custom Tools
  * ```typescript
- * import { park } from "@artinet/cruiser/strands";
+ * import { dock } from "@artinet/cruiser/strands";
  * import { Agent, tool } from "@strands-agents/sdk";
  *
  * const agent = new Agent({
@@ -84,7 +84,7 @@ import { getAgentCard, createStrandsMessage } from "./utils.js";
  *   tools: [calculatorTool, converterTool],
  * });
  *
- * const artinetAgent = await park(agent, {
+ * const artinetAgent = await dock(agent, {
  *   name: "Math Helper",
  *   description: "Calculator and unit conversion assistant",
  * });
@@ -92,7 +92,7 @@ import { getAgentCard, createStrandsMessage } from "./utils.js";
  *
  * @example With AWS Bedrock Configuration
  * ```typescript
- * import { park } from "@artinet/cruiser/strands";
+ * import { dock } from "@artinet/cruiser/strands";
  * import { Agent } from "@strands-agents/sdk";
  *
  * const agent = new Agent({
@@ -101,10 +101,10 @@ import { getAgentCard, createStrandsMessage } from "./utils.js";
  *   region: "us-west-2",
  * });
  *
- * const artinetAgent = await park(agent, { name: "Enterprise Bot" });
+ * const artinetAgent = await dock(agent, { name: "Enterprise Bot" });
  * ```
  */
-export const park: Park<StrandsAgent, never> = async (
+export const dock: Dock<StrandsAgent, never> = async (
   agent: StrandsAgent,
   card?: sdk.A2A.AgentCardParams
 ): Promise<sdk.Agent> => {
@@ -167,3 +167,7 @@ export const park: Park<StrandsAgent, never> = async (
     yield completedUpdate;
   });
 };
+/**
+ * @deprecated Use {@link dock} instead.
+ */
+export const park: Park<StrandsAgent, never> = dock;

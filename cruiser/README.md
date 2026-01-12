@@ -16,7 +16,7 @@ Universal adapters for multi-agent interoperability.
 
 ## Overview
 
-**Cruiser** provides "park" adapters that bridge popular AI agent frameworks to enable multi-agent communication through the [`@artinet/sdk`](https://www.npmjs.com/package/@artinet/sdk).
+**Cruiser** provides "dock" adapters that bridge popular AI agent frameworks to enable multi-agent communication through the [`@artinet/sdk`](https://www.npmjs.com/package/@artinet/sdk).
 
 ### Supported Frameworks
 
@@ -57,11 +57,11 @@ npm install @strands-agents/sdk
 
 ### Single Agent
 
-Create an agent from any of the supported frameworks and park it on artinet:
+Create an agent from any of the supported frameworks and dock it on artinet:
 
 ```typescript
 import { Agent } from "@openai/agents";
-import { park } from "@artinet/cruiser/openai";
+import { dock } from "@artinet/cruiser/openai";
 import { serve } from "@artinet/sdk";
 
 // 1. Create your agent
@@ -70,8 +70,8 @@ const agent = new Agent({
   instructions: "You are a helpful assistant",
 });
 
-// 2. Park it onto artinet
-const artinetAgent = await park(agent, { name: "My Assistant" });
+// 2. Dock it onto artinet
+const artinetAgent = await dock(agent, { name: "My Assistant" });
 
 // 3. Spin it up as an A2A compatible Server
 serve({ agent: artinetAgent, port: 3000 });
@@ -83,19 +83,19 @@ Create interoperable multi-agent systems:
 
 ```typescript
 import { serve, cr8 } from "@artinet/sdk";
-import { park as parkMastra } from "@artinet/cruiser/mastra";
-import { park as parkOpenAI } from "@artinet/cruiser/openai";
+import { dock as dockMastra } from "@artinet/cruiser/mastra";
+import { dock as dockOpenAI } from "@artinet/cruiser/openai";
 import { Agent as MastraAgent } from "@mastra/core/agent";
 import { Agent as OpenAIAgent } from "@openai/agents";
 import { MastraModel } from "./mastra-model";
 
 // Use agents from different frameworks
-const researcher = await parkOpenAI(
+const researcher = await dockOpenAI(
   new OpenAIAgent({ name: "researcher", instructions: "Research topics" }),
   { name: "Researcher" }
 );
 
-const writer = await parkMastra(
+const writer = await dockMastra(
   new MastraAgent({ name: "writer", instructions: "Write content", model }),
   { name: "Writer" }
 );
@@ -117,13 +117,13 @@ console.log(await agent.sendMessage("I want to learn about the Roman Empire."));
 
 ## API Reference
 
-### `park(agent, card?, options?)`
+### `dock(agent, card?, options?)`
 
-Each adapter exports a `park` function with the same signature:
+Each adapter exports a `dock` function with the same signature:
 
 | Parameter | Type               | Description                |
 | --------- | ------------------ | -------------------------- |
-| `agent`   | Framework-specific | The agent instance to park |
+| `agent`   | Framework-specific | The agent instance to dock |
 | `card`    | `AgentCardParams`  | Optional identity details  |
 | `options` | Framework-specific | Optional execution options |
 
@@ -132,9 +132,9 @@ Each adapter exports a `park` function with the same signature:
 ### Describe your agent
 
 ```typescript
-import { park } from "@artinet/cruiser/openai";
+import { dock } from "@artinet/cruiser/openai";
 
-const artinetAgent = await park(
+const artinetAgent = await dock(
   myAgent,
   {
     name: "Production Assistant",
@@ -164,7 +164,7 @@ const artinetAgent = await park(
 │                    @artinet/cruiser                         │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────┐ │
 │  │ OpenAI  │ │ Mastra  │ │ Claude  │ │LangChain│ │ Strands│ │
-│  │  park   │ │  park   │ │  park   │ │  park   │ │  park  │ │
+│  │  dock   │ │  dock   │ │  dock   │ │  dock   │ │  dock  │ │
 │  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └───┬────┘ │
 │       │           │           │           │          │      │
 │       └───────────┴───────────┴───────────┴──────────┘      │
@@ -197,7 +197,7 @@ npm test
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a Pull Request on [GitHub](https://github.com/the-artinet-project/artinet).
+Additional dock functions are welcome! Please open an issue or submit a Pull Request on [GitHub](https://github.com/the-artinet-project/artinet).
 
 Ensure code adheres to the project style and passes linting (`npm run lint`) and tests (`npm test`).
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "@jest/globals";
 import { Agent as StrandsAgent } from "@strands-agents/sdk";
 import { INTEGRATION_TIMEOUT } from "../setup";
 import { OpenAIModel } from "@strands-agents/sdk/openai";
-import { park } from "../../src/strands";
+import { dock } from "../../src/strands";
 import * as sdk from "@artinet/sdk";
 const hasApiKey = !!process.env.OPENAI_API_KEY;
 const baseURL = process.env.INFERENCE_PROVIDER_URL;
@@ -37,7 +37,7 @@ describe("Strands Integration", () => {
         systemPrompt: "You are a helpful assistant. Respond briefly.",
       });
 
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result = await artinetAgent.sendMessage(
         "What is 6 + 6? Reply with just the number."
       );
@@ -67,7 +67,7 @@ describe("Strands Integration", () => {
       });
 
       // First turn
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result1 = await artinetAgent.sendMessage(
         "Remember this code: XYZ123. Confirm you have remembered it."
       );
@@ -105,7 +105,7 @@ describe("Strands Integration", () => {
         systemPrompt: "You are a helpful assistant.",
       });
 
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result = await artinetAgent.sendMessage("Say hello.");
 
       expect(result).toBeDefined();

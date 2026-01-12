@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, beforeAll } from "@jest/globals";
 import { INTEGRATION_TIMEOUT } from "../setup";
-import { park } from "../../src/claude";
+import { dock } from "../../src/claude";
 const hasApiKey = !!process.env.OPENAI_API_KEY;
 describe("Claude Integration", () => {
   beforeAll(() => {
@@ -25,7 +25,7 @@ describe("Claude Integration", () => {
         return;
       }
 
-      const a2agent = await park(
+      const a2agent = await dock(
         {
           model: "claude-sonnet-4-20250514",
           maxTurns: 1,
@@ -52,7 +52,7 @@ describe("Claude Integration", () => {
         return;
       }
 
-      const a2agent = await park(
+      const a2agent = await dock(
         {
           systemPrompt:
             "Your name is TestBot. Always introduce yourself when asked about your name.",

@@ -13,7 +13,7 @@ import {
 } from "@openai/agents";
 import OpenAI from "openai";
 import { INTEGRATION_TIMEOUT } from "../setup";
-import { park } from "../../src/openai";
+import { dock } from "../../src/openai";
 import * as sdk from "@artinet/sdk";
 const hasApiKey = !!process.env.OPENAI_API_KEY;
 const baseURL = process.env.INFERENCE_PROVIDER_URL;
@@ -53,7 +53,7 @@ describe("OpenAI Integration", () => {
         model: modelName,
       });
 
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result = await artinetAgent.sendMessage(
         "What is 2 + 2? Reply with just the number."
       );
@@ -86,7 +86,7 @@ describe("OpenAI Integration", () => {
       });
 
       // First turn
-      const artinetAgent = await park(agent);
+      const artinetAgent = await dock(agent);
       const result1 = await artinetAgent.sendMessage(
         "My name is Alice. Remember this."
       );
