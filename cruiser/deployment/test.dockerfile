@@ -4,11 +4,11 @@ FROM node:20-alpine
 WORKDIR /test
 
 # Copy package tarball
-COPY ../artinet-cruiser-*.tgz /tmp/
+COPY artinet-cruiser-*.tgz  /tmp/cruiser.tgz
 
 # Create test project
 RUN npm init -y && \
-    npm install /tmp/artinet-cruiser-*.tgz \
+    npm install /tmp/cruiser.tgz \
     @ai-sdk/openai \
     ai \
     openai \

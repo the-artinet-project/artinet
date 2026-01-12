@@ -63,7 +63,7 @@ describe("Strands Integration", () => {
       const agent = new StrandsAgent({
         model,
         systemPrompt:
-          "You are a helpful assistant. Remember context from previous messages.",
+          "You are a helpful assistant. You MUST remember and repeat back any codes given to you exactly.",
       });
 
       // First turn
