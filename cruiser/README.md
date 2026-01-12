@@ -12,21 +12,19 @@
 Universal adapters for multi-agent interoperability.
 </p>
 
-> ⚠️ **Experimental**: This library is under active development. APIs may change between versions.
-
 ## Overview
 
 **Cruiser** provides "dock" adapters that bridge popular AI agent frameworks to enable multi-agent communication through the [`@artinet/sdk`](https://www.npmjs.com/package/@artinet/sdk).
 
 ### Supported Frameworks
 
-| Framework            | Import Path                  | Status    |
-| -------------------- | ---------------------------- | --------- |
-| **OpenAI Agents**    | `@artinet/cruiser/openai`    | ✅ Stable |
-| **Mastra**           | `@artinet/cruiser/mastra`    | ✅ Stable |
-| **Claude Agent SDK** | `@artinet/cruiser/claude`    | ✅ Stable |
-| **LangChain**        | `@artinet/cruiser/langchain` | ✅ Stable |
-| **Strands (AWS)**    | `@artinet/cruiser/strands`   | ✅ Stable |
+| Framework            | Import Path                  | Status                   |
+| -------------------- | ---------------------------- | ------------------------ |
+| **OpenAI Agents**    | `@artinet/cruiser/openai`    | Text ✅ Files ⚠️ Data ⚠️ |
+| **Mastra**           | `@artinet/cruiser/mastra`    | Text ✅ Files ⚠️ Data ⚠️ |
+| **Claude Agent SDK** | `@artinet/cruiser/claude`    | Text ✅ Files ⚠️ Data ⚠️ |
+| **LangChain**        | `@artinet/cruiser/langchain` | Text ✅ Files ⚠️ Data ⚠️ |
+| **Strands (AWS)**    | `@artinet/cruiser/strands`   | Text ✅ Files ⚠️ Data ⚠️ |
 
 ## Installation
 
