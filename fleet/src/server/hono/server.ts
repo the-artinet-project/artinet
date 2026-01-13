@@ -17,17 +17,42 @@ import * as deployment from "./deploy-request.js";
 import { AGENT_FIELD_NAME } from "./agent-request.js";
 import { errorHandler } from "./error-handler.js";
 
+/**
+ * Extended settings for the Hono Fleet server.
+ *
+ * Combines base {@link FleetSettings} with Hono-specific handlers for
+ * authentication, user resolution, and request processing.
+ *
+ * @see {@link https://hono.dev/docs/guides/middleware Hono Middleware Guide}
+ */
 export type Settings = FleetSettings & {
+  /** Extracts the user ID from the Hono context. Used for multi-tenant agent isolation. */
   user?: (ctx: hono.Context) => Promise<string>;
+  /** Handler for agent retrieval requests. Generated via {@link agent.factory}. */
   retrieve?: agent.handler;
+  /** Handler for agent deployment requests. Generated via {@link deployment.factory}. */
   deploy?: deployment.handler;
+  /** Handler for agent test/evaluation requests. Generated via {@link testing.factory}. */
   evaluate?: testing.handler;
+  /**
+   * Authentication middleware applied to protected routes.
+   * @see {@link https://hono.dev/docs/guides/middleware#middleware-argument Middleware Guide}
+   */
   auth?: (ctx: hono.Context, next: hono.Next) => Promise<void>;
 };
 
+/**
+ * Options for configuring the Fleet server instance.
+ *
+ * Allows injection of a pre-configured Hono app for integration with
+ * existing servers or edge runtime deployments.
+ */
 export interface Options {
+  /** Pre-configured Hono application. Defaults to a new `Hono()` instance. */
   app?: hono.Hono;
+  /** Apply auth middleware to agent retrieval routes. Defaults to `false`. */
   authOnRetrieve?: boolean;
+  /** Expose the test endpoint for agent evaluation. Defaults to `true`. */
   enableTesting?: boolean;
 }
 
@@ -66,6 +91,49 @@ const createRequestContext = (context: Settings) => {
   };
 };
 
+/**
+ * Creates and configures a Fleet server instance using Hono.
+ *
+ * This function implements the **Factory Pattern** combined with **Dependency Injection**
+ * to provide a flexible, testable, and configurable server setup. Hono is chosen for its
+ * ultrafast performance, edge-runtime compatibility, and minimal footprint.
+ *
+ * @see {@link https://hono.dev/docs/ Hono Documentation}
+ * @see {@link https://hono.dev/docs/concepts/routers Hono Routers}
+ * @see {@link https://hono.dev/docs/guides/middleware Hono Middleware Guide}
+ *
+ * ## Security Considerations
+ *
+ * - Authentication middleware is applied conditionally via `auth` setting
+ * - `authOnRetrieve` flag controls whether agent retrieval requires authentication
+ * - Consider enabling `authOnRetrieve` in production environments
+ *
+ * @param settings - Partial configuration merged with defaults. Supports custom
+ *   handlers for `get`, `set`, `test`, and middleware composition.
+ * @param options - Server instantiation options
+ * @param options.app - Pre-configured Hono application instance. Useful for
+ *   adding custom middleware or integrating with existing servers.
+ * @param options.authOnRetrieve - When `true`, applies auth middleware to agent
+ *   retrieval routes. Defaults to `false` for development convenience.
+ * @param options.enableTesting - When `true`, exposes the test endpoint for
+ *   agent evaluation. Disable in production if not needed.
+ *
+ * @returns Object containing:
+ *   - `app`: The configured Hono application
+ *   - `launch`: Function to start the HTTP server on a specified port
+ *   - `ship`: Async function to deploy agents and return a launchable server
+ *
+ * @example
+ * ```typescript
+ * // Basic usage with defaults
+ * const { app, launch } = fleet();
+ * launch(3000);
+ *
+ * // With custom configuration and edge deployment
+ * const { app } = fleet({ userId: 'admin' }, { authOnRetrieve: true });
+ * export default app; // For Cloudflare Workers
+ * ```
+ */
 export function fleet(
   settings: Partial<Settings> = DEFAULTS,
   {

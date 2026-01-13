@@ -16,11 +16,27 @@ import * as testing from "./test-request.js";
 import * as deployment from "./deploy-request.js";
 import { AGENT_FIELD_NAME } from "./agent-request.js";
 
+/**
+ * Extended settings for the Express Fleet server.
+ *
+ * Combines base {@link FleetSettings} with Express-specific handlers for
+ * authentication, user resolution, and request processing.
+ *
+ * @see {@link https://expressjs.com/en/guide/using-middleware.html Express Middleware}
+ */
 export type Settings = FleetSettings & {
+  /** Extracts the user ID from an incoming request. Used for multi-tenant agent isolation. */
   user?: (req: express.Request) => Promise<string>;
+  /** Handler for agent retrieval requests. Generated via {@link agent.factory}. */
   retrieve?: agent.handler;
+  /** Handler for agent deployment requests. Generated via {@link deployment.factory}. */
   deploy?: deployment.handler;
+  /** Handler for agent test/evaluation requests. Generated via {@link testing.factory}. */
   evaluate?: testing.handler;
+  /**
+   * Authentication middleware applied to protected routes.
+   * @see {@link https://expressjs.com/en/guide/writing-middleware.html Writing Middleware}
+   */
   auth?: (
     req: express.Request,
     res: express.Response,
@@ -28,9 +44,18 @@ export type Settings = FleetSettings & {
   ) => Promise<void>;
 };
 
+/**
+ * Options for configuring the Fleet server instance.
+ *
+ * Allows injection of a pre-configured Express app for integration with
+ * existing servers or custom middleware stacks.
+ */
 export interface Options {
+  /** Pre-configured Express application. Defaults to a new `express()` instance. */
   app?: express.Application;
+  /** Apply auth middleware to agent retrieval routes. Defaults to `false`. */
   authOnRetrieve?: boolean;
+  /** Expose the test endpoint for agent evaluation. Defaults to `true`. */
   enableTesting?: boolean;
 }
 
@@ -70,6 +95,40 @@ const createRequestContext = (context: Settings) => {
   };
 };
 
+/**
+ * Creates and configures a Fleet server instance using Express.
+ *
+ * This function implements the **Factory Pattern** combined with **Dependency Injection**
+ * to provide a flexible, testable, and configurable server setup. The pattern allows
+ * consumers to override defaults while maintaining sensible out-of-the-box behavior.
+ *
+ * @param settings - Partial configuration merged with defaults. Supports custom
+ *   handlers for `get`, `set`, `test`, and middleware composition.
+ * @param options - Server instantiation options
+ * @param options.app - Pre-configured Express application instance. Useful for
+ *   adding custom middleware or integrating with existing servers.
+ * @param options.authOnRetrieve - When `true`, applies auth middleware to agent
+ *   retrieval routes. Defaults to `false` for development convenience.
+ * @param options.enableTesting - When `true`, exposes the test endpoint for
+ *   agent evaluation. Disable in production if not needed.
+ *
+ * @returns Object containing:
+ *   - `app`: The configured Express application
+ *   - `launch`: Function to start the HTTP server on a specified port
+ *   - `ship`: Async function to deploy agents and return a launchable server
+ *
+ * @example
+ * ```typescript
+ * // Basic usage with defaults
+ * const { app, launch } = fleet();
+ * launch(3000);
+ *
+ * // With custom configuration
+ * const { ship } = fleet({ userId: 'admin' }, { authOnRetrieve: true });
+ * const server = await ship([agentConfig]);
+ * server.launch(8080);
+ * ```
+ */
 export function fleet(
   settings: Partial<Settings> = DEFAULTS,
   {
