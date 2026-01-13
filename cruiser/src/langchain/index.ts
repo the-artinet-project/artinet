@@ -139,12 +139,15 @@ export const dock: Dock<ReactAgent, RunnableConfig> = async (
       },
     };
 
-    yield sdk.describe.update.completed({
-      taskId: task.id,
-      contextId: task.contextId,
-      message: responseMessage,
-      metadata,
-    });
+    const completedUpdate: sdk.A2A.TaskStatusUpdateEvent =
+      sdk.describe.update.completed({
+        taskId: task.id,
+        contextId: task.contextId,
+        message: responseMessage,
+        metadata,
+      });
+
+    yield completedUpdate;
   });
 };
 
