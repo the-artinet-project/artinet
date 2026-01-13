@@ -80,7 +80,7 @@
   },
   "homepage": "https://artinet.io",
   "dependencies": {
-    "@artinet/sdk": "^0.6.2",
+    "@artinet/sdk": "^0.6.4",
     "@artinet/types": "^0.0.9",
     "uuid": "^13.0.0"
   },
