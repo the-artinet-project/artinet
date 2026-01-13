@@ -10,7 +10,8 @@ import { API } from "@artinet/types";
 
 export async function ship<T extends CreateAgentRoute["request"]>(
   fleetUrl: string = "http://localhost:3000",
-  request: T
+  request: T,
+  headers: Record<string, string> = {}
 ): Promise<CreateAgentRoute["response"]> {
   const requestBody = await sdk.validateSchema(
     armada.CreateAgentRequestSchema,
@@ -21,6 +22,7 @@ export async function ship<T extends CreateAgentRoute["request"]>(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...headers,
     },
     body: JSON.stringify(requestBody),
   });
