@@ -10,8 +10,8 @@ Build, deploy, and orchestrate AI agents that communicate across frameworks usin
 | Package                                                              | Description                                                  | npm                                                                                                                                                                                                                                                                           |
 | -------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`@artinet/sdk`](https://github.com/the-artinet-project/artinet-sdk) | Core SDK for building A2A agents with client/server support  | [![npm](https://img.shields.io/npm/v/@artinet/sdk?color=black&label=npm)](https://www.npmjs.com/package/@artinet/sdk)                                                                                                                                                         |
+| [`cruiser`](./cruiser/)                                              | Core SDK for building A2A agents with client/server support  | [![npm](https://img.shields.io/npm/v/@artinet/cruiser?color=black&label=npm)](https://www.npmjs.com/package/@artinet/sdk)                                                                                                                                                     |
 | [`fleet`](./fleet)                                                   | Server framework for hosting A2A agents with MCP integration | [![npm](https://img.shields.io/npm/v/@artinet/fleet?color=black&label=npm)](https://www.npmjs.com/package/@artinet/fleet)                                                                                                                                                     |
-| [`easy-a2a`](./easy)                                                 | Turn any OpenAI-compatible API into an A2A agent             | [![npm](https://img.shields.io/npm/v/easy-a2a?color=black&label=npm)](https://www.npmjs.com/package/easy-a2a)                                                                                                                                                                 |
 | [`agent-relay`](./relay)                                             | Agent discovery and multi-agent communication                | [![npm](https://img.shields.io/npm/v/@artinet/agent-relay?color=black&label=npm)](https://www.npmjs.com/package/@artinet/agent-relay)                                                                                                                                         |
 | [`orc8`](./orc8)                                                     | Dynamic orchestration for A2A agents with MCP tool support   | [![npm](https://img.shields.io/npm/v/orc8?color=black&label=npm)](https://www.npmjs.com/package/orc8)                                                                                                                                                                         |
 | [`symphony`](./symphony)                                             | Interactive CLI for managing multi-agent systems             | [![npm](https://img.shields.io/npm/v/@artinet/symphony?color=black&label=npm)](https://www.npmjs.com/package/@artinet/symphony)                                                                                                                                               |
@@ -24,15 +24,17 @@ Build, deploy, and orchestrate AI agents that communicate across frameworks usin
 
 ## Quick Start
 
-### Create an Agent
+### [Create an Agent](./create-agent/)
 
 ```bash
 npx @artinet/create-agent@latest
 ```
 
-### Or Build One Manually
+### [Own every line](https://github.com/the-artinet-project/artinet-sdk)
 
 **Server:**
+
+Serve intelligence in a couple lines. `cr8` lets you quickly scaffold an AI agent without the headache.
 
 ```typescript
 import { cr8 } from "@artinet/sdk";
@@ -42,37 +44,50 @@ const { app } = cr8("My Agent")
   .server.start(3000);
 ```
 
-**Client:**
+**Messenger:**
+
+Talk to any agent. Messenger is an A2A protocol client, purpose built for multi-agent servers.
 
 ```typescript
 import { createMessenger, AgentMessenger } from "@artinet/sdk";
 
-const messenger = createMessenger({ baseUrl: "http://localhost:3000/a2a" });
+const messenger: AgentMessenger = createMessenger({
+  baseUrl: "http://localhost:3000/a2a",
+});
 
 for await (const update of messenger.sendMessageStream("Hello!")) {
   console.log(update);
 }
 ```
 
-### The Easy Way
+### [One protocol, Every framework](./cruiser/)
+
+Cruiser docks agents from any framework onto artinet. Letting your OpenAI, Claude, and LangChain agents collaborate.
 
 ```typescript
-import a2a from "easy-a2a";
+import { Agent } from "@openai/agents";
+import { dock } from "@artinet/cruiser/openai";
+import { serve } from "@artinet/sdk";
 
-const agent = a2a({ apiKey: "your-api-key" })
-  .ai("You are a helpful assistant.")
-  .createAgent({ agentCard: "MyAgent" });
+const openaiAgent = new Agent({
+  name: "assistant",
+  instructions: "You are a helpful assistant",
+});
 
-await agent.sendMessage("Hello!");
+const agent = await dock(agent, { name: "My Assistant" });
+
+await agent.sendMessage("Hello, World!");
 ```
 
-### Deploy with Fleet
+### [Ship agents, not infrastructure.](./fleet/)
+
+Fleet is a lightweight server that deploys A2A AI agents, so you can focus on intelligence, not plumbing.
 
 ```typescript
 import { fleet } from "@artinet/fleet/express";
-import { A2AClient } from "@artinet/sdk";
+import { createMessenger, AgentMessenger } from "@artinet/sdk";
 
-const swarm = await fleet().ship([
+const flotilla = await fleet().ship([
   {
     config: {
       uri: "my-agent",
@@ -81,9 +96,11 @@ const swarm = await fleet().ship([
   },
 ]);
 
-swarm.launch(3000);
+flotilla.launch(3000);
 
-const client = new A2AClient("http://localhost:3000/agentId/my-agent");
+const messenger: AgentMessenger = await createMessenger({ baseUrl: "http://localhost:3000/agentId/my-agent" });
+
+await messenger.sendMessage("Hello, World!");
 ```
 
 ## Architecture
@@ -102,8 +119,8 @@ const client = new A2AClient("http://localhost:3000/agentId/my-agent");
 │  └── sdk                  → Build A2A servers                   │
 ├─────────────────────────────────────────────────────────────────┤
 │  Agent Building                                                 │
-│  ├── easy-a2a             → Quick agent creation                │
 │  ├── orc8                 → Orchestration + MCP tools           │
+│  ├── cruiser              → Framework adapter (Langchain, etc)  │
 │  └── relay                → Agent discovery                     │
 ├─────────────────────────────────────────────────────────────────┤
 │  Foundation                                                     │
