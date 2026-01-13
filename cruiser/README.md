@@ -18,18 +18,18 @@ Universal adapters for multi-agent interoperability.
 
 ### Supported Frameworks
 
-| Framework            | Import Path                  | Status                   |
-| -------------------- | ---------------------------- | ------------------------ |
-| **OpenAI Agents**    | `@artinet/cruiser/openai`    | Text ✅ Files ⚠️ Data ⚠️ |
-| **Mastra**           | `@artinet/cruiser/mastra`    | Text ✅ Files ⚠️ Data ⚠️ |
-| **Claude Agent SDK** | `@artinet/cruiser/claude`    | Text ✅ Files ⚠️ Data ⚠️ |
-| **LangChain**        | `@artinet/cruiser/langchain` | Text ✅ Files ⚠️ Data ⚠️ |
-| **Strands (AWS)**    | `@artinet/cruiser/strands`   | Text ✅ Files ⚠️ Data ⚠️ |
+| Framework            | Import Path                  | Status  |
+| -------------------- | ---------------------------- | ------- |
+| **OpenAI Agents**    | `@artinet/cruiser/openai`    | Text ✅ |
+| **Mastra**           | `@artinet/cruiser/mastra`    | Text ✅ |
+| **Claude Agent SDK** | `@artinet/cruiser/claude`    | Text ✅ |
+| **LangChain**        | `@artinet/cruiser/langchain` | Text ✅ |
+| **Strands (AWS)**    | `@artinet/cruiser/strands`   | Text ✅ |
 
 ## Installation
 
 ```bash
-npm install @artinet/cruiser @artinet/sdk
+npm install @artinet/cruiser @artinet/sdk @modelcontextprotocol/sdk @a2a-js/sdk
 ```
 
 Install your preferred agent framework:
@@ -55,7 +55,7 @@ npm install @strands-agents/sdk
 
 ### Single Agent
 
-Create an agent from any of the supported frameworks and dock it on artinet:
+Create an agent from any of the supported frameworks and dock it onto artinet:
 
 ```typescript
 import { Agent } from "@openai/agents";
@@ -75,7 +75,9 @@ const artinetAgent = await dock(agent, { name: "My Assistant" });
 serve({ agent: artinetAgent, port: 3000 });
 ```
 
-### Multi-Agent System
+### Multi-Agent Systems
+
+> _Experimental_
 
 Create interoperable multi-agent systems:
 
@@ -101,12 +103,12 @@ const writer = await dockMastra(
 // Chain them together
 const agent = cr8("Orchestrator Agent")
   // The researcher will receive the incoming user message
-  .sendMessage(researcher)
+  .sendMessage({ agent: researcher })
   // The results are passed to the writer with additional instructions
-  .sendMessage(
-    writer,
-    "use the research results to create a publishable article"
-  ).agent;
+  .sendMessage({
+    agent: writer,
+    message: "use the research results to create a publishable article",
+  }).agent;
 
 console.log(await agent.sendMessage("I want to learn about the Roman Empire."));
 ```
