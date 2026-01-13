@@ -218,7 +218,7 @@ export function extractA2AMessage<TAgent extends ReactAgent>(
     for (const message of result.messages) {
       if (typeof message.content === "string") {
         parts.push(sdk.describe.part.text(message.content));
-      } else {
+      } else if (message.type === "ai") {
         /**Pop the last block which belongs to the assistant */
         const block = message.content.pop();
         if (block && block.type === "text") {
