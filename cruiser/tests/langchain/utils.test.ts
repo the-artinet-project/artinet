@@ -313,6 +313,7 @@ describe("LangChain utils", () => {
       const result = {
         messages: [
           {
+            type: "ai",
             content: [
               { type: "text", text: "Block 1" },
               { type: "text", text: "Block 2" },
