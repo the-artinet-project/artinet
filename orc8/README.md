@@ -41,6 +41,12 @@ console.log(response);
 await orchestrator.stop();
 ```
 
+## Modules
+
+| Module                   | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| [Relay](./docs/relay.md) | Discover agents, relay messages, send tasks, and search. |
+
 ## Adding Agents
 
 ```typescript
