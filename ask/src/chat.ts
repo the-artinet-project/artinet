@@ -105,7 +105,7 @@ async function sendMessage(
   );
 
   console.log(
-    banner + chalk.gray("Agent: ") + sdk.getContent(agentResponseSource)
+    banner + chalk.gray("Agent: ") + sdk.extractTextContent(agentResponseSource)
   );
   console.log();
 }
@@ -161,12 +161,14 @@ export async function chat(
       role: "user",
       parts: [{ text: response.message, kind: "text" }],
     };
+
     console.log();
     if (verbose) {
       console.log(
         chalk.bgWhite(chalk.black(`📤 Sending message: ${msg.messageId}`))
       );
     }
+    
     try {
       const agentResponseSource = client.sendMessageStream({
         message: msg,
@@ -177,7 +179,7 @@ export async function chat(
         if ((update.kind === "message" || update.kind === "task") && !verbose) {
           continue;
         }
-        const response: string = sdk.getContent(update) ?? "No response";
+        const response: string = sdk.extractTextContent(update) ?? "No response";
         if (response) {
           console.log(banner + chalk.gray("Agent: ") + response);
         } else if (verbose && banner.length > 0) {
