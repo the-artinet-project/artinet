@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, beforeAll } from "@jest/globals";
 import { Agent as MastraAgent } from "@mastra/core/agent";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { dock } from "../../src/mastra";
 import { INTEGRATION_TIMEOUT } from "../setup";
 
@@ -32,7 +32,7 @@ describe("Mastra Integration", () => {
         return;
       }
 
-      const openai = createOpenAI({
+      const openai = createOpenRouter({
         apiKey: process.env.OPENAI_API_KEY,
         ...(baseURL && { baseURL }),
       });
@@ -71,7 +71,7 @@ describe("Mastra Integration", () => {
         return;
       }
 
-      const openai = createOpenAI({
+      const openai = createOpenRouter({
         apiKey: process.env.OPENAI_API_KEY,
         ...(baseURL && { baseURL }),
       });
