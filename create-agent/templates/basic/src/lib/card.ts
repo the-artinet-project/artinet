@@ -4,9 +4,9 @@
  *
  * This file defines the card for the basic agent.
  */
-import { AgentCard } from "@artinet/sdk";
+import { A2A } from "@artinet/sdk";
 
-export const agentCard: AgentCard = {
+export const agentCard: A2A.AgentCard = {
   name: "basic-agent",
   description: "A simple agent that returns your original message.",
   url: "http://localhost:3000/a2a",
@@ -24,6 +24,7 @@ export const agentCard: AgentCard = {
       id: "echo",
       name: "Echo",
       description: "A simple skill that returns your original message.",
+      tags: [],
     },
   ],
 };

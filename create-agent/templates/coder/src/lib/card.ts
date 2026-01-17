@@ -1,6 +1,6 @@
-import { AgentCard } from "@artinet/sdk";
+import { A2A } from "@artinet/sdk";
 
-export const agentCard: AgentCard = {
+export const agentCard: A2A.AgentCard = {
   protocolVersion: "0.3.0",
   defaultInputModes: ["text"],
   defaultOutputModes: ["text"],
@@ -18,6 +18,7 @@ export const agentCard: AgentCard = {
       id: "code",
       name: "Code",
       description: "A skill that generates code.",
+      tags: [],
     },
   ],
 };

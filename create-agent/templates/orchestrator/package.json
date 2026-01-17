@@ -8,9 +8,9 @@
     "start:with-chat": "tsx src/launch.ts --with-chat"
   },
   "dependencies": {
-    "@artinet/ask": "0.0.7",
-    "@artinet/router": "0.0.17",
-    "@artinet/sdk": "0.5.14",
+    "@artinet/ask": "^0.1.0",
+    "orc8": "^0.1.1",
+    "@artinet/sdk": "^0.6.4",
     "uuid": "^13.0.0",
     "tsx": "^4.19.2"
   }

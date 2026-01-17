@@ -1,15 +1,9 @@
-import { createAgentServer, InMemoryTaskStore } from "@artinet/sdk";
+import { cr8 } from "@artinet/sdk";
 import { demoAgent } from "./agent.js";
 import { agentCard, launchAsk } from "./lib/index.js";
 
 // Create a server
-const { app } = createAgentServer({
-  agent: {
-    engine: demoAgent,
-    // Use in-memory storage (no persistence between restarts)
-    tasks: new InMemoryTaskStore(),
-    agentCard: agentCard,
-  },
+const { app } = cr8(agentCard, {
   // Custom agent card path
   agentCardPath: "/.well-known/agent-card.json",
 
@@ -22,7 +16,7 @@ const { app } = createAgentServer({
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   },
-});
+}).serve(demoAgent);
 
 // Start the server
 app.listen(3000, () => {

@@ -1,4 +1,3 @@
-
 <p align="center">
 <a href="https://artinet.io"><img src="https://img.shields.io/badge/website-artinet.io-black" alt="Website"></a>
 <a href="https://www.npmjs.com/package/@artinet/create-agent"><img src="https://img.shields.io/npm/v/@artinet/create-agent?color=black" alt="Version"></a>
@@ -32,8 +31,8 @@ This command will initiate an interactive session:
     ```bash
     ? Select template › - Use arrow-keys. Return to submit.
     ❯   basic
-        coder
-        orchestrator
+        coder (requires OPENAI_API_KEY)
+        orchestrator (requires OPENAI_API_KEY)
     ```
 2.  **Enter Project Name:** You'll be asked to provide a name for your new project. This name will be used for the directory and in the project's `package.json`.
     ```bash

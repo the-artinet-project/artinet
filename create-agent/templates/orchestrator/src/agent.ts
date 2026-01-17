@@ -1,78 +1,47 @@
-import { LocalRouter } from "@artinet/router";
-import { AgentEngine, AgentBuilder, getParts, getPayload } from "@artinet/sdk";
+import { orc8, getHistory } from "orc8";
+import { openaiProvider } from "orc8/openai";
+import { AgentEngine, cr8, getParts, getPayload, Agent } from "@artinet/sdk";
 import { codingAgentCard } from "./lib/index.js";
 
-const router = new LocalRouter();
-export const codingAgentEngine: AgentEngine = AgentBuilder()
-  .text(({ context }) => {
-    const stateHistory = context.State().task.history ?? [];
-    const history = [...stateHistory, ...[context.command.message]];
-    const messages = history.map((m) => ({
-      role: m.role === "agent" ? ("agent" as const) : ("user" as const),
-      content: getParts(m.parts).text,
-    }));
+export const codingAgent: Agent = cr8("Coding Agent")
+  .text(async ({ context }) => {
+    const task = await context.getTask();
+    task.history = [...(task.history ?? []), context.userMessage];
+    const messages = getHistory(task);
     return {
-      parts: [`Generating code...`],
-      args: messages,
+      reply: [`Generating code...`],
+      args: {
+        messages,
+      },
     };
   })
   .text(async ({ args }) => {
-    return await router.connect({
-      message: {
-        identifier: "deepseek-ai/DeepSeek-R1",
-        preferredEndpoint: "open-router",
-        session: {
-          messages: [
-            {
-              role: "system",
-              content: [
-                "You are an expert coding assistant.",
-                "Provide a high-quality code sample according to the output instructions provided below.",
-                "You may generate multiple files as needed.",
-              ].join(" "),
-            },
-            ...(args ?? []),
-          ],
+    return await orc8
+      .create({
+        modelId: "gpt-4o-mini",
+        provider: openaiProvider({ apiKey: process.env.OPENAI_API_KEY }),
+      })
+      .connect([
+        {
+          role: "system",
+          content: [
+            "You are an expert coding assistant.",
+            "Provide a high-quality code sample according to the output instructions provided below.",
+            "You may generate multiple files as needed.",
+          ].join(" "),
         },
-      },
-    });
-  })
-  .createAgentEngine();
+        ...(args?.messages ?? []),
+      ]);
+  }).agent;
 
-router.createAgent({
-  engine: codingAgentEngine,
-  agentCard: codingAgentCard,
-});
-
-export const demoAgent: AgentEngine = AgentBuilder()
-  .text(() => "Thinking about your request...")
-  .text(async ({ command }) => {
-    console.log("Orchestrating request...");
-    return await router.connect({
-      message: {
-        identifier: "deepseek-ai/DeepSeek-R1",
-        preferredEndpoint: "open-router",
-        session: {
-          messages: [
-            {
-              role: "system",
-              content: [
-                "You are an orchestration agent.",
-                "You will be given a request and you will need to pick the best agent to execute the request.",
-                "Finally, you will need to synthesize the response from the agents and return the final response to the user.",
-              ].join(" "),
-            },
-            {
-              role: "user",
-              content: getPayload(command.message).text,
-            },
-          ],
-        },
-        options: {
-          isAuthRequired: false,
-        },
-      },
-      agents: ["coding-agent"],
-    });
+export const demoAgent: AgentEngine = orc8
+  .create({
+    modelId: "gpt-4o-mini",
+    provider: openaiProvider({ apiKey: process.env.OPENAI_API_KEY }),
+    instructions: [
+      "You are an orchestration agent.",
+      "You will be given a request and you will need to pick the best agent to execute the request.",
+      "Finally, you will need to synthesize the response from the agents and return the final response to the user.",
+    ].join(" "),
   })
-  .createAgentEngine();
+  .add(codingAgent).engine;
