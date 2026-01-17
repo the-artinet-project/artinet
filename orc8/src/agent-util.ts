@@ -31,6 +31,10 @@ import { Runtime } from "@artinet/types";
 import * as Callable from "./types.js";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * Interface for agents that support abortable sendMessage requests.
+ * @internal
+ */
 export interface AbortableSender extends MessageSender {
   sendMessage(
     params: A2A.MessageSendParams,
@@ -101,6 +105,7 @@ const _response = (
 };
 
 /**
+ * @internal
  * Sends a message to an A2A agent and returns the response.
  *
  * Handles the complete agent call lifecycle:

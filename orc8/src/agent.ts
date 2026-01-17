@@ -50,6 +50,7 @@ import * as Utils from "./agent-util.js";
 type implFn = typeof Utils.callAgent;
 
 /**
+ * @internal
  * Wrapper class for A2A-compatible agents.
  *
  * Provides a standardized callable interface for both local A2A agents

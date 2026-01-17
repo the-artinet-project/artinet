@@ -32,7 +32,7 @@
  * Copyright 2025 The Artinet Project
  * SPDX-License-Identifier: Apache-2.0
  */
-import { Manager as BaseManager } from "@artinet/sdk";
+import { ResourceManager } from "@artinet/sdk";
 import pLimit from "p-limit";
 import { logger } from "@artinet/sdk";
 import * as Callable from "./types.js";
@@ -42,13 +42,14 @@ import * as Util from "./manager-util.js";
 type requestFn = typeof Util.request;
 
 /**
+ * @internal
  * Service manager for callable agents and tools.
  *
  * Extends the base SDK Manager to provide specialized handling for
  * orchestrator callables, including concurrent execution with rate limiting
  * and graceful service shutdown.
  *
- * @extends {BaseManager<Callable.Agent | Callable.Tool>}
+ * @extends {ResourceManager<Callable.Agent | Callable.Tool>}
  *
  * @example
  * ```typescript
@@ -59,7 +60,7 @@ type requestFn = typeof Util.request;
  * });
  * ```
  */
-export class Manager extends BaseManager<Callable.Agent | Callable.Tool> {
+export class Manager extends ResourceManager<Callable.Agent | Callable.Tool> {
   /** Bound reference to the request dispatch utility function. */
   protected _request: requestFn = Util.request.bind(this);
 
