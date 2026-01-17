@@ -8,116 +8,150 @@
 
 <h1 align="center"><em>agent relay</em></h1>
 
-A library that enables AI agents to discover and communicate with other [A2A (Agent-to-Agent)](https://github.com/a2aproject/A2A) enabled AI agents via the [@artinet/sdk](https://github.com/the-artinet-project/artinet-sdk).
+> Agent Relay has been migrated to [orc8](https://www.npmjs.com/package/orc8).
+> For the time being this package will be maintained as a re-export but will eventually be deprecated.
+> Migrating to `orc8` is highly recommended.
+
+Relay is an [orc8](https://github.com/the-artinet-project/artinet) module for discovering and communicating with AI agents via the [@artinet/sdk](https://github.com/the-artinet-project/artinet-sdk).
 
 ## Features
 
-- **Automatic Agent Discovery**: Scans network ports to discover available agents
-- **Multi-Agent Orchestration**: Coordinate tasks across multiple specialized agents
-- **Message Relay**: Send messages to agents and receive responses with full task context
-- **Task Management**: Query task status and cancel running tasks
-- **Agent Discovery**: View and search agents by name, description, or skills
+- **Registration**: Register A2A agents or clients directly
+- **Automatic Discovery**: Scan ports and keep a live registry of reachable agents
+- **Message Relay**: Send messages and stream responses with full task context
+- **Task Management**: Get tasks and cancel running work
+- **Agent Search**: Query agent cards by name, description, or skills
 
 ## Installation
 
 ```bash
-npm install @artinet/agent-relay
+npm install orc8
+```
+
+Port-based discovery requires `portscanner` (peer dependency):
+
+```bash
+npm install portscanner
 ```
 
 ## Usage
 
-\*We recommend allocating a small port range because port scanning is resource intensive.
+### Imports
+
+```typescript
+import { Relay, Discover } from "orc8/relay";
+```
 
 ### Configuration Options
 
+Relay manages registered agents:
+
 ```typescript
-interface AgentRelayConfig {
-  callerId: string; // Unique identifier for this relay instance (ensures the agent cannot call itself)
-  syncInterval?: number; // Sync interval in ms (default: 2500)
-  scanConfig?: {
-    host?: string; // Host to scan (default: "localhost")
-    startPort?: number; // Starting port (default: 3000)
-    endPort?: number; // Ending port (default: 3100)
-    threads?: number; // Concurrent scan threads (default: 10)
-    fallbackPath?: string; // Agent card fallback path (default: "/.well-known/agent-card.json")
-  };
+import type { Service, AgentMessenger } from "@artinet/sdk";
+
+interface RelayConfig {
+  callerId: string; // Unique identifier for this relay instance (prevents self-calls)
+  abortSignal?: AbortSignal; // Optional abort signal for outgoing requests
+  agents?: Map<string, Service | AgentMessenger>; // Optional initial registry
 }
 ```
 
-### Quickstart
+Discoverable relay adds optional scanning and sync:
 
 ```typescript
-import { AgentBuilder, createAgentServer, SendMessageSuccessResult } from "@artinet/sdk";
-import { AgentRelay } from "@artinet/agent-relay";
+interface DiscoverConfig {
+  callerId: string;
+  syncInterval?: number; // Rescan interval in ms (omit to disable background sync)
+  host?: string; // Default: "localhost"
+  startPort?: number; // Default: 3000
+  endPort?: number; // Default: 3100
+  threads?: number; // Default: 250
+  headers?: Record<string, string>; // Optional headers for agent requests
+  fallbackPath?: string; // Default: "/.well-known/agent-card.json"
+}
+```
 
-// create and start an Agent Server
-const agentServer = createAgentServer({
-    agent: AgentBuilder()
-      .text(() => "hello world!")
-      .createAgent({
-        agentCard: {
-          name: "test-agent",
-          skills: [{
-              name: "calculator",
-              ...
-            }],
-          ...
-        },
-      }),
-  });
+### Quickstart (Discovery + Relay)
+
+```typescript
+import { cr8, A2A } from "@artinet/sdk";
+import { Discover } from "orc8/relay";
+
+// Create and start an Agent Server
+const agentServer = cr8({
+  name: "test-agent",
+  skills: [
+    {
+      name: "calculator",
+    },
+  ],
+}).text("hello world!").server;
 
 const server = agentServer.app.listen(3001, () => {
   console.log("test-agent started on port 3001");
 });
 
-// Create a relay instance
-const relay: AgentRelay = await AgentRelay.create({
-  callerId: "caller-id", // The callers unique ID
-  scanConfig: {
-    host: "localhost",
-    startPort: 3000,
-    endPort: 3100,
-  },
-  syncInterval: 2500, // Rescan every 2.5 seconds
+// Create a discoverable relay
+const relay = await Discover.create({
+  callerId: "caller-id",
+  host: "localhost",
+  startPort: 3000,
+  endPort: 3100,
+  syncInterval: 2500,
 });
 
 // Send a message to an agent
-const response: SendMessageSuccessResult = await relay.sendMessage({ agentId: "test-agent", messageSendParams: {
-  message: {
-    role: "user",
-    kind: "message",
-    parts: [{ kind: "text", text: "Hello!" }],
-    messageId: "msg-123",
+const response: A2A.SendMessageSuccessResult = await relay.sendMessage({
+  agentId: "test-agent",
+  messageSendParams: {
+    message: {
+      role: "user",
+      kind: "message",
+      parts: [{ kind: "text", text: "Hello!" }],
+      messageId: "msg-123",
+    },
   },
-}});
+});
 
 // Clean up when done
-await relay.close();
+await relay.stop();
+server.close();
 ```
 
-**List the available agents**
+### Manual Registration
 
 ```typescript
-const agentIds: string[] = await relay.getAgentIds();
-console.log("Available agents:", agentIds);
+import { createMessenger } from "@artinet/sdk";
+import { Relay } from "orc8/relay";
+
+const relay = await Relay.create({ callerId: "caller-id" });
+
+const messenger = await createMessenger({
+  baseUrl: "http://localhost:3001",
+  fallbackPath: "/.well-known/agent-card.json",
+});
+
+await relay.registerAgent(messenger);
 ```
 
-**Search for agents by name, description, or skills**
+### Task Management
 
 ```typescript
-const agents: AgentCard[] = await relay.searchAgents({ query: "calculator" });
+const task = await relay.getTask({
+  agentId: "test-agent",
+  taskQuery: { taskId: "task-123", metadata: {}, historyLength: undefined },
+});
+
+const cancelled = await relay.cancelTask({
+  agentId: "test-agent",
+  taskId: { id: "task-123", metadata: {} },
+});
 ```
 
-### Build
+### Search Agents
 
-```bash
-npm run build
-```
-
-### Test
-
-```bash
-npm test
+```typescript
+const agents = await relay.searchAgents({ query: "calculator" });
 ```
 
 ## Requirements
@@ -131,5 +165,5 @@ Apache-2.0
 
 ## References
 
-- [A2A Protocol Documentation](https://artinet.io)
-- [Artinet SDK](https://github.com/the-artinet-project/sdk)
+- [artinet](https://artinet.io)
+- [sdk](https://github.com/the-artinet-project/sdk)
