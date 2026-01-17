@@ -5,22 +5,13 @@
 import { ServerOptions } from "@modelcontextprotocol/sdk/server/index.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Implementation } from "@modelcontextprotocol/sdk/types.js";
-import { AgentRelay, AgentRelayConfig } from "@artinet/agent-relay";
+import { Discover, DiscoverConfig, Relay } from "@artinet/agent-relay";
 import { v4 as uuidv4 } from "uuid";
-import {
-  TaskSchema,
-  AgentCardSchema,
-  AgentCard,
-  SendMessageSuccessResult,
-  Task,
-  SendMessageSuccessResultSchema,
-  getContent,
-  UpdateEvent,
-} from "@artinet/sdk";
-import { z } from "zod";
+import * as sdk from "@artinet/sdk";
+import { z } from "zod/v4";
 
 class RelayServer extends McpServer {
-  private relay: AgentRelay | null = null;
+  private relay: Relay | null = null;
   constructor(
     info: Implementation = {
       name: "agent-relay-server",
@@ -58,11 +49,11 @@ The assistant should always return the result to the user in a clear and concise
     });
   }
   override async close(): Promise<void> {
-    await this.relay?.close();
+    await this.relay?.stop();
     await super.close();
   }
-  public async init(config: AgentRelayConfig) {
-    this.relay = await AgentRelay.create(config);
+  public async init(config: DiscoverConfig) {
+    this.relay = await Discover.create(config);
     this.registerTool(
       "sendMessage",
       {
@@ -80,13 +71,13 @@ The assistant should always return the result to the user in a clear and concise
               "The id of the task that the message is related to. If not provided, a new task will be created."
             )
             .optional(),
-        }).shape,
+        }),
         outputSchema: z.object({
-          result: SendMessageSuccessResultSchema,
-        }).shape,
+          result: sdk.A2A.SendMessageSuccessResultSchema,
+        }),
       },
       async (args) => {
-        const result: SendMessageSuccessResult | undefined =
+        const result: sdk.A2A.SendMessageSuccessResult | undefined =
           await this.relay?.sendMessage({
             agentId: args.agentId,
             messageSendParams: {
@@ -104,7 +95,7 @@ The assistant should always return the result to the user in a clear and concise
             {
               type: "text",
               text:
-                getContent(result as unknown as UpdateEvent) ??
+                sdk.extractTextContent(result as sdk.A2A.Update) ??
                 "No result from the agent. This may be because the agent is not responding or the message was not sent.",
             },
           ],
@@ -129,11 +120,11 @@ The assistant should always return the result to the user in a clear and concise
           })
           .describe(
             "The agent id and task query to get the status of a running task from the agent."
-          ).shape,
-        outputSchema: TaskSchema.shape,
+          ),
+        outputSchema: sdk.A2A.TaskSchema,
       },
       async (args) => {
-        const result: Task | undefined = await this.relay?.getTask({
+        const result: sdk.A2A.Task | undefined = await this.relay?.getTask({
           agentId: args.agentId,
           taskQuery: {
             id: args.taskId,
@@ -169,11 +160,11 @@ The assistant should always return the result to the user in a clear and concise
           })
           .describe(
             "The agent id and task id to cancel a running task from the agent."
-          ).shape,
-        outputSchema: TaskSchema.shape,
+          ),
+        outputSchema: sdk.A2A.TaskSchema,
       },
       async (args) => {
-        const result: Task | undefined = await this.relay?.cancelTask({
+        const result: sdk.A2A.Task | undefined = await this.relay?.cancelTask({
           agentId: args.agentId,
           taskId: {
             id: args.taskId,
@@ -204,11 +195,11 @@ The assistant should always return the result to the user in a clear and concise
           agentId: z
             .string()
             .describe("The id of the agent to get the agent card from."),
-        }).shape,
-        outputSchema: AgentCardSchema.shape,
+        }),
+        outputSchema: sdk.A2A.AgentCardSchema,
       },
       async (args) => {
-        const result: AgentCard | undefined = await this.relay?.getAgentCard({
+        const result: sdk.A2A.AgentCard | undefined = await this.relay?.getAgentCard({
           agentId: args.agentId,
         });
         const text: string = result
@@ -232,12 +223,12 @@ The assistant should always return the result to the user in a clear and concise
         description: "View the agents that are registered with the relay.",
         outputSchema: z.object({
           agents: z
-            .array(AgentCardSchema)
+            .array(sdk.A2A.AgentCardSchema)
             .describe("The agents that are registered with the relay."),
-        }).shape,
+        }),
       },
       async () => {
-        const result: AgentCard[] = (await this.relay?.getAgentCards()) ?? [];
+        const result: sdk.A2A.AgentCard[] = (await this.relay?.getAgentCards()) ?? [];
         const text: string =
           result && result.length > 0
             ? JSON.stringify({ agents: result }, null, 2)
@@ -263,15 +254,15 @@ The assistant should always return the result to the user in a clear and concise
           "Search for agents by name, description, or skills. The query is case insensitive and will match against the entire name, description, and skills of the agents.",
         inputSchema: z.object({
           query: z.string().describe("The query to search against."),
-        }).shape,
+        }),
         outputSchema: z.object({
           agents: z
-            .array(AgentCardSchema)
+            .array(sdk.A2A.AgentCardSchema)
             .describe("The agents that match the query."),
-        }).shape,
+        }),
       },
       async (args) => {
-        const result: AgentCard[] =
+        const result: sdk.A2A.AgentCard[] =
           (await this.relay?.searchAgents({ query: args.query })) ?? [];
         const text: string =
           result && result.length > 0

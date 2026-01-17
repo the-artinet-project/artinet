@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { AgentRelayConfig, RelayServer } from "../src/index.js";
+import { DiscoverConfig, RelayServer } from "../src/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 const args = process.argv.slice(2);
@@ -19,22 +19,20 @@ const SYNC_INTERVAL = process.env.ARTINET_RELAY_SYNC_INTERVAL
   : 2500;
 
 const callerId = commands[0];
-const config: AgentRelayConfig = {
+const config: DiscoverConfig = {
   callerId: callerId,
   syncInterval: SYNC_INTERVAL,
-  scanConfig: {
-    host: "localhost",
-    startPort: commands?.[1] ? parseInt(commands[1]) : 3000,
-    endPort: commands?.[2] ? parseInt(commands[2]) : 3100,
-    threads: commands?.[3] ? parseInt(commands[3]) : 10,
-    fallbackPath: "/.well-known/agent-card.json",
-  },
+  host: "localhost",
+  startPort: commands?.[1] ? parseInt(commands[1]) : 3000,
+  endPort: commands?.[2] ? parseInt(commands[2]) : 3100,
+  threads: commands?.[3] ? parseInt(commands[3]) : 10,
+  fallbackPath: "/.well-known/agent-card.json", 
 };
 
 const server = new RelayServer(
   {
     name: "agent-relay-server",
-    version: "0.0.1",
+    version: "0.1.0",
   },
   {}
 );
