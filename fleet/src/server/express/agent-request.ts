@@ -124,7 +124,9 @@ export async function request({
   handler = handle,
   user,
 }: Params): Promise<void> {
-  const agentId: string = req?.params?.[AGENT_FIELD_NAME];
+  const agentId: string = Array.isArray(req?.params?.[AGENT_FIELD_NAME])
+    ? req?.params?.[AGENT_FIELD_NAME][0]
+    : req?.params?.[AGENT_FIELD_NAME];
   if (!agentId) {
     return next(
       INVALID_REQUEST({ message: `${AGENT_FIELD_NAME} is required` })
