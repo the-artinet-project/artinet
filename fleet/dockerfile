@@ -10,7 +10,7 @@ RUN curl -fsSL -o launch.mjs \
     https://raw.githubusercontent.com/the-artinet-project/artinet/main/fleet/launch.js
 
 
-RUN npm init -y && npm install @artinet/fleet@^0.1.0-alpha.2 \
+RUN npm init -y && npm install @artinet/fleet@latest \
 pino-pretty@^13.1.3 \
 pm2@^6.0.14 \
 hono@^4.11.3 \
