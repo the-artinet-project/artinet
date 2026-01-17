@@ -1,4 +1,5 @@
 export default {
+  forceExit: true,
   preset: "ts-jest",
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts"],

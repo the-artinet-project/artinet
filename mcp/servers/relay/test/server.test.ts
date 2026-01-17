@@ -2,20 +2,13 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { jest, describe, it, expect, afterAll, beforeAll } from "@jest/globals";
-import {
-  createAgentServer,
-  AgentBuilder,
-  ExpressAgentServer,
-  TaskState,
-  Task,
-  AgentCard,
-} from "@artinet/sdk";
+import * as sdk from "@artinet/sdk";
 import { Server } from "http";
 jest.setTimeout(10000);
 const base_args = ["dist/bin/stdio.js", "test-caller", "3000", "3100"];
-const testAgentCard: AgentCard = {
+const testAgentCard: sdk.A2A.AgentCard = {
   name: "test-agent",
-  url: "http://localhost:3000/a2a",
+  url: "http://localhost:3000",
   description: "A test agent",
   version: "1.0.0",
   protocolVersion: "0.3.0",
@@ -36,27 +29,24 @@ const testAgentCard: AgentCard = {
   ],
 };
 describe.only("RelayMCPServer", () => {
-  let agentServer: ExpressAgentServer;
+  let agentServer: sdk.ExpressAgentServer;
   let httpServer: Server;
   beforeAll(async () => {
-    agentServer = createAgentServer({
-      agent: AgentBuilder()
+    agentServer = sdk.cr8(testAgentCard)
         .text(async ({ content }) => {
           if (content === "poll") {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await sdk.sleep(2000);
           }
           return "hello world!";
         })
-        .createAgent({
-          agentCard: testAgentCard,
-        }),
-      basePath: "/a2a",
+        .server;
+    httpServer = agentServer.app.listen(3000, () => {
+      console.log("Agent server started on port 3000");
     });
-    httpServer = agentServer.app.listen(3000, () => {});
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await sdk.sleep(1000);
   });
   afterAll(async () => {
-    await httpServer?.close();
+    httpServer?.close();
     await agentServer.agent.stop();
   });
   describe("basic stdio calls", () => {
@@ -69,13 +59,14 @@ describe.only("RelayMCPServer", () => {
       });
       client = new Client({ name: "Relay Client", version: "1.0.0" }, {});
       await client.connect(transport);
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await sdk.sleep(100);
     });
     afterAll(async () => {
       await transport?.close();
       await client?.close();
     });
     it("should work with stdio transport", async () => {
+      await sdk.sleep(1000);
       const response = await client.callTool({
         name: "sendMessage",
         arguments: {
@@ -87,9 +78,9 @@ describe.only("RelayMCPServer", () => {
         .text as string;
       expect(taskResponse).toBe("hello world!");
       expect(
-        ((response as CallToolResult).structuredContent?.result as Task)?.status
+        ((response as CallToolResult).structuredContent?.result as sdk.A2A.Task)?.status
           ?.state
-      ).toBe(TaskState.completed);
+      ).toBe(sdk.A2A.TaskState.completed);
     }, 10000);
     it("should get the task status", async () => {
       const response = client.callTool({
@@ -100,7 +91,7 @@ describe.only("RelayMCPServer", () => {
           taskId: "123",
         },
       });
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await sdk.sleep(500);
       const task = (
         await client.callTool({
           name: "getTask",
@@ -109,12 +100,12 @@ describe.only("RelayMCPServer", () => {
             taskId: "123",
           },
         })
-      ).structuredContent as Task;
-      expect(task?.status?.state).toBe(TaskState.submitted);
+      ).structuredContent as sdk.A2A.Task;
+      expect(task?.status?.state).toBe(sdk.A2A.TaskState.submitted);
       const fullResponse = ((await response) as CallToolResult)
-        .structuredContent?.result as Task;
+        .structuredContent?.result as sdk.A2A.Task;
       expect(fullResponse?.id).toBe("123");
-      expect(fullResponse?.status?.state).toBe(TaskState.completed);
+      expect(fullResponse?.status?.state).toBe(sdk.A2A.TaskState.completed);
     }, 10000);
     it("should cancel a task", async () => {
       const response = client.callTool({
@@ -125,7 +116,7 @@ describe.only("RelayMCPServer", () => {
           taskId: "123",
         },
       });
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await sdk.sleep(100);
       const task = (
         await client.callTool({
           name: "cancelTask",
@@ -134,11 +125,11 @@ describe.only("RelayMCPServer", () => {
             taskId: "123",
           },
         })
-      ).structuredContent as Task;
-      expect(task?.status?.state).toBe(TaskState.canceled);
+      ).structuredContent as sdk.A2A.Task;
+      expect(task?.status?.state).toBe(sdk.A2A.TaskState.canceled);
       //todo fix race condition in task cancellation
       const fullResponse = ((await response) as CallToolResult)
-        .structuredContent?.result as Task;
+        .structuredContent?.result as sdk.A2A.Task;
       expect(fullResponse?.id).toBe("123");
     }, 10000);
     it("should get agent card", async () => {
@@ -149,31 +140,25 @@ describe.only("RelayMCPServer", () => {
         },
       });
       const agentCard = (response as CallToolResult)
-        .structuredContent as AgentCard;
+        .structuredContent as sdk.A2A.AgentCard;
       expect(agentCard?.name).toBe("test-agent");
     }, 10000);
   });
   describe("advanced stdio calls", () => {
     it("should view agents", async () => {
-      const agentServer2 = createAgentServer({
-        agent: AgentBuilder()
+      const agentServer2 = sdk.cr8({
+        ...testAgentCard,
+        name: "test-agent-2",
+        url: "http://localhost:3002",
+      })
           .text(async ({ content }) => {
             if (content === "poll") {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
+              await sdk.sleep(2000);
             }
             return "hello world!";
-          })
-          .createAgent({
-            agentCard: {
-              ...testAgentCard,
-              name: "test-agent-2",
-              url: "http://localhost:3002/a2a",
-            },
-          }),
-        basePath: "/a2a",
-      });
+          }).server;
       const httpServer2 = agentServer2.app.listen(3002, () => {});
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sdk.sleep(1000);
       const transport_ = new StdioClientTransport({
         command: "node",
         args: base_args,
@@ -187,35 +172,28 @@ describe.only("RelayMCPServer", () => {
         name: "viewAgents",
       });
       const agents = (response as CallToolResult).structuredContent
-        ?.agents as AgentCard[];
+        ?.agents as sdk.A2A.AgentCard[];
       expect(agents).toHaveLength(2);
       expect(agents[0].name).toBe("test-agent");
       expect(agents[1].name).toBe("test-agent-2");
       await transport_.close();
       await client_.close();
-      await httpServer2.close();
+      httpServer2.close();
       await agentServer2.agent.stop();
     }, 10000);
     it("should search agents", async () => {
-      const agentServer2 = createAgentServer({
-        agent: AgentBuilder()
-          .text(async ({ content }) => {
+      const agentServer2 = sdk.cr8({
+          ...testAgentCard,
+          name: "test-agent-2",
+          url: "http://localhost:3002",
+      }).text(async ({ content }) => {
             if (content === "poll") {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
+              await sdk.sleep(2000);
             }
             return "hello world!";
-          })
-          .createAgent({
-            agentCard: {
-              ...testAgentCard,
-              name: "test-agent-2",
-              url: "http://localhost:3002/a2a",
-            },
-          }),
-        basePath: "/a2a",
-      });
+          }).server;
       const httpServer2 = agentServer2.app.listen(3002, () => {});
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sdk.sleep(1000);
       const transport_ = new StdioClientTransport({
         command: "node",
         args: base_args,
@@ -232,12 +210,12 @@ describe.only("RelayMCPServer", () => {
         },
       });
       const agents = (response as CallToolResult).structuredContent
-        ?.agents as AgentCard[];
+        ?.agents as sdk.A2A.AgentCard[];
       expect(agents).toHaveLength(1);
       expect(agents[0].name).toBe("test-agent-2");
       await client_.close();
       await transport_.close();
-      await httpServer2.close();
+      httpServer2.close();
       await agentServer2.agent.stop();
     }, 10000);
 
@@ -252,30 +230,22 @@ describe.only("RelayMCPServer", () => {
       );
       await client_.connect(transport_);
       const httpServers: Server[] = [];
-      const agentServers: ExpressAgentServer[] = [];
+      const agentServers: sdk.ExpressAgentServer[] = [];
       for (let i = 0; i < 10; i++) {
         agentServers.push(
-          createAgentServer({
-            agent: AgentBuilder()
-              .text(() => "hello world!")
-              .createAgent({
-                agentCard: {
-                  ...testAgentCard,
-                  name: `test-agent-${i}`,
-                  url: `http://localhost:${3002 + i}/a2a`,
-                },
-              }),
-            basePath: "/a2a",
-          })
-        );
+          sdk.cr8({
+            ...testAgentCard,
+            name: `test-agent-${i}`,
+            url: `http://localhost:${3002 + i}`,
+          }).text("hello world!").server);
         httpServers.push(agentServers[i].app.listen(3002 + i, () => {}));
       }
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await sdk.sleep(3000);
       const response = await client_.callTool({
         name: "viewAgents",
       });
       const agents = (response as CallToolResult).structuredContent
-        ?.agents as AgentCard[];
+        ?.agents as sdk.A2A.AgentCard[];
       expect(agents).toHaveLength(11);
       await client_.close();
       await transport_.close();
