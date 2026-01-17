@@ -6,6 +6,7 @@ export default {
     "^(\\.{1,2}/.*)\\.js$": "$1",
     "^~/(.*)$": "<rootDir>/src/",
   },
+  transformIgnorePatterns: ["/node_modules/(?!(orc8|@artinet)/)"],
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",

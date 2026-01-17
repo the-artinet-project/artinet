@@ -1,13 +1,5 @@
-import { scanAgents, AgentRelay } from "../src/index.js";
-import {
-  createAgentServer,
-  AgentBuilder,
-  ExpressAgentServer,
-  getContent,
-  AgentCard,
-  configureLogger,
-  MessageSendParams,
-} from "@artinet/sdk";
+import { Discover, Relay } from "../src/index.js";
+import * as sdk from "@artinet/sdk";
 import {
   jest,
   describe,
@@ -17,11 +9,8 @@ import {
   expect,
 } from "@jest/globals";
 import { Server } from "http";
-import { join } from "path";
-configureLogger({ level: "error" });
 jest.setTimeout(10000);
-const TEST_CONFIG_PATH = join(process.cwd(), "test", "config");
-const testAgentCard: AgentCard = {
+const testAgentCard: sdk.A2A.AgentCard = {
   name: "test-agent",
   url: "http://localhost:3001/a2a",
   description: "A test agent",
@@ -43,103 +32,97 @@ const testAgentCard: AgentCard = {
     },
   ],
 };
+
 describe("AgentRelay", () => {
-  let agentServer: ExpressAgentServer;
+  let agentServer: sdk.ExpressAgentServer;
   let server: Server;
   it("should pass empty array when no servers found", async () => {
-    const configs = await scanAgents({
+    const configs = await Discover.scan({
       host: "localhost",
       startPort: 3000,
       endPort: 6000,
+      threads: 10,
     });
     expect(configs).toHaveLength(0);
   });
   it("relay should be empty when no agents found", async () => {
-    const relay = await AgentRelay.create({
+    const relay = await Discover.create({
       callerId: "test-caller",
-      scanConfig: {
-        host: "localhost",
-        startPort: 3000,
-        endPort: 6000,
-      },
+      host: "localhost",
+      startPort: 3000,
+      endPort: 6000,
       abortSignal: new AbortController().signal,
       syncInterval: 2500,
-      configPath: TEST_CONFIG_PATH,
     });
-    expect(relay.getAgentCount()).toBe(0);
-    await relay.close();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(relay.count).toBe(0);
+    await relay.stop();
+    await sdk.sleep(1000);
   });
   describe("scanAgents", () => {
     beforeEach(async () => {
-      agentServer = createAgentServer({
-        agent: AgentBuilder()
-          .text(() => "hello world!")
-          .createAgent({
-            agentCard: testAgentCard,
-          }),
-        basePath: "/a2a",
-      });
+      agentServer = sdk
+        .cr8(testAgentCard, {
+          basePath: "/a2a",
+        })
+        .text("hello world!").server;
       server = agentServer.app.listen(3001, () => {});
       //wait for server to start
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sdk.sleep(1000);
     });
     afterEach(async () => {
-      await server.close();
+      server.close();
+      await sdk.sleep(100);
     });
     it("it should detect local agent server", async () => {
-      const configs = await scanAgents({
+      const configs = await Discover.scan({
         host: "localhost",
         startPort: 3000,
         endPort: 3001,
       });
       expect(configs).toHaveLength(1);
-      expect(configs[0].url).toBe("http://localhost:3001");
+      expect(configs[0].baseUrl).toBe("http://localhost:3001");
       expect(configs[0].headers).toBeUndefined();
       expect(configs[0].fallbackPath).toBeUndefined();
     });
 
     it("should detect multiple local servers", async () => {
       const server2 = agentServer.app.listen(4002, () => {});
-      const configs = await scanAgents({
+      const configs = await Discover.scan({
         host: "localhost",
         startPort: 3000,
         endPort: 5000,
       });
       expect(configs).toHaveLength(2);
-      expect(configs[0].url).toBe("http://localhost:3001");
-      expect(configs[1].url).toBe("http://localhost:4002");
-      await server2.close();
+      expect(configs[0].baseUrl).toBe("http://localhost:3001");
+      expect(configs[1].baseUrl).toBe("http://localhost:4002");
+      server2.close();
     });
     describe("Relay Operations", () => {
-      let relay: AgentRelay;
+      let relay: Relay;
       beforeEach(async () => {
-        relay = await AgentRelay.create({
+        relay = await Discover.create({
           callerId: "test-caller",
-          scanConfig: {
-            host: "localhost",
-            startPort: 3000,
-            endPort: 5000,
-            fallbackPath: "/.well-known/agent-card.json",
-          },
+          host: "localhost",
+          startPort: 3000,
+          endPort: 5000,
+          fallbackPath: "/a2a/.well-known/agent-card.json",
           abortSignal: new AbortController().signal,
           syncInterval: 2500,
-          configPath: TEST_CONFIG_PATH,
         });
       });
       afterEach(async () => {
-        await relay.close();
+        await relay.stop();
       });
       it("should capture agents on start", async () => {
-        expect(relay.getAgentCount()).toBeGreaterThanOrEqual(1);
+        expect(relay.count).toBeGreaterThanOrEqual(1);
       });
       it("should get agentIds", async () => {
-        const agentIds = await relay.getAgentIds();
+        const agentIds = relay.uris;
         expect(agentIds.length).toBeGreaterThanOrEqual(1);
         expect(agentIds).toContain("test-agent");
       });
       it("should get agentCount", async () => {
-        const agentCount = await relay.getAgentCount();
+        const agentCount = relay.count;
         expect(agentCount).toBeGreaterThanOrEqual(1);
       });
       it("should get agent", async () => {
@@ -157,7 +140,7 @@ describe("AgentRelay", () => {
         expect(agents[0].name).toBe("test-agent");
       });
       it("should send message", async () => {
-        const messageSendParams: MessageSendParams = {
+        const messageSendParams: sdk.A2A.MessageSendParams = {
           message: {
             role: "user",
             kind: "message",
@@ -175,23 +158,21 @@ describe("AgentRelay", () => {
           messageSendParams: messageSendParams,
         });
         expect(response).toBeDefined();
-        const content = getContent(response);
+        const content = sdk.extractTextContent(response);
         expect(content).toBe("hello world!");
       });
       it("should register agent", async () => {
         let timeoutId: NodeJS.Timeout | undefined = undefined;
-        const testAgent = AgentBuilder()
-          .text(async ({ command }) => {
+        const testAgent = sdk
+          .cr8({ ...testAgentCard, name: "test-agent-2" })
+          .text(async () => {
             await new Promise((resolve) => {
               timeoutId = setTimeout(() => {
                 resolve("hello world!");
               }, 4000);
             });
             return "hello world!";
-          })
-          .createAgent({
-            agentCard: { ...testAgentCard, name: "test-agent-2" },
-          });
+          }).agent;
         const agentCard = await relay.registerAgent(testAgent);
         expect(agentCard).toBeDefined();
         expect(agentCard?.name).toBe("test-agent-2");
@@ -202,20 +183,16 @@ describe("AgentRelay", () => {
       });
       it("should get task", async () => {
         let timeoutId: NodeJS.Timeout | undefined = undefined;
-        const testAgent = AgentBuilder()
-          .text(async ({ command }) => {
-            await new Promise((resolve) => {
-              timeoutId = setTimeout(() => {
-                resolve("hello world!");
-              }, 4000);
-            });
-            return "hello world!";
-          })
-          .createAgent({
-            agentCard: testAgentCard,
+        const testAgent = sdk.cr8(testAgentCard).text(async () => {
+          await new Promise((resolve) => {
+            timeoutId = setTimeout(() => {
+              resolve("hello world!");
+            }, 4000);
           });
+          return "hello world!";
+        }).agent;
         const agentCard = await relay.registerAgent(testAgent);
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sdk.sleep(500);
         const response = relay.sendMessage({
           agentId: agentCard.name,
           messageSendParams: {
@@ -234,7 +211,7 @@ describe("AgentRelay", () => {
           },
         });
         expect(response).toBeDefined();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sdk.sleep(500);
         const task = await relay.getTask({
           agentId: agentCard.name,
           taskQuery: {
@@ -250,20 +227,16 @@ describe("AgentRelay", () => {
       });
       it("should cancel task", async () => {
         let timeoutId: NodeJS.Timeout | undefined = undefined;
-        const testAgent = AgentBuilder()
-          .text(async ({ command }) => {
-            await new Promise((resolve) => {
-              timeoutId = setTimeout(() => {
-                resolve(true);
-              }, 4000);
-            });
-            return "hello world!";
-          })
-          .createAgent({
-            agentCard: testAgentCard,
+        const testAgent = sdk.cr8(testAgentCard).text(async () => {
+          await new Promise((resolve) => {
+            timeoutId = setTimeout(() => {
+              resolve(true);
+            }, 4000);
           });
+          return "hello world!";
+        }).agent;
         const agentCard = await relay.registerAgent(testAgent);
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sdk.sleep(500);
         const response = relay.sendMessage({
           agentId: agentCard.name,
           messageSendParams: {
@@ -282,7 +255,7 @@ describe("AgentRelay", () => {
           },
         });
         expect(response).toBeDefined();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sdk.sleep(500);
         const task = await relay.cancelTask({
           agentId: agentCard.name,
           taskId: {
@@ -296,42 +269,34 @@ describe("AgentRelay", () => {
         }
       });
       it("should detect new agent", async () => {
-        expect(relay.getAgentCount()).toBe(1);
-        const agentServer2 = createAgentServer({
-          agent: AgentBuilder()
-            .text(() => "hello world!")
-            .createAgent({
-              agentCard: { ...testAgentCard, name: "test-agent-2" },
-            }),
-        });
+        expect(relay.count).toBe(1);
+        const agentServer2 = sdk
+          .cr8({ ...testAgentCard, name: "test-agent-2" })
+          .text("hello world!").server;
         const server2 = agentServer2.app.listen(4005, () => {});
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        expect(relay.getAgentCount()).toBe(2);
-        await server2.close();
+        await sdk.sleep(3000);
+        expect(relay.count).toBe(2);
+        server2.close();
       }, 100000);
       it("should detect multiple agents", async () => {
-        expect(relay.getAgentCount()).toBe(1);
+        expect(relay.count).toBe(1);
         const httpServers: Server[] = [];
-        const agentServers: ExpressAgentServer[] = [];
+        const agentServers: sdk.ExpressAgentServer[] = [];
         for (let i = 0; i < 10; i++) {
           agentServers.push(
-            createAgentServer({
-              agent: AgentBuilder()
-                .text(() => "hello world!")
-                .createAgent({
-                  agentCard: {
-                    ...testAgentCard,
-                    name: `test-agent-${i}`,
-                    url: `http://localhost:${3002 + i}`,
-                  },
-                }),
-            })
+            sdk
+              .cr8({
+                ...testAgentCard,
+                name: `test-agent-${i}`,
+                url: `http://localhost:${3002 + i}`,
+              })
+              .text("hello world!").server
           );
           httpServers.push(agentServers[i].app.listen(3002 + i, () => {}));
         }
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        expect(relay.getAgentCount()).toBe(11);
-        const agentIds = await relay.getAgentIds();
+        await sdk.sleep(3000);
+        expect(relay.count).toBe(11);
+        const agentIds = relay.uris;
         expect(agentIds.length).toBe(11);
         for (let i = 0; i < 10; i++) {
           expect(agentIds).toContain(`test-agent-${i}`);
@@ -342,35 +307,31 @@ describe("AgentRelay", () => {
         );
       }, 100000);
       it("should remove dead agents", async () => {
-        expect(relay.getAgentCount()).toBe(1);
+        expect(relay.count).toBe(1);
         const httpServers: Server[] = [];
-        const agentServers: ExpressAgentServer[] = [];
+        const agentServers: sdk.ExpressAgentServer[] = [];
         for (let i = 0; i < 2; i++) {
           agentServers.push(
-            createAgentServer({
-              agent: AgentBuilder()
-                .text(() => "hello world!")
-                .createAgent({
-                  agentCard: {
-                    ...testAgentCard,
-                    name: `test-agent-${i}`,
-                    url: `http://localhost:${3002 + i}`,
-                  },
-                }),
-            })
+            sdk
+              .cr8({
+                ...testAgentCard,
+                name: `test-agent-${i}`,
+                url: `http://localhost:${3002 + i}`,
+              })
+              .text("hello world!").server
           );
           httpServers.push(agentServers[i].app.listen(3002 + i, () => {}));
         }
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        expect(relay.getAgentCount()).toBe(3);
-        await httpServers[0].close();
+        await sdk.sleep(3000);
+        expect(relay.count).toBe(3);
+        httpServers[0].close();
         await agentServers[0].agent.stop();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        expect(relay.getAgentCount()).toBe(2);
-        await httpServers[1].close();
+        await sdk.sleep(3000);
+        expect(relay.count).toBe(2);
+        httpServers[1].close();
         await agentServers[1].agent.stop();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        expect(relay.getAgentCount()).toBe(1);
+        await sdk.sleep(3000);
+        expect(relay.count).toBe(1);
       }, 150000);
     });
   });
