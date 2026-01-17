@@ -7,7 +7,7 @@ import { dock as dockStrands } from "@artinet/cruiser/strands";
 import { Agent as MastraAgent } from "@mastra/core/agent";
 import { Agent as OpenAIAgent, setDefaultOpenAIClient } from "@openai/agents";
 import { OpenAI } from "openai";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import * as langchain from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
 import { Agent as StrandsAgent } from "@strands-agents/sdk";
@@ -71,12 +71,12 @@ if (openaiAgent) {
   console.log("✔️ OpenAI agent docked successfully");
 }
 
-const openai = createOpenAI({
+const router = createOpenRouter({
   apiKey: String(process.env.OPENAI_API_KEY).trim(),
   ...(baseURL && { baseURL }),
 });
 
-const openaiModel = openai("gpt-4o-mini");
+const openaiModel = router("gpt-4o-mini");
 
 const mastraAgent = await dockMastra(
   new MastraAgent({

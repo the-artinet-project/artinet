@@ -8,14 +8,12 @@ COPY artinet-cruiser-*.tgz  /tmp/cruiser.tgz
 
 # Create test project
 RUN npm init -y && npm install \
-    @ai-sdk/openai \
+    @openrouter/ai-sdk-provider \
     ai \
     openai \
     typescript \
     tsx \
     express \
-    # @a2a-js/sdk \
-    # @modelcontextprotocol/sdk \
     @mastra/core \
     @mastra/server \
     @strands-agents/sdk \
