@@ -1,6 +1,6 @@
 {
   "name": "@artinet/ask",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "description": "A lightweight command-line chat client for connecting to A2A Servers.",
   "author": "artinet",
   "license": "Apache-2.0",
@@ -31,7 +31,7 @@
     "artificial intelligence"
   ],
   "engines": {
-    "node": ">=18.9.1"
+    "node": ">=20.0.0"
   },
   "type": "module",
   "main": "./dist/src/index.js",
@@ -48,18 +48,18 @@
     "ask": "node dist/src/cli.js"
   },
   "dependencies": {
+    "@artinet/sdk": "^0.6.4",
     "chalk": "^5.6.2",
     "commander": "^14.0.1",
-    "@artinet/sdk": "^0.6.0",
     "prompts": "^2.4.2",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "rimraf": "^5.0.5",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.9.3",
+    "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",
-    "@types/node": "^24.7.0"
+    "rimraf": "^6.1.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
