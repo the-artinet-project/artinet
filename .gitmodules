@@ -4,3 +4,6 @@
 [submodule "sdk"]
 	path = sdk
 	url = https://github.com/the-artinet-project/artinet-sdk.git
+[submodule "armada"]
+	path = armada
+	url = https://github.com/the-artinet-project/armada.git
