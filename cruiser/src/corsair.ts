@@ -10,7 +10,7 @@
  * ## Naming Convention
  *
  * - **Dock**: The adapter function that transforms a framework-specific agent
- *   into an {@link sdk.Agent | artinet-compatible agent}
+ *   into an {@link sdk.Agent}
  * - **Corsair**: The module containing the core type definitions (cruiser's helm)
  *
  * @example
@@ -32,7 +32,7 @@ import type * as sdk from "@artinet/sdk";
  *
  * All Cruiser adapters implement this interface to ensure consistent behavior
  * across different agent frameworks. The dock function transforms a framework-
- * specific agent into an {@link sdk.Agent | A2A-compatible agent} that can be deployed on Artinet.
+ * specific agent into an {@link sdk.Agent} that can be deployed on Artinet.
  *
  * @typeParam TAgent - The framework-specific agent type (e.g., {@link OpenAIAgent}, {@link MastraAgent})
  * @typeParam TOptions - Optional configuration type for the adapter (defaults to unknown)
@@ -79,7 +79,7 @@ export type Dock<TAgent, TOptions = unknown> = (
  *
  * All Cruiser adapters implement this interface to ensure consistent behavior
  * across different agent frameworks. The dock function transforms a framework-
- * specific agent into an {@link sdk.Agent | A2A-compatible agent} that can be deployed on Artinet.
+ * specific agent into an {@link sdk.Agent} that can be deployed on Artinet.
  *
  * @typeParam TAgent - The framework-specific agent type (e.g., {@link OpenAIAgent}, {@link MastraAgent})
  * @typeParam TOptions - Optional configuration type for the adapter (defaults to unknown)
