@@ -1,7 +1,7 @@
 import { BashServer, BashSession } from "../src/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import {
   jest,
   describe,
@@ -182,7 +182,7 @@ describe("BashMCPServer", () => {
           stop: true,
         },
       });
-      expect((response as CallToolResult).content[0].text).toBe(
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBe(
         "Hello, World!"
       );
       await client.close();
@@ -202,7 +202,7 @@ describe("BashMCPServer", () => {
           stop: true,
         },
       });
-      expect((response as CallToolResult).content[0].text).toBe(
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBe(
         "Testing bash tool functionality"
       );
       await client.close();
@@ -222,7 +222,7 @@ describe("BashMCPServer", () => {
           stop: true,
         },
       });
-      expect((response as CallToolResult).content[0].text).toBe(
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBe(
         "unable to execute command rm -rf / because it contains a banned command."
       );
       await client.close();
@@ -241,7 +241,7 @@ describe("BashMCPServer", () => {
           command: "echo 'Hello, World!'",
         },
       });
-      expect((response as CallToolResult).content[0].text).toBe(
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBe(
         "Hello, World!"
       );
       await client.callTool({
@@ -256,7 +256,7 @@ describe("BashMCPServer", () => {
           command: "echo 'Hello, World!'",
         },
       });
-      expect((response2 as CallToolResult).content[0].text).toBe(
+      expect(((response2 as CallToolResult).content[0] as TextContent).text).toBe(
         "Hello, World!"
       );
       await client.close();
@@ -275,7 +275,7 @@ describe("BashMCPServer", () => {
           command: "echo 'Hello, World!'",
         },
       });
-      expect((response as CallToolResult).content[0].text).toBe(
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBe(
         "Hello, World!"
       );
       await new Promise((resolve) => setTimeout(resolve, 120000));
@@ -285,7 +285,7 @@ describe("BashMCPServer", () => {
           command: "echo 'Hello, World!'",
         },
       });
-      expect((response2 as CallToolResult).content[0].text).toBe(
+      expect(((response2 as CallToolResult).content[0] as TextContent).text).toBe(
         "Hello, World!"
       );
       await client.close();
@@ -306,7 +306,7 @@ describe("BashMCPServer", () => {
             "cd /home/pattp/.local/share/emoji_dir && npm test -- --config=jest.config.js",
         },
       });
-      expect((response as CallToolResult).content[0].text).toBeDefined();
+      expect(((response as CallToolResult).content[0] as TextContent).text).toBeDefined();
       await client.close();
       await transport.close();
     });
