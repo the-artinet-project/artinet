@@ -1,6 +1,6 @@
 {
   "name": "@artinet/create-agent",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "A tool to create template Agent2Agent projects via the CLI.",
   "keywords": [
     "artinet",

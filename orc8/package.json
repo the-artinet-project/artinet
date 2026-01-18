@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.5",
   "name": "orc8",
   "description": "A dynamic orchestration library for A2A enabled AI agents that can call MCP servers.",
   "author": "artinet",
@@ -104,6 +104,6 @@
     "typescript-eslint": "^8.53.0"
   },
   "engines": {
-    "node": ">=18.9.1"
+    "node": ">=20.0.0"
   }
 }

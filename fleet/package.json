@@ -1,6 +1,6 @@
 {
   "name": "@artinet/fleet",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "A an agentic orchestration server for on premise deployment.",
   "type": "module",
   "main": "./dist/index.js",
@@ -62,12 +62,12 @@
   ],
   "rootDir": ".",
   "dependencies": {
-    "@artinet/armada": "^0.1.1",
+    "@artinet/armada": "^0.1.4",
     "@artinet/sdk": "^0.6.4",
-    "@artinet/types": "^0.0.9",
+    "@artinet/types": "^0.1.4",
     "@sindresorhus/slugify": "^3.0.0",
-    "agent-def": "^0.1.0",
-    "orc8": "^0.1.2",
+    "agent-def": "^0.1.4",
+    "orc8": "^0.1.4",
     "zod": "^3.25"
   },
   "peerDependencies": {
@@ -108,6 +108,6 @@
     "undici": "^5.29.0"
   },
   "engines": {
-    "node": ">=18.9.1"
+    "node": ">=20.0.0"
   }
 }

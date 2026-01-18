@@ -1,6 +1,6 @@
 {
   "name": "@artinet/agent-relay",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "A library for discovering and relaying messages between A2A enabled AI agents via the @artinet/sdk.",
   "author": "artinet",
   "license": "Apache-2.0",
@@ -39,7 +39,7 @@
     "prepublishOnly": "npm run clean:all && npm i && npm run build && npm test"
   },
   "dependencies": {
-    "orc8": "^0.1.2"
+    "orc8": "^0.1.4"
   },
   "peerDependencies": {
     "@a2a-js/sdk": "^0.3.7",
@@ -71,6 +71,6 @@
     "typescript-eslint": "^8.53.0"
   },
   "engines": {
-    "node": ">=18.9.1"
+    "node": ">=20.0.0"
   }
 }
