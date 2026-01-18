@@ -6,10 +6,11 @@
 import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
-import { AgentConfigurationSchema } from "agent-def";
-import { AgentLoader } from "../loader.js";
-
-interface MigrationResult {
+import { LoadedAgentSchema } from "../types/config.js";
+import { Loader } from "../loader.js";
+import { v4 as uuidv4 } from "uuid";
+import { logger } from "@artinet/sdk";
+interface Result {
   migratedFiles: string[];
   failedFiles: { file: string; error: string }[];
   skippedFiles: string[];
@@ -24,15 +25,15 @@ interface MigrationResult {
 export async function migrateAgents(
   agentDir: string,
   targetDir?: string
-): Promise<MigrationResult> {
-  const result: MigrationResult = {
+): Promise<Result> {
+  const result: Result = {
     migratedFiles: [],
     failedFiles: [],
     skippedFiles: [],
   };
 
   // First, try loading agents with the current schema
-  const loader = new AgentLoader();
+  const loader = new Loader();
   await loader.loadAgents(agentDir);
 
   // Process files with errors
@@ -40,6 +41,7 @@ export async function migrateAgents(
     const filePath = errorEntry.filePath;
 
     try {
+      logger.info(`Migrating agent from ${filePath}`);
       // Read the file
       const fileContent = await fs.readFile(filePath, "utf8");
       const { data, content } = matter(fileContent);
@@ -56,22 +58,32 @@ export async function migrateAgents(
       let migrated = false;
       const migratedData = { ...data };
 
+
       // Transform: model -> modelId
       if (migratedData.model && !migratedData.modelId) {
+        logger.debug(`Migrating model to modelId`, {
+          model: migratedData.model,
+        });
         migratedData.modelId = migratedData.model;
         delete migratedData.model;
         migrated = true;
       }
 
       // Transform: tools -> toolIds
-      if (migratedData.tools && !migratedData.toolIds) {
-        migratedData.toolIds = migratedData.tools;
+      if (migratedData.tools && !migratedData.toolUris) {
+        logger.debug(`Migrating tools to toolUris`, {
+          tools: migratedData.tools,
+        });
+        migratedData.toolUris = migratedData.tools;
         delete migratedData.tools;
         migrated = true;
       }
 
       // Transform: teams -> groupIds
       if (migratedData.teams && !migratedData.groupIds) {
+        logger.debug(`Migrating teams to groupIds`, {
+          teams: migratedData.teams,
+        });
         migratedData.groupIds = migratedData.teams.map((team: any) => {
           if (typeof team === "string") return team;
           if (team.name && team.role) {
@@ -86,27 +98,54 @@ export async function migrateAgents(
 
       // Fix: skills need tags [] field
       if (migratedData.skills && Array.isArray(migratedData.skills)) {
+        logger.debug(`Migrating skills to tags`, {
+          skills: migratedData.skills,
+        });
         migratedData.skills = migratedData.skills.map((skill: any) => {
           if (!skill.tags) {
             migrated = true;
             return { ...skill, tags: [] };
           }
           return skill;
+        }) ?? [];
+      }
+
+      if (!migratedData.schemaVersion) {
+        logger.debug(`Migrating schemaVersion to 0.1.0`, {
+          schemaVersion: migratedData.schemaVersion,
         });
+        migratedData.schemaVersion = "0.1.0";
+        migrated = true;
+      }
+
+      if (!migratedData.uri) {
+        migratedData.uri =
+          migratedData.name ??
+          migratedData.id ??
+          uuidv4();
+        logger.debug(`Migrating uri`, {
+          uri: migratedData.uri,
+        });
+        migrated = true;
       }
 
       if (!migrated) {
+        logger.debug(`Skipping agent ${filePath} as no migrations were applied`, {
+          migratedData,
+        });
         result.skippedFiles.push(filePath);
         continue;
       }
 
       // Add instructions to data for validation
       migratedData.instructions = content.trim();
-
       // Validate against the new schema
-      const parseResult = AgentConfigurationSchema.safeParse(migratedData);
+      const parseResult = LoadedAgentSchema.safeParse(migratedData);
 
       if (parseResult.success) {
+        logger.info(`Successfully migrated agent ${filePath}`, {
+          uri: migratedData.uri,
+        });
         // Remove instructions before writing (it goes in the body)
         delete migratedData.instructions;
 
@@ -129,12 +168,18 @@ export async function migrateAgents(
 
         result.migratedFiles.push(outputPath);
       } else {
+        logger.error(`Failed to migrate agent ${filePath}`, {
+          error: parseResult.error,
+        });
         result.failedFiles.push({
           file: filePath,
           error: parseResult.error.message,
         });
       }
     } catch (error) {
+      logger.error(`Failed to migrate agent ${filePath}`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
       result.failedFiles.push({
         file: filePath,
         error: error instanceof Error ? error.message : String(error),

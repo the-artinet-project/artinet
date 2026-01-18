@@ -5,28 +5,30 @@
 
 import fs from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
-import { AgentConfigurationSchema, type AgentConfiguration } from "agent-def";
 import glob from "fast-glob";
 import matter from "gray-matter";
 import pLimit from "p-limit";
 import path from "path";
 import {
-  AgentLoaderConfig,
+  Config,
   LoadError,
   LoadResults,
-  ResolvedAgent,
+  Delta,
+  UnresolvedAgentSchema,
+  UnresolvedAgent,
+  LoadedAgentSchema
 } from "./types/config.js";
-
+import { logger } from "@artinet/sdk";
 /**
  * Loads and validates agent definitions from frontmatter markdown files
  */
-export class AgentLoader {
-  public config: AgentLoaderConfig;
+export class Loader {
+  public config: Config;
   public errors: LoadError[] = [];
-  public agentIds = new Set<string>();
-  public agents: Record<string, ResolvedAgent> = {};
+  public agentUris = new Set<string>();
+  public agents: Record<string, Delta> = {};
 
-  constructor(config: Partial<AgentLoaderConfig> = {}) {
+  constructor(config: Partial<Config> = {}) {
     this.config = {
       threads: 10,
       availableTools: [],
@@ -46,7 +48,7 @@ export class AgentLoader {
     if (targetPath.endsWith(".md")) {
       await this.processFile(absolutePath);
       return {
-        agents: this.agents,
+        deltas: this.agents,
         errors: this.errors,
       };
     }
@@ -73,7 +75,7 @@ export class AgentLoader {
       )
     );
     return {
-      agents: this.agents,
+      deltas: this.agents,
       errors: this.errors,
     };
   }
@@ -84,16 +86,16 @@ export class AgentLoader {
   private reset(): void {
     this.agents = {};
     this.errors = [];
-    this.agentIds.clear();
+    this.agentUris.clear();
   }
 
   /**
    * Loads a single agent definition file
    */
   private async processFile(filePath: string): Promise<void> {
-    let agentConfig: AgentConfiguration;
+    let unresolvedAgent: UnresolvedAgent;
     let _errors: any[] = [];
-    let agentId: string;
+    let agentUri: string;
     try {
       const fileContent = await fs.readFile(filePath, "utf8");
       if (fileContent.trim() === "") {
@@ -106,29 +108,36 @@ export class AgentLoader {
       }
 
       data.instructions = content.trim();
-      const parseResult = AgentConfigurationSchema.safeParse(data);
+      const parseResult = UnresolvedAgentSchema.safeParse(data);
       if (!parseResult.success) {
         throw new Error(
           `Failed to parse agent definition: ${parseResult.error.message}`
         );
       }
-      agentConfig = parseResult.data;
-      agentConfig.id;
-      if (!agentConfig.id) {
-        agentConfig.id = agentConfig.name ?? uuidv4();
-      } else if (this.agentIds.has(agentConfig.id)) {
-        throw new Error(`Duplicate agent ID: ${agentConfig.id}`);
-      }
-      agentId = agentConfig.id;
+      unresolvedAgent = parseResult.data;
+      unresolvedAgent.uri;
 
-      this.agents[agentId] = {
+      if (!unresolvedAgent.uri) {
+        unresolvedAgent.uri = unresolvedAgent.name ?? uuidv4();
+      } else if (this.agentUris.has(unresolvedAgent.uri)) {
+        throw new Error(`Duplicate agent URI: ${unresolvedAgent.uri}`);
+      }
+      
+      agentUri = unresolvedAgent.uri;
+      this.agents[agentUri] = {
         sourceFile: filePath,
-        config: agentConfig,
+        config: LoadedAgentSchema.parse(unresolvedAgent),
         client: false,
       };
-
-      this.agentIds.add(agentId);
+      
+      this.agentUris.add(agentUri);
+      logger.info(`Loaded agent from ${filePath}`, {
+        uri: agentUri,
+      });
     } catch (error) {
+      logger.error(`Failed to load agent from ${filePath}`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
       _errors.push({
         message: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
@@ -143,8 +152,8 @@ export class AgentLoader {
   }
 }
 
-export async function loadAgents(agentDir: string): Promise<AgentLoader> {
-  const agentLoader = new AgentLoader();
+export async function loadAgents(agentDir: string): Promise<Loader> {
+  const agentLoader = new Loader();
 
   try {
     await agentLoader.loadAgents(agentDir);
