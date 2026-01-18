@@ -1,17 +1,18 @@
 ---
+schemaVersion: 0.1.0
 name: javascript-pro
 description:
   Master modern JavaScript with ES6+, async patterns, and Node.js APIs.
   Handles promises, event loops, and browser/Node compatibility. Use PROACTIVELY for
   JavaScript optimization, async debugging, or complex JS patterns.
-model: deepseek-ai/DeepSeek-R1
+modelId: deepseek-ai/DeepSeek-R1
 version: 1.0.0
 skills:
   - id: javascript
     name: Javascript
     description: Master modern JavaScript with ES6+, async patterns, and Node
     tags: []
-toolIds:
+toolUris:
   - secure-filesystem-server
   - mcp-fetch
   - sequential-thinking-server

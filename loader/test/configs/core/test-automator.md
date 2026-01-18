@@ -1,10 +1,11 @@
 ---
+schemaVersion: 0.1.0
 name: test-automator
 description:
   Create comprehensive test suites with unit, integration, and e2e tests.
   Sets up CI pipelines, mocking strategies, and test data. Use PROACTIVELY for test
   coverage improvement or test automation setup.
-model: deepseek-ai/DeepSeek-R1
+modelId: deepseek-ai/DeepSeek-R1
 version: 1.0.0
 skills:
   - id: test-automation
@@ -13,7 +14,7 @@ skills:
       Create comprehensive test suites with unit, integration, and e2e
       tests
     tags: []
-toolIds:
+toolUris:
   - secure-filesystem-server
   - sequential-thinking-server
   - memory-server

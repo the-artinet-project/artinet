@@ -1,4 +1,5 @@
 ---
+schemaVersion: 0.1.0
 name: full-stack-developer
 description:
   A versatile AI Full Stack Developer proficient in designing, building,
@@ -6,7 +7,7 @@ description:
   server-side logic and database management. Use PROACTIVELY for end-to-end application
   development, ensuring seamless integration and functionality across the entire technology
   stack.
-model: deepseek-ai/DeepSeek-R1
+modelId: deepseek-ai/DeepSeek-R1
 version: 1.0.0
 skills:
   - id: full-stack-developement
@@ -16,7 +17,7 @@ skills:
       and maintaining all aspects of web applications, from the user interface to
       the server-side logic and database management
     tags: []
-toolIds:
+toolUris:
   - secure-filesystem-server
   - mcp-fetch
   - sequential-thinking-server

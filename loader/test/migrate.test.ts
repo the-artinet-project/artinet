@@ -1,6 +1,6 @@
 import { describe } from "@jest/globals";
 import { migrateAgents } from "../src/legacy/migrate.js";
-import { AgentLoader } from "../src/loader.js";
+import { Loader } from "../src/loader.js";
 import fs from "fs/promises";
 describe("Agent Migration Tests", () => {
   it("migrates a single agent", async () => {
@@ -10,12 +10,12 @@ describe("Agent Migration Tests", () => {
     );
     expect(result.migratedFiles).toBeDefined();
     expect(result.migratedFiles.length).toBe(1);
-    const agentLoader = new AgentLoader();
+    const agentLoader = new Loader();
     const migratedResult = await agentLoader.loadAgents(
       "./test/configs/migrated/business-analyst-migrated.md"
     );
-    expect(migratedResult.agents).toBeDefined();
-    expect(Object.keys(migratedResult.agents).length).toBe(1);
+    expect(migratedResult.deltas).toBeDefined();
+    expect(Object.keys(migratedResult.deltas).length).toBe(1);
   });
   it("loads a multiple agents from a directory", async () => {
     const result = await migrateAgents(
@@ -24,12 +24,12 @@ describe("Agent Migration Tests", () => {
     );
     expect(result.migratedFiles).toBeDefined();
     expect(result.migratedFiles.length).toBe(3);
-    const agentLoader = new AgentLoader();
+    const agentLoader = new Loader();
     const migratedResult = await agentLoader.loadAgents(
       "./test/configs/migrated"
     );
-    expect(migratedResult.agents).toBeDefined();
-    expect(Object.keys(migratedResult.agents).length).toBe(3);
+    expect(migratedResult.deltas).toBeDefined();
+    expect(Object.keys(migratedResult.deltas).length).toBe(3);
   });
   afterAll(async () => {
     await fs.rm("./test/configs/migrated", { recursive: true });

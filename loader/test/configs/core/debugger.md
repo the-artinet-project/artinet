@@ -1,4 +1,5 @@
 ---
+schemaVersion: 0.1.0
 name: debugger
 description:
   Debugging specialist for errors, test failures, and unexpected behavior.
@@ -10,7 +11,7 @@ skills:
     name: debug
     description: Debugging specialist for errors, test failures, and unexpected behavior
     tags: []
-toolIds:
+toolUris:
   - secure-filesystem-server
   - sequential-thinking-server
   - bash-mcp-server

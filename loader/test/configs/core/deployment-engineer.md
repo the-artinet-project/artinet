@@ -1,4 +1,5 @@
 ---
+schemaVersion: 0.1.0
 name: deployment-engineer
 description:
   Configure CI/CD pipelines, Docker containers, and cloud deployments.
@@ -11,7 +12,7 @@ skills:
     name: Deployment
     description: Configure CI/CD pipelines, Docker containers, and cloud deployments
     tags: []
-toolId:
+toolUris:
   - secure-filesystem-server
   - mcp-fetch
   - bash-mcp-server

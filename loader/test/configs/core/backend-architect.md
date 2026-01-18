@@ -1,4 +1,5 @@
 ---
+schemaVersion: 0.1.0
 name: backend-architect
 description:
   Acts as a consultative architect to design robust, scalable, and maintainable
@@ -17,7 +18,7 @@ skills:
     name: API Development
     description: Design and implement scalable APIs
     tags: []
-toolIds:
+toolUris:
   - bash-mcp-server
   - secure-filesystem-server
   - mcp-fetch

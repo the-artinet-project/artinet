@@ -1,10 +1,11 @@
 ---
+schemaVersion: 0.1.0
 name: typescript-pro
 description:
   Master TypeScript with advanced types, generics, and strict type safety.
   Handles complex type systems, decorators, and enterprise-grade patterns. Use PROACTIVELY
   for TypeScript architecture, type inference optimization, or advanced typing patterns.
-model: deepseek-ai/DeepSeek-R1
+modelId: deepseek-ai/DeepSeek-R1
 version: 1.0.0
 skills:
   - id: typescript-programming
@@ -13,7 +14,7 @@ skills:
       Master TypeScript with advanced types, generics, and strict type
       safety
     tags: []
-toolIds:
+toolUris:
   - secure-filesystem-server
   - mcp-fetch
   - sequential-thinking-server
