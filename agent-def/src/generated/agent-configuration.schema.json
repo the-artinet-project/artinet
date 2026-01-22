@@ -1,0 +1,3011 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Unique agent identifier",
+      "type": "string"
+    },
+    "uri": {
+      "description": "The URI of the agent.",
+      "type": "string"
+    },
+    "protocolVersion": {
+      "description": "The version of the A2A protocol this agent supports.",
+      "default": "0.3.0",
+      "type": "string"
+    },
+    "name": {
+      "description": "Human readable name of the agent.",
+      "type": "string"
+    },
+    "description": {
+      "description": "A human-readable description of the agent.",
+      "type": "string"
+    },
+    "url": {
+      "description": "The preferred endpoint URL for interacting with the agent.",
+      "type": "string",
+      "format": "uri"
+    },
+    "preferredTransport": {
+      "description": "The preferred transport protocol for the agent.",
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "JSONRPC",
+            "GRPC",
+            "HTTP+JSON"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "additionalInterfaces": {
+      "description": "Additional supported interfaces (transport and URL combinations).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "description": "The URL where this interface is available. Must be a valid absolute HTTPS URL in production.",
+            "type": "string",
+            "format": "uri"
+          },
+          "transport": {
+            "description": "The transport protocol supported at this URL.",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "JSONRPC",
+                  "GRPC",
+                  "HTTP+JSON"
+                ]
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "url",
+          "transport"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "iconUrl": {
+      "description": "The URL of the agent's icon.",
+      "type": "string",
+      "format": "uri"
+    },
+    "provider": {
+      "description": "The service provider of the agent.",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "description": "The name of the organization providing the agent.",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL associated with the agent provider.",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "organization",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "version": {
+      "description": "The version identifier for the agent or its API.",
+      "type": "string"
+    },
+    "documentationUrl": {
+      "description": "An optional URL pointing to the agent's documentation.",
+      "type": "string",
+      "format": "uri"
+    },
+    "capabilities": {
+      "description": "The capabilities supported by the agent.",
+      "type": "object",
+      "properties": {
+        "streaming": {
+          "description": "Indicates if the agent supports streaming responses.",
+          "type": "boolean"
+        },
+        "pushNotifications": {
+          "description": "Indicates if the agent supports push notification mechanisms.",
+          "type": "boolean"
+        },
+        "stateTransitionHistory": {
+          "description": "Indicates if the agent supports providing state transition history.",
+          "type": "boolean"
+        },
+        "extensions": {
+          "description": "Extensions supported by this agent.",
+          "type": "array",
+          "items": {
+            "description": "A declaration of an extension supported by an Agent.",
+            "type": "object",
+            "properties": {
+              "uri": {
+                "description": "The URI of the extension.",
+                "type": "string"
+              },
+              "description": {
+                "description": "A description of how this agent uses this extension.",
+                "type": "string"
+              },
+              "required": {
+                "description": "Whether the client must follow specific requirements of the extension.",
+                "type": "boolean"
+              },
+              "params": {
+                "description": "Optional configuration for the extension.",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "uri"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "securitySchemes": {
+      "description": "Security scheme details used for authenticating with this agent. Maps scheme names to their configurations.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "description": "Defines a security scheme using an API key.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "API Key Type of the security scheme.",
+                "type": "string",
+                "const": "apiKey"
+              },
+              "description": {
+                "description": "Description of this security scheme.",
+                "type": "string"
+              },
+              "in": {
+                "description": "The location of the API key. Valid values are 'query', 'header', or 'cookie'.",
+                "type": "string",
+                "enum": [
+                  "query",
+                  "header",
+                  "cookie"
+                ]
+              },
+              "name": {
+                "description": "The name of the header, query or cookie parameter to be used.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "in",
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "HTTP Type of the security scheme.",
+                "type": "string",
+                "const": "http"
+              },
+              "description": {
+                "description": "Description of this security scheme.",
+                "type": "string"
+              },
+              "scheme": {
+                "description": "The name of the HTTP Authentication scheme to be used in the Authorization header as defined in RFC7235. The values used SHOULD be registered in the IANA Authentication Scheme registry. The value is case-insensitive, as defined in RFC7235.",
+                "type": "string"
+              },
+              "bearerFormat": {
+                "description": "A hint to the client to identify how the bearer token is formatted. Bearer tokens are usually generated by an authorization server, so this information is primarily for documentation purposes.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "scheme"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "OAuth2 security scheme configuration.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "OAuth2 Type of the security scheme.",
+                "type": "string",
+                "const": "oauth2"
+              },
+              "description": {
+                "description": "Description of this security scheme.",
+                "type": "string"
+              },
+              "flows": {
+                "description": "An object containing configuration information for the flow types supported.",
+                "type": "object",
+                "properties": {
+                  "authorizationCode": {
+                    "description": "Configuration for the OAuth Authorization Code flow",
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "tokenUrl": {
+                        "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "refreshUrl": {
+                        "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "scopes": {
+                        "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "authorizationUrl",
+                      "tokenUrl",
+                      "scopes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "clientCredentials": {
+                    "description": "Configuration for the OAuth Client Credentials flow",
+                    "type": "object",
+                    "properties": {
+                      "tokenUrl": {
+                        "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "refreshUrl": {
+                        "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "scopes": {
+                        "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "tokenUrl",
+                      "scopes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "implicit": {
+                    "description": "Configuration for the OAuth Implicit flow",
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "refreshUrl": {
+                        "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "scopes": {
+                        "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "authorizationUrl",
+                      "scopes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "password": {
+                    "description": "Configuration for the OAuth Resource Owner Password flow",
+                    "type": "object",
+                    "properties": {
+                      "tokenUrl": {
+                        "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "refreshUrl": {
+                        "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "scopes": {
+                        "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "tokenUrl",
+                      "scopes"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "oauth2MetadataUrl": {
+                "description": "URL to the oauth2 authorization server metadata",
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "flows"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "openIdConnect"
+              },
+              "description": {
+                "description": "Description of this security scheme.",
+                "type": "string"
+              },
+              "openIdConnectUrl": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "openIdConnectUrl"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "mutualTLS"
+              },
+              "description": {
+                "description": "Description of this security scheme.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "security": {
+      "description": "Security requirements for contacting the agent. Array of security requirement objects, where each object maps scheme names to scope arrays.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "defaultInputModes": {
+      "description": "The default input modes supported by the agent.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "defaultOutputModes": {
+      "description": "The default output modes supported by the agent.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skills": {
+      "description": "List of specific skills offered by the agent.",
+      "type": "array",
+      "items": {
+        "description": "A unit of capability that an agent can perform.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique identifier for the skill.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Human-readable name of the skill.",
+            "type": "string"
+          },
+          "description": {
+            "description": "Description of the skill.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "List of tags associated with the skill for categorization.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "examples": {
+            "description": "List of example inputs or use cases for the skill.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inputModes": {
+            "description": "List of input modes supported by this skill.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "outputModes": {
+            "description": "List of output modes supported by this skill.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "security": {
+            "description": "Security schemes necessary for the agent to leverage this skill.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "tags"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "supportsAuthenticatedExtendedCard": {
+      "description": "True if the agent supports providing an extended agent card when the user is authenticated.",
+      "type": "boolean"
+    },
+    "signatures": {
+      "description": "JSON Web Signatures computed for this AgentCard.",
+      "type": "array",
+      "items": {
+        "description": "A JWS signature of an AgentCard.",
+        "type": "object",
+        "properties": {
+          "protected": {
+            "description": "The protected JWS header for the signature.",
+            "type": "string"
+          },
+          "signature": {
+            "description": "The computed signature, Base64url-encoded.",
+            "type": "string"
+          },
+          "header": {
+            "description": "The unprotected JWS header values.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "protected",
+          "signature"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "schemaVersion": {
+      "description": "The schema version of the agent definition",
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "modelId": {
+      "description": "Model identifier",
+      "type": "string"
+    },
+    "toolUris": {
+      "description": "List of tool ids that this agent can use",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agentUris": {
+      "description": "The agent ids that this agent can call",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "groupIds": {
+      "description": "List of group ids that this agent belongs to",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Group identifier (e.g., 'team:backend', 'project:api-v2')",
+                "type": "string"
+              },
+              "properties": {
+                "description": "Optional properties of the group (e.g., role, priority, status)",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "instructions": {
+      "description": "System prompt for the agent",
+      "type": "string"
+    },
+    "services": {
+      "description": "List of MCP or A2A services",
+      "default": [],
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "description": "An agent service is a server or instance of an agent.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "The URL of the server.",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "headers": {
+                    "description": "An object containing custom HTTP headers to be sent with every request to this server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "authToken": {
+                    "description": "The authentication token to be used for the server.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "description": "An object containing the parameters to be used for the server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  "type": {
+                    "default": "a2a",
+                    "type": "string",
+                    "const": "a2a"
+                  },
+                  "uri": {
+                    "description": "The URI of the agent.",
+                    "type": "string"
+                  },
+                  "info": {
+                    "description": "The info of the agent.",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "uri": {
+                        "description": "The URI of the agent.",
+                        "type": "string"
+                      },
+                      "protocolVersion": {
+                        "description": "The version of the A2A protocol this agent supports.",
+                        "default": "0.3.0",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Human readable name of the agent.",
+                        "type": "string"
+                      },
+                      "description": {
+                        "description": "A human-readable description of the agent.",
+                        "type": "string"
+                      },
+                      "url": {
+                        "description": "The preferred endpoint URL for interacting with the agent.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "preferredTransport": {
+                        "description": "The preferred transport protocol for the agent.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "JSONRPC",
+                              "GRPC",
+                              "HTTP+JSON"
+                            ]
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "additionalInterfaces": {
+                        "description": "Additional supported interfaces (transport and URL combinations).",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "description": "The URL where this interface is available. Must be a valid absolute HTTPS URL in production.",
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "transport": {
+                              "description": "The transport protocol supported at this URL.",
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "JSONRPC",
+                                    "GRPC",
+                                    "HTTP+JSON"
+                                  ]
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "transport"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "iconUrl": {
+                        "description": "The URL of the agent's icon.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "provider": {
+                        "description": "The service provider of the agent.",
+                        "type": "object",
+                        "properties": {
+                          "organization": {
+                            "description": "The name of the organization providing the agent.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "URL associated with the agent provider.",
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "organization",
+                          "url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "version": {
+                        "description": "The version identifier for the agent or its API.",
+                        "type": "string"
+                      },
+                      "documentationUrl": {
+                        "description": "An optional URL pointing to the agent's documentation.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "capabilities": {
+                        "description": "The capabilities supported by the agent.",
+                        "type": "object",
+                        "properties": {
+                          "streaming": {
+                            "description": "Indicates if the agent supports streaming responses.",
+                            "type": "boolean"
+                          },
+                          "pushNotifications": {
+                            "description": "Indicates if the agent supports push notification mechanisms.",
+                            "type": "boolean"
+                          },
+                          "stateTransitionHistory": {
+                            "description": "Indicates if the agent supports providing state transition history.",
+                            "type": "boolean"
+                          },
+                          "extensions": {
+                            "description": "Extensions supported by this agent.",
+                            "type": "array",
+                            "items": {
+                              "description": "A declaration of an extension supported by an Agent.",
+                              "type": "object",
+                              "properties": {
+                                "uri": {
+                                  "description": "The URI of the extension.",
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "description": "A description of how this agent uses this extension.",
+                                  "type": "string"
+                                },
+                                "required": {
+                                  "description": "Whether the client must follow specific requirements of the extension.",
+                                  "type": "boolean"
+                                },
+                                "params": {
+                                  "description": "Optional configuration for the extension.",
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                }
+                              },
+                              "required": [
+                                "uri"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "securitySchemes": {
+                        "description": "Security scheme details used for authenticating with this agent. Maps scheme names to their configurations.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "description": "Defines a security scheme using an API key.",
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "API Key Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "apiKey"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "in": {
+                                  "description": "The location of the API key. Valid values are 'query', 'header', or 'cookie'.",
+                                  "type": "string",
+                                  "enum": [
+                                    "query",
+                                    "header",
+                                    "cookie"
+                                  ]
+                                },
+                                "name": {
+                                  "description": "The name of the header, query or cookie parameter to be used.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "in",
+                                "name"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "HTTP Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "http"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "scheme": {
+                                  "description": "The name of the HTTP Authentication scheme to be used in the Authorization header as defined in RFC7235. The values used SHOULD be registered in the IANA Authentication Scheme registry. The value is case-insensitive, as defined in RFC7235.",
+                                  "type": "string"
+                                },
+                                "bearerFormat": {
+                                  "description": "A hint to the client to identify how the bearer token is formatted. Bearer tokens are usually generated by an authorization server, so this information is primarily for documentation purposes.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "scheme"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "description": "OAuth2 security scheme configuration.",
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "OAuth2 Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "oauth2"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "flows": {
+                                  "description": "An object containing configuration information for the flow types supported.",
+                                  "type": "object",
+                                  "properties": {
+                                    "authorizationCode": {
+                                      "description": "Configuration for the OAuth Authorization Code flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "authorizationUrl": {
+                                          "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "authorizationUrl",
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "clientCredentials": {
+                                      "description": "Configuration for the OAuth Client Credentials flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "implicit": {
+                                      "description": "Configuration for the OAuth Implicit flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "authorizationUrl": {
+                                          "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "authorizationUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "password": {
+                                      "description": "Configuration for the OAuth Resource Owner Password flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "oauth2MetadataUrl": {
+                                  "description": "URL to the oauth2 authorization server metadata",
+                                  "type": "string",
+                                  "format": "uri"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "flows"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "openIdConnect"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "openIdConnectUrl": {
+                                  "type": "string",
+                                  "format": "uri"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "openIdConnectUrl"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "mutualTLS"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "security": {
+                        "description": "Security requirements for contacting the agent. Array of security requirement objects, where each object maps scheme names to scope arrays.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "defaultInputModes": {
+                        "description": "The default input modes supported by the agent.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "defaultOutputModes": {
+                        "description": "The default output modes supported by the agent.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "skills": {
+                        "description": "List of specific skills offered by the agent.",
+                        "type": "array",
+                        "items": {
+                          "description": "A unit of capability that an agent can perform.",
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "description": "Unique identifier for the skill.",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "Human-readable name of the skill.",
+                              "type": "string"
+                            },
+                            "description": {
+                              "description": "Description of the skill.",
+                              "type": "string"
+                            },
+                            "tags": {
+                              "description": "List of tags associated with the skill for categorization.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "examples": {
+                              "description": "List of example inputs or use cases for the skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "inputModes": {
+                              "description": "List of input modes supported by this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "outputModes": {
+                              "description": "List of output modes supported by this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "security": {
+                              "description": "Security schemes necessary for the agent to leverage this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string"
+                                },
+                                "additionalProperties": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "description",
+                            "tags"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "supportsAuthenticatedExtendedCard": {
+                        "description": "True if the agent supports providing an extended agent card when the user is authenticated.",
+                        "type": "boolean"
+                      },
+                      "signatures": {
+                        "description": "JSON Web Signatures computed for this AgentCard.",
+                        "type": "array",
+                        "items": {
+                          "description": "A JWS signature of an AgentCard.",
+                          "type": "object",
+                          "properties": {
+                            "protected": {
+                              "description": "The protected JWS header for the signature.",
+                              "type": "string"
+                            },
+                            "signature": {
+                              "description": "The computed signature, Base64url-encoded.",
+                              "type": "string"
+                            },
+                            "header": {
+                              "description": "The unprotected JWS header values.",
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "protected",
+                            "signature"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "protocolVersion",
+                      "name",
+                      "description",
+                      "url",
+                      "version",
+                      "capabilities",
+                      "defaultInputModes",
+                      "defaultOutputModes",
+                      "skills"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "url",
+                  "type",
+                  "uri",
+                  "info"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "The URL of the server.",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "headers": {
+                    "description": "An object containing custom HTTP headers to be sent with every request to this server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "authToken": {
+                    "description": "The authentication token to be used for the server.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "description": "An object containing the parameters to be used for the server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  "type": {
+                    "default": "a2a",
+                    "type": "string",
+                    "const": "a2a"
+                  },
+                  "uri": {
+                    "description": "The URI of the agent.",
+                    "type": "string"
+                  },
+                  "info": {
+                    "description": "\nThe info of the agent. \nIf not provided, the info will be fetched from the URI.\nOptional for now, but may become required in the future.\nStrongly encouraged to provide the info if possible.\n",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "uri": {
+                        "description": "The URI of the agent.",
+                        "type": "string"
+                      },
+                      "protocolVersion": {
+                        "description": "The version of the A2A protocol this agent supports.",
+                        "default": "0.3.0",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Human readable name of the agent.",
+                        "type": "string"
+                      },
+                      "description": {
+                        "description": "A human-readable description of the agent.",
+                        "type": "string"
+                      },
+                      "url": {
+                        "description": "The preferred endpoint URL for interacting with the agent.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "preferredTransport": {
+                        "description": "The preferred transport protocol for the agent.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "JSONRPC",
+                              "GRPC",
+                              "HTTP+JSON"
+                            ]
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "additionalInterfaces": {
+                        "description": "Additional supported interfaces (transport and URL combinations).",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "description": "The URL where this interface is available. Must be a valid absolute HTTPS URL in production.",
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "transport": {
+                              "description": "The transport protocol supported at this URL.",
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "JSONRPC",
+                                    "GRPC",
+                                    "HTTP+JSON"
+                                  ]
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "transport"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "iconUrl": {
+                        "description": "The URL of the agent's icon.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "provider": {
+                        "description": "The service provider of the agent.",
+                        "type": "object",
+                        "properties": {
+                          "organization": {
+                            "description": "The name of the organization providing the agent.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "URL associated with the agent provider.",
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "organization",
+                          "url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "version": {
+                        "description": "The version identifier for the agent or its API.",
+                        "type": "string"
+                      },
+                      "documentationUrl": {
+                        "description": "An optional URL pointing to the agent's documentation.",
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "capabilities": {
+                        "description": "The capabilities supported by the agent.",
+                        "type": "object",
+                        "properties": {
+                          "streaming": {
+                            "description": "Indicates if the agent supports streaming responses.",
+                            "type": "boolean"
+                          },
+                          "pushNotifications": {
+                            "description": "Indicates if the agent supports push notification mechanisms.",
+                            "type": "boolean"
+                          },
+                          "stateTransitionHistory": {
+                            "description": "Indicates if the agent supports providing state transition history.",
+                            "type": "boolean"
+                          },
+                          "extensions": {
+                            "description": "Extensions supported by this agent.",
+                            "type": "array",
+                            "items": {
+                              "description": "A declaration of an extension supported by an Agent.",
+                              "type": "object",
+                              "properties": {
+                                "uri": {
+                                  "description": "The URI of the extension.",
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "description": "A description of how this agent uses this extension.",
+                                  "type": "string"
+                                },
+                                "required": {
+                                  "description": "Whether the client must follow specific requirements of the extension.",
+                                  "type": "boolean"
+                                },
+                                "params": {
+                                  "description": "Optional configuration for the extension.",
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                }
+                              },
+                              "required": [
+                                "uri"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "securitySchemes": {
+                        "description": "Security scheme details used for authenticating with this agent. Maps scheme names to their configurations.",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "description": "Defines a security scheme using an API key.",
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "API Key Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "apiKey"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "in": {
+                                  "description": "The location of the API key. Valid values are 'query', 'header', or 'cookie'.",
+                                  "type": "string",
+                                  "enum": [
+                                    "query",
+                                    "header",
+                                    "cookie"
+                                  ]
+                                },
+                                "name": {
+                                  "description": "The name of the header, query or cookie parameter to be used.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "in",
+                                "name"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "HTTP Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "http"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "scheme": {
+                                  "description": "The name of the HTTP Authentication scheme to be used in the Authorization header as defined in RFC7235. The values used SHOULD be registered in the IANA Authentication Scheme registry. The value is case-insensitive, as defined in RFC7235.",
+                                  "type": "string"
+                                },
+                                "bearerFormat": {
+                                  "description": "A hint to the client to identify how the bearer token is formatted. Bearer tokens are usually generated by an authorization server, so this information is primarily for documentation purposes.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "scheme"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "description": "OAuth2 security scheme configuration.",
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "description": "OAuth2 Type of the security scheme.",
+                                  "type": "string",
+                                  "const": "oauth2"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "flows": {
+                                  "description": "An object containing configuration information for the flow types supported.",
+                                  "type": "object",
+                                  "properties": {
+                                    "authorizationCode": {
+                                      "description": "Configuration for the OAuth Authorization Code flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "authorizationUrl": {
+                                          "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "authorizationUrl",
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "clientCredentials": {
+                                      "description": "Configuration for the OAuth Client Credentials flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "implicit": {
+                                      "description": "Configuration for the OAuth Implicit flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "authorizationUrl": {
+                                          "description": "The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "authorizationUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "password": {
+                                      "description": "Configuration for the OAuth Resource Owner Password flow",
+                                      "type": "object",
+                                      "properties": {
+                                        "tokenUrl": {
+                                          "description": "The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "refreshUrl": {
+                                          "description": "The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.",
+                                          "type": "string",
+                                          "format": "uri"
+                                        },
+                                        "scopes": {
+                                          "description": "The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.",
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string"
+                                          },
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "tokenUrl",
+                                        "scopes"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "oauth2MetadataUrl": {
+                                  "description": "URL to the oauth2 authorization server metadata",
+                                  "type": "string",
+                                  "format": "uri"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "flows"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "openIdConnect"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                },
+                                "openIdConnectUrl": {
+                                  "type": "string",
+                                  "format": "uri"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "openIdConnectUrl"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "mutualTLS"
+                                },
+                                "description": {
+                                  "description": "Description of this security scheme.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "security": {
+                        "description": "Security requirements for contacting the agent. Array of security requirement objects, where each object maps scheme names to scope arrays.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "defaultInputModes": {
+                        "description": "The default input modes supported by the agent.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "defaultOutputModes": {
+                        "description": "The default output modes supported by the agent.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "skills": {
+                        "description": "List of specific skills offered by the agent.",
+                        "type": "array",
+                        "items": {
+                          "description": "A unit of capability that an agent can perform.",
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "description": "Unique identifier for the skill.",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "Human-readable name of the skill.",
+                              "type": "string"
+                            },
+                            "description": {
+                              "description": "Description of the skill.",
+                              "type": "string"
+                            },
+                            "tags": {
+                              "description": "List of tags associated with the skill for categorization.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "examples": {
+                              "description": "List of example inputs or use cases for the skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "inputModes": {
+                              "description": "List of input modes supported by this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "outputModes": {
+                              "description": "List of output modes supported by this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "security": {
+                              "description": "Security schemes necessary for the agent to leverage this skill.",
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string"
+                                },
+                                "additionalProperties": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "description",
+                            "tags"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "supportsAuthenticatedExtendedCard": {
+                        "description": "True if the agent supports providing an extended agent card when the user is authenticated.",
+                        "type": "boolean"
+                      },
+                      "signatures": {
+                        "description": "JSON Web Signatures computed for this AgentCard.",
+                        "type": "array",
+                        "items": {
+                          "description": "A JWS signature of an AgentCard.",
+                          "type": "object",
+                          "properties": {
+                            "protected": {
+                              "description": "The protected JWS header for the signature.",
+                              "type": "string"
+                            },
+                            "signature": {
+                              "description": "The computed signature, Base64url-encoded.",
+                              "type": "string"
+                            },
+                            "header": {
+                              "description": "The unprotected JWS header values.",
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "protected",
+                            "signature"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "protocolVersion",
+                      "name",
+                      "description",
+                      "url",
+                      "version",
+                      "capabilities",
+                      "defaultInputModes",
+                      "defaultOutputModes",
+                      "skills"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "uri",
+                  "info"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          {
+            "description": "A tool service is a server or instance of a tool.",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "The URL of the server.",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "headers": {
+                    "description": "An object containing custom HTTP headers to be sent with every request to this server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "authToken": {
+                    "description": "The authentication token to be used for the server.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "description": "An object containing the parameters to be used for the server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  "type": {
+                    "default": "mcp",
+                    "type": "string",
+                    "const": "mcp"
+                  },
+                  "uri": {
+                    "description": "The URI of the tool/function name.",
+                    "type": "string"
+                  },
+                  "info": {
+                    "description": "The info of the tool.",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "uri": {
+                        "description": "The URI of the tool.",
+                        "type": "string"
+                      },
+                      "implementation": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "icons": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "src": {
+                                  "type": "string"
+                                },
+                                "mimeType": {
+                                  "type": "string"
+                                },
+                                "sizes": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "theme": {
+                                  "type": "string",
+                                  "enum": [
+                                    "light",
+                                    "dark"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "src"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "websiteUrl": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "version"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "serverCapabilities": {
+                        "type": "object",
+                        "properties": {
+                          "experimental": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {}
+                          },
+                          "logging": {},
+                          "completions": {},
+                          "prompts": {
+                            "type": "object",
+                            "properties": {
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "resources": {
+                            "type": "object",
+                            "properties": {
+                              "subscribe": {
+                                "type": "boolean"
+                              },
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "tools": {
+                            "type": "object",
+                            "properties": {
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "tasks": {
+                            "type": "object",
+                            "properties": {
+                              "list": {},
+                              "cancel": {},
+                              "requests": {
+                                "type": "object",
+                                "properties": {
+                                  "tools": {
+                                    "type": "object",
+                                    "properties": {
+                                      "call": {}
+                                    },
+                                    "additionalProperties": {}
+                                  }
+                                },
+                                "additionalProperties": {}
+                              }
+                            },
+                            "additionalProperties": {}
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "tools": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "inputSchema": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "object"
+                                },
+                                "properties": {
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                },
+                                "required": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": {}
+                            },
+                            "outputSchema": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "object"
+                                },
+                                "properties": {
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                },
+                                "required": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": {}
+                            },
+                            "annotations": {
+                              "type": "object",
+                              "properties": {
+                                "title": {
+                                  "type": "string"
+                                },
+                                "readOnlyHint": {
+                                  "type": "boolean"
+                                },
+                                "destructiveHint": {
+                                  "type": "boolean"
+                                },
+                                "idempotentHint": {
+                                  "type": "boolean"
+                                },
+                                "openWorldHint": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "execution": {
+                              "type": "object",
+                              "properties": {
+                                "taskSupport": {
+                                  "type": "string",
+                                  "enum": [
+                                    "required",
+                                    "optional",
+                                    "forbidden"
+                                  ]
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "inputSchema"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "uri": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "mimeType": {
+                              "type": "string"
+                            },
+                            "annotations": {
+                              "type": "object",
+                              "properties": {
+                                "audience": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": [
+                                      "user",
+                                      "assistant"
+                                    ]
+                                  }
+                                },
+                                "priority": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                "lastModified": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-]\\d{2}:\\d{2})))$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "properties": {},
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "uri"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "prompts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "arguments": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "required": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "name"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "properties": {},
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "instructions": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "implementation",
+                      "serverCapabilities",
+                      "tools",
+                      "resources",
+                      "prompts"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "url",
+                  "type",
+                  "uri",
+                  "info"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "The URL of the server.",
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "headers": {
+                    "description": "An object containing custom HTTP headers to be sent with every request to this server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "authToken": {
+                    "description": "The authentication token to be used for the server.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "description": "An object containing the parameters to be used for the server.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  "type": {
+                    "default": "mcp",
+                    "type": "string",
+                    "const": "mcp"
+                  },
+                  "uri": {
+                    "description": "The URI of the tool/function name.",
+                    "type": "string"
+                  },
+                  "info": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "uri": {
+                        "description": "The URI of the tool.",
+                        "type": "string"
+                      },
+                      "implementation": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "icons": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "src": {
+                                  "type": "string"
+                                },
+                                "mimeType": {
+                                  "type": "string"
+                                },
+                                "sizes": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "theme": {
+                                  "type": "string",
+                                  "enum": [
+                                    "light",
+                                    "dark"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "src"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "websiteUrl": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "version"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "serverCapabilities": {
+                        "type": "object",
+                        "properties": {
+                          "experimental": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {}
+                          },
+                          "logging": {},
+                          "completions": {},
+                          "prompts": {
+                            "type": "object",
+                            "properties": {
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "resources": {
+                            "type": "object",
+                            "properties": {
+                              "subscribe": {
+                                "type": "boolean"
+                              },
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "tools": {
+                            "type": "object",
+                            "properties": {
+                              "listChanged": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "tasks": {
+                            "type": "object",
+                            "properties": {
+                              "list": {},
+                              "cancel": {},
+                              "requests": {
+                                "type": "object",
+                                "properties": {
+                                  "tools": {
+                                    "type": "object",
+                                    "properties": {
+                                      "call": {}
+                                    },
+                                    "additionalProperties": {}
+                                  }
+                                },
+                                "additionalProperties": {}
+                              }
+                            },
+                            "additionalProperties": {}
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "tools": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "inputSchema": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "object"
+                                },
+                                "properties": {
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                },
+                                "required": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": {}
+                            },
+                            "outputSchema": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "const": "object"
+                                },
+                                "properties": {
+                                  "type": "object",
+                                  "propertyNames": {
+                                    "type": "string"
+                                  },
+                                  "additionalProperties": {}
+                                },
+                                "required": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "additionalProperties": {}
+                            },
+                            "annotations": {
+                              "type": "object",
+                              "properties": {
+                                "title": {
+                                  "type": "string"
+                                },
+                                "readOnlyHint": {
+                                  "type": "boolean"
+                                },
+                                "destructiveHint": {
+                                  "type": "boolean"
+                                },
+                                "idempotentHint": {
+                                  "type": "boolean"
+                                },
+                                "openWorldHint": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "execution": {
+                              "type": "object",
+                              "properties": {
+                                "taskSupport": {
+                                  "type": "string",
+                                  "enum": [
+                                    "required",
+                                    "optional",
+                                    "forbidden"
+                                  ]
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "inputSchema"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "uri": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "mimeType": {
+                              "type": "string"
+                            },
+                            "annotations": {
+                              "type": "object",
+                              "properties": {
+                                "audience": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": [
+                                      "user",
+                                      "assistant"
+                                    ]
+                                  }
+                                },
+                                "priority": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                "lastModified": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-]\\d{2}:\\d{2})))$"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "properties": {},
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "uri"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "prompts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "icons": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "src": {
+                                    "type": "string"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "sizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "theme": {
+                                    "type": "string",
+                                    "enum": [
+                                      "light",
+                                      "dark"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "src"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "arguments": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "required": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "name"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "_meta": {
+                              "type": "object",
+                              "properties": {},
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "instructions": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "arguments": {
+                    "description": "The arguments to be used to start the tool.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "command": {
+                            "description": "The command to be used to start the tool.",
+                            "type": "string"
+                          },
+                          "args": {
+                            "description": "The arguments to be used to start the tool.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "command",
+                          "args"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "description": "The arguments for the function call.",
+                        "type": "string"
+                      },
+                      {}
+                    ]
+                  }
+                },
+                "required": [
+                  "type",
+                  "uri"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "metadata": {
+      "description": "Runtime metadata for environment-specific configuration",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "uri",
+    "name",
+    "description",
+    "version",
+    "skills",
+    "schemaVersion",
+    "instructions",
+    "services"
+  ],
+  "additionalProperties": false,
+  "title": "AgentConfiguration"
+}
