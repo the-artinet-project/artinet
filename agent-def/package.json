@@ -2,15 +2,15 @@
   "name": "agent-def",
   "version": "0.1.5",
   "description": "A standardized definition for collaborative agents.",
-  "main": "dist/src/definition.js",
-  "module": "dist/src/definition.js",
-  "types": "dist/src/definition.d.ts",
+  "main": "dist/src/index.js",
+  "module": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/src/definition.d.ts",
-      "import": "./dist/src/definition.js",
-      "default": "./dist/src/definition.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "default": "./dist/src/index.js"
     }
   },
   "scripts": {
