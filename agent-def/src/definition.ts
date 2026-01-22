@@ -179,6 +179,9 @@ export const AgentDefinitionSchema = Runtime.AgentInfoSchema.partial({
     instructions: z.string().describe("System prompt for the agent"),
   });
 export type AgentDefinition = z.output<typeof AgentDefinitionSchema>;
+export const isAgentDefinition = (value: unknown): value is AgentDefinition => {
+  return AgentDefinitionSchema.safeParse(value).success;
+};
 
 /**
  * Agent configuration schema
@@ -266,3 +269,6 @@ export const AgentConfigurationSchema = AgentDefinitionSchema.extend({
     .describe("Runtime metadata for environment-specific configuration"),
 });
 export type AgentConfiguration = z.output<typeof AgentConfigurationSchema>;
+export const isAgentConfiguration = (value: unknown): value is AgentConfiguration => {
+  return AgentConfigurationSchema.safeParse(value).success;
+};
