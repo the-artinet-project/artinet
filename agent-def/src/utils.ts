@@ -16,7 +16,7 @@ export function getTags(config: AgentConfiguration): string[] {
     if (config.groupIds) {
         tags.concat(config.groupIds?.map((groupId) => typeof groupId === "string" ? groupId : groupId.id) ?? []);
     }
-    tags.push(config.version);
+    tags.push(config.schemaVersion);
     tags.push("a2a");
     return tags;
 }
