@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as Callable from "../../module.js";
-import { Agent, A2A, AgentMessenger } from "@artinet/sdk";
+import { Agent, A2A, AgentMessenger, core } from "@artinet/sdk";
 import { Runtime } from "@artinet/types";
+import type { Agent as CallableAgent, Tool as CallableTool } from "../../types.js";
 
 const refreshCache = async (
   callables: Callable.Agent[],
@@ -36,7 +37,7 @@ const updateCache = async (
 export class Manager extends Callable.Manager {
   private _infos: Map<string, Runtime.AgentInfo> = new Map();
 
-  constructor(agents: Map<string, Agent | AgentMessenger> = new Map()) {
+  constructor(agents: Map<string, Agent | AgentMessenger> = new Map(), throwOnSet?: boolean, storage?: core.Manager<CallableAgent | CallableTool>) {
     super(
       new Map(
         Array.from(agents.entries()).map(([id, agent]) => {
@@ -46,7 +47,9 @@ export class Manager extends Callable.Manager {
           }
           return [id, callable];
         })
-      )
+      ),
+      throwOnSet,
+      storage
     );
   }
 

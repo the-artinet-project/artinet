@@ -17,7 +17,9 @@
  * @see {@link https://artinet.io} - A2A Protocol documentation
  */
 import * as sdk from "@artinet/sdk";
+import { core } from "@artinet/sdk";
 import * as Callable from "../../module.js";
+import type { Agent as CallableAgent, Tool as CallableTool } from "../../types.js";
 import {
   Registry,
   RelayRequest,
@@ -40,6 +42,10 @@ export interface Config {
   abortSignal?: AbortSignal;
   /** Optional pre-populated agent registry. */
   agents?: Map<string, sdk.Agent | sdk.AgentMessenger>;
+  /** Optional storage for the relay. */
+  storage?: core.Manager<CallableAgent | CallableTool>;
+  /** Optional flag to throw an error if a callable is set that already exists. */
+  throwOnSet?: boolean;
 }
 
 /**
@@ -81,7 +87,7 @@ export class Relay extends Manager implements Registry {
    * Prefer {@link Relay.create} for consistent instantiation.
    */
   constructor(config: Config) {
-    super(config.agents ?? new Map());
+    super(config.agents ?? new Map(), config.throwOnSet ?? true, config.storage);
     this._config = {
       callerId: config.callerId,
       abortSignal: config.abortSignal,
