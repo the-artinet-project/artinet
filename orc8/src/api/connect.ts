@@ -83,6 +83,7 @@ export const artinetProvider: APIProvider = async (
     "Access-Control-Allow-Credentials": "true",
   }
 ): Promise<API.ConnectResponse> => {
+  throw new Error("The artinet API is currently in a closed beta. Please use the openai Provider or contact us to get access.");
   const restResponse = await fetch(PROVIDER_URL, {
     method: "POST",
     headers: headers,
