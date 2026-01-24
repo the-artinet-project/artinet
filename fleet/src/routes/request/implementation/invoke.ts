@@ -144,6 +144,7 @@ export const callAgent = async (
       );
     }
     case "task/pushNotificationConfig/set": {
+      //todo: dock agents onto native for push notification support 
       if (!isAgentMessenger(agent)) {
         throw sdk.PUSH_NOTIFICATION_NOT_SUPPORTED({
           data: {
