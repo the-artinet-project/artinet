@@ -26,13 +26,13 @@ import { extractTextContent, formatJson, logger, safeParse } from "@artinet/sdk"
 import z, { toJSONSchema } from "zod/v4";
 import * as Callables from "../types.js";
 
-const customSeperator = "_-_";
+const customSeparator = "_-_";
 
 const encodeUriInfo = (
   type: "mcp" | "a2a",
   uri: string,
   name: string = ""
-): string => `${type}${customSeperator}${uri}${customSeperator}${name}`;
+): string => `${type}${customSeparator}${uri}${customSeparator}${name}`;
 
 function mcpName(uri: string, toolName: string): string {
   return encodeUriInfo("mcp", uri, toolName);
@@ -54,7 +54,7 @@ function extractUriInfo(
   name: string,
   uriMap: Map<string, string>
 ): { type: "mcp" | "a2a"; uri: string; name: string } {
-  const [_type, shortUri, _name] = name.split(customSeperator);
+  const [_type, shortUri, _name] = name.split(customSeparator);
   return {
     type: _type as "mcp" | "a2a",
     uri: expandUri(shortUri, uriMap),
