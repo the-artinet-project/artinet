@@ -14,7 +14,8 @@ export const GetAgents: RequestAgentRoute["intercept"] = {
   action: async ({
     request,
     context,
-  }: RequestAgentRoute["input"]): Promise<RequestAgentRoute["request"]> => {
+  }: RequestAgentRoute["input"]): Promise<RequestAgentRoute["request"]> => { 
+    /**Must remain a synchronous loop to ensure that circular dependencies are detected */
     for (const uri of context.target?.agentUris ?? []) {
       await armada.TryFindBase<
         typeof armada.StoredAgentSchema,
