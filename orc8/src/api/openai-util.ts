@@ -22,7 +22,7 @@
  */
 import openai from "openai";
 import { API, Runtime, Experimental } from "@artinet/types";
-import { getContent, formatJson, logger, safeParse } from "@artinet/sdk";
+import { extractTextContent, formatJson, logger, safeParse } from "@artinet/sdk";
 import z, { toJSONSchema } from "zod/v4";
 import * as Callables from "../types.js";
 
@@ -189,7 +189,7 @@ function agentContent(
 ): openai.ChatCompletionToolMessageParam["content"] {
   if (typeof response.result === "string") return response.result;
 
-  return getContent(response.result) ?? "";
+  return extractTextContent(response.result, false) ?? "";
 }
 
 function openaiToolMessageContent(
