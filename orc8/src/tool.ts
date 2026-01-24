@@ -44,6 +44,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Client as MCPClient } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioServerParameters, StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { Transport as MCPTransport } from '@modelcontextprotocol/sdk/shared/transport.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { safeStdioTransport, safeClose } from './utils/safeTransport.js';
 import { envArgsCapture } from './utils/env-expand.js';
 import { core, logger } from '@artinet/sdk';
@@ -202,7 +203,12 @@ export class Tool implements Callable.Tool, core.Service<ServiceRequest, Runtime
      * - Kills the subprocess
      */
     async stop(): Promise<void> {
-        await safeClose(this._client, this._transport as StdioClientTransport);
+        if (this._transport instanceof InMemoryTransport) {
+            await this._transport.close().catch((_) => {});
+            await this._client.close().catch((_) => {});
+        } else {
+            await safeClose(this._client, this._transport as StdioClientTransport);
+        }
     }
 
     /**
@@ -226,11 +232,17 @@ export class Tool implements Callable.Tool, core.Service<ServiceRequest, Runtime
      * }, "filesystem");
      * ```
      */
-    static async create(params: StdioServerParameters, uri: string = uuidv4()): Promise<Tool> {
-        const transport = safeStdioTransport({
-            ...params,
-            args: envArgsCapture(params.args ?? []),
-        });
+    static async create(params: StdioServerParameters | InMemoryTransport, uri: string = uuidv4()): Promise<Tool> {
+        let transport: StdioClientTransport | InMemoryTransport;
+        if (params instanceof InMemoryTransport) {
+            transport = params;
+        } else {
+            transport = safeStdioTransport({
+                ...params,
+                args: envArgsCapture(params.args ?? []),
+            });
+        }
+
         // Monitor the error stream for updates during initialization
         const handle = (data: Buffer) => logger.info(`[${uri}]: tool update: `, data.toString());
 
