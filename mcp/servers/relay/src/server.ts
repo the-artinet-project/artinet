@@ -11,6 +11,13 @@ import * as sdk from '@artinet/sdk';
 import { z } from 'zod/v4';
 import { Runtime } from '@artinet/types';
 
+interface ServerParams {
+    implementation?: Implementation;
+    options?: ServerOptions;
+    config: DiscoverConfig;
+    tools?: Runtime.ToolUtils.Definition[];
+}
+
 class RelayServer extends McpServer {
     private relay: Relay | null = null;
     constructor(
@@ -273,6 +280,12 @@ The assistant should always return the result to the user in a clear and concise
             }
         }
     }
+
+    static async create({ implementation, options, config, tools }: ServerParams): Promise<RelayServer> {
+        const server = new RelayServer(implementation, options);
+        await server.init(config, tools);
+        return server;
+    }
 }
 
-export { RelayServer };
+export { RelayServer, type ServerParams };
