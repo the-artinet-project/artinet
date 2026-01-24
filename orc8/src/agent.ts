@@ -230,3 +230,5 @@ export class Agent implements Callable.Agent {
     return _agent;
   }
 }
+
+export const from = Agent.from;
