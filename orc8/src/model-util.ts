@@ -19,18 +19,13 @@
  * Copyright 2025 The Artinet Project
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  AgentMessenger,
-  CreateAgentParams,
-  Agent as A2A_Agent,
-  Service as A2A_Service,
-  A2A,
-} from "@artinet/sdk";
-import { API, Runtime } from "@artinet/types";
-import * as Callable from "./types.js";
-import { StdioServerParameters } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { Agent } from "./agent.js";
-import { Tool } from "./tool.js";
+import { AgentMessenger, CreateAgentParams, Agent as A2A_Agent, Service as A2A_Service, A2A } from '@artinet/sdk';
+import { API, Runtime } from '@artinet/types';
+import * as Callable from './types.js';
+import { StdioServerParameters } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { Agent } from './agent.js';
+import { Tool } from './tool.js';
 
 /**
  * Function type for API providers that communicate with LLM backends.
@@ -56,10 +51,7 @@ import { Tool } from "./tool.js";
  * };
  * ```
  */
-export type APIProvider = (
-  request: API.ConnectRequest,
-  abortSignal?: AbortSignal
-) => Promise<API.ConnectResponse>;
+export type APIProvider = (request: API.ConnectRequest, abortSignal?: AbortSignal) => Promise<API.ConnectResponse>;
 
 /**
  * Function type for invoking multiple callables with shared options.
@@ -67,11 +59,11 @@ export type APIProvider = (
  * @internal
  */
 export type InvokeCallables = ({
-  request,
-  options,
+    request,
+    options,
 }: {
-  request: Callable.Request[];
-  options: Callable.Options;
+    request: Callable.Request[];
+    options: Callable.Options;
 }) => Promise<Callable.Response[]>;
 
 /**
@@ -82,10 +74,7 @@ export type InvokeCallables = ({
  * @internal
  */
 function createCall(response: API.ConnectResponse): Callable.Request[] {
-  return [
-    ...(response.options?.tools?.requests ?? []),
-    ...(response.options?.agents?.requests ?? []),
-  ];
+    return [...(response.options?.tools?.requests ?? []), ...(response.options?.agents?.requests ?? [])];
 }
 
 /**
@@ -101,32 +90,30 @@ function createCall(response: API.ConnectResponse): Callable.Request[] {
  * @internal
  */
 function update(
-  request: API.ConnectRequest,
-  responses: Callable.Response[] = [],
-  messages: API.ConnectRequest["messages"] = []
+    request: API.ConnectRequest,
+    responses: Callable.Response[] = [],
+    messages: API.ConnectRequest['messages'] = [],
 ): API.ConnectRequest {
-  const options = request.options;
-  request.options = {
-    ...options,
-    tools: {
-      ...options?.tools,
-      responses: [
-        ...(options?.tools?.responses ?? []),
-        ...(responses.filter((response) => Runtime.isToolResponse(response)) ??
-          []),
-      ],
-    },
-    agents: {
-      ...options?.agents,
-      responses: [
-        ...(options?.agents?.responses ?? []),
-        ...(responses.filter((response) => Runtime.isAgentResponse(response)) ??
-          []),
-      ],
-    },
-  };
-  request.messages = [...request.messages, ...messages];
-  return request;
+    const options = request.options;
+    request.options = {
+        ...options,
+        tools: {
+            ...options?.tools,
+            responses: [
+                ...(options?.tools?.responses ?? []),
+                ...(responses.filter((response) => Runtime.isToolResponse(response)) ?? []),
+            ],
+        },
+        agents: {
+            ...options?.agents,
+            responses: [
+                ...(options?.agents?.responses ?? []),
+                ...(responses.filter((response) => Runtime.isAgentResponse(response)) ?? []),
+            ],
+        },
+    };
+    request.messages = [...request.messages, ...messages];
+    return request;
 }
 
 /**
@@ -147,26 +134,24 @@ function update(
  * ```
  */
 export async function options(
-  callables: (Callable.Agent | Callable.Tool)[],
-  options?: API.ConnectOptions
+    callables: (Callable.Agent | Callable.Tool)[],
+    options?: API.ConnectOptions,
 ): Promise<API.ConnectOptions> {
-  const targets = await Promise.all(
-    callables.map(async (callable) => await callable?.getTarget?.())
-  );
-  const tools = targets.filter((target) => Runtime.isToolService(target));
-  const agents = targets.filter((target) => Runtime.isAgentService(target));
-  // Limit the options to the tools and agents that are actually available
-  return {
-    ...options,
-    tools: {
-      ...options?.tools,
-      services: tools,
-    },
-    agents: {
-      ...options?.agents,
-      services: agents,
-    },
-  };
+    const targets = await Promise.all(callables.map(async (callable) => await callable?.getTarget?.()));
+    const tools = targets.filter((target) => Runtime.isToolService(target));
+    const agents = targets.filter((target) => Runtime.isAgentService(target));
+    // Limit the options to the tools and agents that are actually available
+    return {
+        ...options,
+        tools: {
+            ...options?.tools,
+            services: tools,
+        },
+        agents: {
+            ...options?.agents,
+            services: agents,
+        },
+    };
 }
 
 /**
@@ -197,41 +182,41 @@ export async function options(
  * ```
  */
 export function request(
-  modelId: string,
-  messages: string | API.Message | API.Session | API.ConnectRequest,
-  options: API.ConnectOptions
+    modelId: string,
+    messages: string | API.Message | API.Session | API.ConnectRequest,
+    options: API.ConnectOptions,
 ): API.ConnectRequest {
-  let request: API.ConnectRequest = {
-    messages: [],
-    identifier: modelId,
-    preferredEndpoint: "auto",
-    options: options,
-  };
+    let request: API.ConnectRequest = {
+        messages: [],
+        identifier: modelId,
+        preferredEndpoint: 'auto',
+        options: options,
+    };
 
-  if (typeof messages === "string") {
-    request = {
-      ...request,
-      messages: [{ role: "user", content: messages }],
-    };
-  } else if (API.isMessage(messages)) {
-    request = {
-      ...request,
-      messages: [messages],
-    };
-  } else if (API.isSession(messages)) {
-    request = {
-      ...request,
-      messages: messages,
-    };
-  } else if (API.isConnectRequest(messages)) {
-    request = {
-      ...request,
-      ...messages,
-    };
-  } else {
-    throw new Error("Invalid messages type: " + typeof messages);
-  }
-  return request;
+    if (typeof messages === 'string') {
+        request = {
+            ...request,
+            messages: [{ role: 'user', content: messages }],
+        };
+    } else if (API.isMessage(messages)) {
+        request = {
+            ...request,
+            messages: [messages],
+        };
+    } else if (API.isSession(messages)) {
+        request = {
+            ...request,
+            messages: messages,
+        };
+    } else if (API.isConnectRequest(messages)) {
+        request = {
+            ...request,
+            ...messages,
+        };
+    } else {
+        throw new Error('Invalid messages type: ' + typeof messages);
+    }
+    return request;
 }
 
 /**
@@ -246,14 +231,12 @@ export function request(
  * @returns The extracted text content
  */
 export function response(response: API.ConnectResponse): string {
-  const content =
-    typeof response.message.content === "string"
-      ? response.message.content
-      : response.message.content?.text;
-  if (!content) {
-    throw new Error("No content found in response");
-  }
-  return content;
+    const content =
+        typeof response.message.content === 'string' ? response.message.content : response.message.content?.text;
+    if (!content) {
+        throw new Error('No content found in response');
+    }
+    return content;
 }
 
 /**
@@ -266,10 +249,11 @@ export function response(response: API.ConnectResponse): string {
  * - `StdioServerParameters`: MCP server configuration for tools
  */
 export type CallableService =
-  | A2A_Agent
-  | AgentMessenger
-  | Omit<CreateAgentParams, "contexts">
-  | StdioServerParameters;
+    | A2A_Agent
+    | AgentMessenger
+    | Omit<CreateAgentParams, 'contexts'>
+    | StdioServerParameters
+    | InMemoryTransport;
 
 /**
  * Converts a service definition into a callable instance.
@@ -298,21 +282,21 @@ export type CallableService =
  * ```
  */
 export async function add<T extends CallableService = CallableService>(
-  service: T,
-  uri?: string
+    service: T,
+    uri?: string,
 ): Promise<Callable.Agent | Callable.Tool> {
-  let callable: Callable.Agent | Callable.Tool | undefined = undefined;
-  if (service instanceof A2A_Service || service instanceof AgentMessenger) {
-    callable = Agent.from(service, uri);
-  } else if (typeof service === "object" && "engine" in service) {
-    callable = Agent.create(service, uri);
-  } else if (typeof service === "object" && "command" in service) {
-    callable = await Tool.create(service, uri);
-  }
-  if (!callable) {
-    throw new Error(`[Model:add]: Invalid service type: ${typeof service}`);
-  }
-  return callable;
+    let callable: Callable.Agent | Callable.Tool | undefined = undefined;
+    if (service instanceof A2A_Service || service instanceof AgentMessenger) {
+        callable = Agent.from(service, uri);
+    } else if (typeof service === 'object' && 'engine' in service) {
+        callable = Agent.create(service, uri);
+    } else if (typeof service === 'object' && 'command' in service) {
+        callable = await Tool.create(service, uri);
+    }
+    if (!callable) {
+        throw new Error(`[Model:add]: Invalid service type: ${typeof service}`);
+    }
+    return callable;
 }
 
 /**
@@ -323,8 +307,8 @@ export async function add<T extends CallableService = CallableService>(
  * @internal
  */
 const max_iterations_message: API.Message = {
-  role: "system",
-  content: `
+    role: 'system',
+    content: `
 The assistant has run out of executions for this task and will not be able to continue.
 The assistant must now formulate a final response to the user summarising what has been achieved so far and what is left to be done.
 In the final response, the assistant will also provide the user with suggestions for next steps and ask them whether they would like to continue.`,
@@ -360,63 +344,58 @@ In the final response, the assistant will also provide the user with suggestions
  * ```
  */
 export async function react(
-  request: API.ConnectRequest,
-  provider: APIProvider,
-  call: InvokeCallables,
-  history: Callable.Response[] = [],
-  options: Callable.Options
+    request: API.ConnectRequest,
+    provider: APIProvider,
+    call: InvokeCallables,
+    history: Callable.Response[] = [],
+    options: Callable.Options,
 ): Promise<API.ConnectResponse> {
-  let iterations: number = options.iterations ?? Callable.DEFAULT_ITERATIONS;
+    let iterations: number = options.iterations ?? Callable.DEFAULT_ITERATIONS;
 
-  let apiResponse: API.ConnectResponse | undefined = undefined;
-  let results: Callable.Response[] = [];
+    let apiResponse: API.ConnectResponse | undefined = undefined;
+    let results: Callable.Response[] = [];
 
-  for (let i = 0; i < iterations && !options.abortSignal?.aborted; i++) {
-    const maxIteration: API.Message[] =
-      i >= iterations - 1 ? [max_iterations_message] : [];
+    for (let i = 0; i < iterations && !options.abortSignal?.aborted; i++) {
+        const maxIteration: API.Message[] = i >= iterations - 1 ? [max_iterations_message] : [];
 
-    const updatedRequest: API.ConnectRequest = update(
-      request,
-      results,
-      maxIteration
-    );
+        const updatedRequest: API.ConnectRequest = update(request, results, maxIteration);
 
-    apiResponse = await provider(updatedRequest, options.abortSignal);
+        apiResponse = await provider(updatedRequest, options.abortSignal);
 
-    results = await call({ request: createCall(apiResponse), options });
-    if (results.length === 0) break;
+        results = await call({ request: createCall(apiResponse), options });
+        if (results.length === 0) break;
 
-    history = [...history, ...results];
-  }
+        history = [...history, ...results];
+    }
 
-  if (!apiResponse) {
-    throw new Error("No response from model");
-  }
+    if (!apiResponse) {
+        throw new Error('No response from model');
+    }
 
-  return apiResponse;
+    return apiResponse;
 }
 
 function createSkill(value: Callable.Agent | Callable.Tool): A2A.AgentSkill {
-  let name: string = `${value.kind}-${value.uri}`;
-  let description: string = `${value.kind} - ${value.uri}`;
+    let name: string = `${value.kind}-${value.uri}`;
+    let description: string = `${value.kind} - ${value.uri}`;
 
-  const info: Runtime.AgentInfo | Runtime.ToolInfo | undefined = value.info;
-  if (info) {
-    if (Runtime.isAgentInfo(info)) {
-      name = info.name;
-      description = info.description;
-    } else {
-      name = info.implementation.name;
-      description = info.instructions ?? `A ${info.implementation.name} tool.`;
+    const info: Runtime.AgentInfo | Runtime.ToolInfo | undefined = value.info;
+    if (info) {
+        if (Runtime.isAgentInfo(info)) {
+            name = info.name;
+            description = info.description;
+        } else {
+            name = info.implementation.name;
+            description = info.instructions ?? `A ${info.implementation.name} tool.`;
+        }
     }
-  }
 
-  return {
-    id: value.uri,
-    name: name,
-    description: description,
-    tags: [value.kind],
-  };
+    return {
+        id: value.uri,
+        name: name,
+        description: description,
+        tags: [value.kind],
+    };
 }
 
 /**
@@ -437,14 +416,14 @@ function createSkill(value: Callable.Agent | Callable.Tool): A2A.AgentSkill {
  * ```
  */
 export function createCard(
-  modelId: string,
-  callables: (Callable.Agent | Callable.Tool)[]
+    modelId: string,
+    callables: (Callable.Agent | Callable.Tool)[],
 ): Partial<A2A.AgentCard> & { name: string; description: string } {
-  return {
-    name: `${modelId}-agent`,
-    description: `An agent that uses the ${modelId} large language model.`,
-    skills: callables.map((value) => createSkill(value)),
-  };
+    return {
+        name: `${modelId}-agent`,
+        description: `An agent that uses the ${modelId} large language model.`,
+        skills: callables.map((value) => createSkill(value)),
+    };
 }
 
 /**
@@ -467,23 +446,23 @@ export function createCard(
  * ```
  */
 export function createArtifact(
-  taskId: string,
-  contextId: string,
-  data: Callable.Response
+    taskId: string,
+    contextId: string,
+    data: Callable.Response,
 ): A2A.TaskArtifactUpdateEvent {
-  const artifact: A2A.TaskArtifactUpdateEvent = {
-    taskId: taskId,
-    contextId: contextId,
-    kind: "artifact-update",
-    artifact: {
-      artifactId: data.id,
-      parts: [{ kind: "data", data: data as { [x: string]: unknown } }],
-    },
-    metadata: {
-      ["timestamp"]: new Date().toISOString(),
-    },
-  };
-  return artifact;
+    const artifact: A2A.TaskArtifactUpdateEvent = {
+        taskId: taskId,
+        contextId: contextId,
+        kind: 'artifact-update',
+        artifact: {
+            artifactId: data.id,
+            parts: [{ kind: 'data', data: data as { [x: string]: unknown } }],
+        },
+        metadata: {
+            ['timestamp']: new Date().toISOString(),
+        },
+    };
+    return artifact;
 }
 
 /**
@@ -492,11 +471,7 @@ export function createArtifact(
  * @param context - The A2A context to bind the responses to
  * @returns A function that binds a callable response to the context
  */
-export function bindResponses(
-  context: A2A.Context
-): (data: Callable.Response) => void {
-  return (data: Callable.Response) =>
-    context.publisher.onUpdate(
-      createArtifact(context.taskId, context.contextId, data)
-    );
+export function bindResponses(context: A2A.Context): (data: Callable.Response) => void {
+    return (data: Callable.Response) =>
+        context.publisher.onUpdate(createArtifact(context.taskId, context.contextId, data));
 }
