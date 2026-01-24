@@ -4,6 +4,7 @@
  */
 
 import * as armada from '@artinet/armada';
+import { RelayServer } from '@artinet/agent-relay-mcp';
 import { AgentConfiguration } from 'agent-def';
 import * as sdk from '@artinet/sdk';
 import { API } from '@artinet/types';
@@ -50,10 +51,12 @@ export interface RequestContext
      * Normally these functions would be wired in at the entry definition,
      * but allocating them here makes it easier for consumers to override.
      */
+
     /**
      * This function parses an agent configuration and loads the agent process into memory.
      */
     load: loadFunction;
+
     /**
      * This function invokes the agent with the given request.
      */
@@ -63,6 +66,11 @@ export interface RequestContext
      * This function tests the agent with the given request.
      */
     inferenceProviderUrl?: string;
+
+    /**
+     * The relay for this server.
+     */
+    relay?: Promise<RelayServer>;
 }
 
 export interface RequestAgentRoute<Req extends AgentRequest = AgentRequest> extends armada.Storable<
