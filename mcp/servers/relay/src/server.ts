@@ -2,30 +2,31 @@
  * Copyright 2025 The Artinet Project
  * SPDX-License-Identifier: Apache-2.0
  */
-import { ServerOptions } from "@modelcontextprotocol/sdk/server/index.js";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Implementation } from "@modelcontextprotocol/sdk/types.js";
-import { Discover, DiscoverConfig, Relay } from "@artinet/agent-relay";
-import { v4 as uuidv4 } from "uuid";
-import * as sdk from "@artinet/sdk";
-import { z } from "zod/v4";
+import { ServerOptions } from '@modelcontextprotocol/sdk/server/index.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { Implementation } from '@modelcontextprotocol/sdk/types.js';
+import { Discover, DiscoverConfig, Relay } from '@artinet/agent-relay';
+import { v4 as uuidv4 } from 'uuid';
+import * as sdk from '@artinet/sdk';
+import { z } from 'zod/v4';
+import { Runtime } from '@artinet/types';
 
 class RelayServer extends McpServer {
-  private relay: Relay | null = null;
-  constructor(
-    info: Implementation = {
-      name: "agent-relay-server",
-      version: "0.0.1",
-    },
-    options: ServerOptions = {}
-  ) {
-    super(info, {
-      ...options,
-      instructions:
-        options?.instructions +
-        `The relay server is a tool that allows the assistant to:
+    private relay: Relay | null = null;
+    constructor(
+        info: Implementation = {
+            name: 'agent-relay-server',
+            version: '0.0.1',
+        },
+        options: ServerOptions = {},
+    ) {
+        super(info, {
+            ...options,
+            instructions:
+                options?.instructions +
+                `The relay server is a tool that allows the assistant to:
     - send messages to other agents
-    - get information about a task that is currently running orcancel a task that is currently running
+    - get information about a task that is currently running or cancel a task that is currently running
     - get information about an agent in the form of an agent card ( which includes the skills of the agent and its capabilities)
     - view the available agents
     - and search for agents based on a query
@@ -46,242 +47,232 @@ If the assistant determines that the request has not been adequately fulfilled b
 Upon completion of the request, the assistant should return the result to the user.
 The assistant should always return the result to the user in a clear and concise manner.
       `,
-    });
-  }
-  override async close(): Promise<void> {
-    await this.relay?.stop();
-    await super.close();
-  }
-  public async init(config: DiscoverConfig) {
-    this.relay = await Discover.create(config);
-    this.registerTool(
-      "sendMessage",
-      {
-        title: "Send Message",
-        description:
-          "A message will be sent to the target agent and a response object containing the full details of request will be returned to the assistant. Which contains the task id and the message sent to the agent, the conversation history and the artifacts created by the agent.",
-        inputSchema: z.object({
-          agentId: z
-            .string()
-            .describe("The id of the agent to send the message to."),
-          message: z.string().describe("The message to send to the agent."),
-          taskId: z
-            .string()
-            .describe(
-              "The id of the task that the message is related to. If not provided, a new task will be created."
-            )
-            .optional(),
-        }),
-        outputSchema: z.object({
-          result: sdk.A2A.SendMessageSuccessResultSchema,
-        }),
-      },
-      async (args) => {
-        const result: sdk.A2A.SendMessageSuccessResult | undefined =
-          await this.relay?.sendMessage({
-            agentId: args.agentId,
-            messageSendParams: {
-              message: {
-                role: "user",
-                messageId: uuidv4(),
-                kind: "message",
-                parts: [{ text: args.message, kind: "text" }],
-                taskId: args.taskId ?? uuidv4(),
-              },
-            },
-          });
-        return {
-          content: [
-            {
-              type: "text",
-              text:
-                sdk.extractTextContent(result as sdk.A2A.Update) ??
-                "No result from the agent. This may be because the agent is not responding or the message was not sent.",
-            },
-          ],
-          structuredContent: {
-            result: result,
-          },
-        };
-      }
-    );
-
-    this.registerTool(
-      "getTask",
-      {
-        title: "Get Task",
-        description: "Get the status of a running task from an agent",
-        inputSchema: z
-          .object({
-            agentId: z
-              .string()
-              .describe("The id of the agent to get the task from."),
-            taskId: z.string().describe("The id of the task to get."),
-          })
-          .describe(
-            "The agent id and task query to get the status of a running task from the agent."
-          ),
-        outputSchema: sdk.A2A.TaskSchema,
-      },
-      async (args) => {
-        const result: sdk.A2A.Task | undefined = await this.relay?.getTask({
-          agentId: args.agentId,
-          taskQuery: {
-            id: args.taskId,
-            metadata: {},
-            historyLength: undefined,
-          },
         });
-        return {
-          content: [
-            {
-              type: "text",
-              text:
-                result?.status?.state ??
-                "No task found. This may be because the task is not running or the agent is not responding.",
-            },
-          ],
-          structuredContent: result,
-        };
-      }
-    );
+    }
+    override async close(): Promise<void> {
+        await this.relay?.stop();
+        await super.close();
+    }
+    public async init(config: DiscoverConfig, tools?: Runtime.ToolUtils.Definition[]) {
+        this.relay = await Discover.create(config);
 
-    this.registerTool(
-      "cancelTask",
-      {
-        title: "Cancel Task",
-        description: "Cancel a running task from an agent",
-        inputSchema: z
-          .object({
-            agentId: z
-              .string()
-              .describe("The id of the agent to cancel the task from."),
-            taskId: z.string().describe("The id of the task to cancel."),
-          })
-          .describe(
-            "The agent id and task id to cancel a running task from the agent."
-          ),
-        outputSchema: sdk.A2A.TaskSchema,
-      },
-      async (args) => {
-        const result: sdk.A2A.Task | undefined = await this.relay?.cancelTask({
-          agentId: args.agentId,
-          taskId: {
-            id: args.taskId,
-            metadata: {},
-          },
-        });
-        return {
-          content: [
+        this.registerTool(
+            'sendMessage',
             {
-              type: "text",
-              text:
-                result?.status?.state ??
-                "No task found. This may be because the task is not running or the agent is not responding.",
+                title: 'Send Message',
+                description:
+                    'A message will be sent to the target agent and a response object containing the full details of request will be returned to the assistant. Which contains the task id and the message sent to the agent, the conversation history and the artifacts created by the agent.',
+                inputSchema: z.object({
+                    agentId: z.string().describe('The id of the agent to send the message to.'),
+                    message: z.string().describe('The message to send to the agent.'),
+                    taskId: z
+                        .string()
+                        .describe(
+                            'The id of the task that the message is related to. If not provided, a new task will be created.',
+                        )
+                        .optional(),
+                }),
+                outputSchema: z.object({
+                    result: sdk.A2A.SendMessageSuccessResultSchema,
+                }),
             },
-          ],
-          structuredContent: result,
-        };
-      }
-    );
+            async (args) => {
+                const result: sdk.A2A.SendMessageSuccessResult | undefined = await this.relay?.sendMessage({
+                    agentId: args.agentId,
+                    messageSendParams: {
+                        message: {
+                            role: 'user',
+                            messageId: uuidv4(),
+                            kind: 'message',
+                            parts: [{ text: args.message, kind: 'text' }],
+                            taskId: args.taskId ?? uuidv4(),
+                        },
+                    },
+                });
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text:
+                                sdk.extractTextContent(result as sdk.A2A.Update) ??
+                                'No result from the agent. This may be because the agent is not responding or the message was not sent.',
+                        },
+                    ],
+                    structuredContent: {
+                        result: result,
+                    },
+                };
+            },
+        );
 
-    this.registerTool(
-      "getAgentCard",
-      {
-        title: "Get Agent Card",
-        description:
-          "Get the AgentCard that describes the capabilities and skills of an agent",
-        inputSchema: z.object({
-          agentId: z
-            .string()
-            .describe("The id of the agent to get the agent card from."),
-        }),
-        outputSchema: sdk.A2A.AgentCardSchema,
-      },
-      async (args) => {
-        const result: sdk.A2A.AgentCard | undefined = await this.relay?.getAgentCard({
-          agentId: args.agentId,
-        });
-        const text: string = result
-          ? JSON.stringify(result, null, 2)
-          : "No agent card found. This may be because the agent is not registered or the agent is not responding.";
-        return {
-          content: [
+        this.registerTool(
+            'getTask',
             {
-              type: "text",
-              text: text,
+                title: 'Get Task',
+                description: 'Get the status of a running task from an agent',
+                inputSchema: z
+                    .object({
+                        agentId: z.string().describe('The id of the agent to get the task from.'),
+                        taskId: z.string().describe('The id of the task to get.'),
+                    })
+                    .describe('The agent id and task query to get the status of a running task from the agent.'),
+                outputSchema: sdk.A2A.TaskSchema,
             },
-          ],
-          structuredContent: result,
-        };
-      }
-    );
-    this.registerTool(
-      "viewAgents",
-      {
-        title: "View Agents",
-        description: "View the agents that are registered with the relay.",
-        outputSchema: z.object({
-          agents: z
-            .array(sdk.A2A.AgentCardSchema)
-            .describe("The agents that are registered with the relay."),
-        }),
-      },
-      async () => {
-        const result: sdk.A2A.AgentCard[] = (await this.relay?.getAgentCards()) ?? [];
-        const text: string =
-          result && result.length > 0
-            ? JSON.stringify({ agents: result }, null, 2)
-            : "No agents registered with the relay.";
-        return {
-          content: [
+            async (args) => {
+                const result: sdk.A2A.Task | undefined = await this.relay?.getTask({
+                    agentId: args.agentId,
+                    taskQuery: {
+                        id: args.taskId,
+                        metadata: {},
+                        historyLength: undefined,
+                    },
+                });
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text:
+                                result?.status?.state ??
+                                'No task found. This may be because the task is not running or the agent is not responding.',
+                        },
+                    ],
+                    structuredContent: result,
+                };
+            },
+        );
+
+        this.registerTool(
+            'cancelTask',
             {
-              type: "text" as const,
-              text: text,
+                title: 'Cancel Task',
+                description: 'Cancel a running task from an agent',
+                inputSchema: z
+                    .object({
+                        agentId: z.string().describe('The id of the agent to cancel the task from.'),
+                        taskId: z.string().describe('The id of the task to cancel.'),
+                    })
+                    .describe('The agent id and task id to cancel a running task from the agent.'),
+                outputSchema: sdk.A2A.TaskSchema,
             },
-          ],
-          structuredContent: {
-            agents: result ?? [],
-          },
-        };
-      }
-    );
-    this.registerTool(
-      "searchAgents",
-      {
-        title: "Search Agents",
-        description:
-          "Search for agents by name, description, or skills. The query is case insensitive and will match against the entire name, description, and skills of the agents.",
-        inputSchema: z.object({
-          query: z.string().describe("The query to search against."),
-        }),
-        outputSchema: z.object({
-          agents: z
-            .array(sdk.A2A.AgentCardSchema)
-            .describe("The agents that match the query."),
-        }),
-      },
-      async (args) => {
-        const result: sdk.A2A.AgentCard[] =
-          (await this.relay?.searchAgents({ query: args.query })) ?? [];
-        const text: string =
-          result && result.length > 0
-            ? JSON.stringify({ agents: result }, null, 2)
-            : "No agents found. This may be because the query is not valid or the agents are not responding.";
-        return {
-          content: [
+            async (args) => {
+                const result: sdk.A2A.Task | undefined = await this.relay?.cancelTask({
+                    agentId: args.agentId,
+                    taskId: {
+                        id: args.taskId,
+                        metadata: {},
+                    },
+                });
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text:
+                                result?.status?.state ??
+                                'No task found. This may be because the task is not running or the agent is not responding.',
+                        },
+                    ],
+                    structuredContent: result,
+                };
+            },
+        );
+
+        this.registerTool(
+            'getAgentCard',
             {
-              type: "text",
-              text: text,
+                title: 'Get Agent Card',
+                description: 'Get the AgentCard that describes the capabilities and skills of an agent',
+                inputSchema: z.object({
+                    agentId: z.string().describe('The id of the agent to get the agent card from.'),
+                }),
+                outputSchema: sdk.A2A.AgentCardSchema,
             },
-          ],
-          structuredContent: {
-            agents: result,
-          },
-        };
-      }
-    );
-  }
+            async (args) => {
+                const result: sdk.A2A.AgentCard | undefined = await this.relay?.getAgentCard({
+                    agentId: args.agentId,
+                });
+                const text: string = result
+                    ? sdk.formatJson(result)
+                    : 'No agent card found. This may be because the agent is not registered or the agent is not responding.';
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: text,
+                        },
+                    ],
+                    structuredContent: result,
+                };
+            },
+        );
+
+        this.registerTool(
+            'viewAgents',
+            {
+                title: 'View Agents',
+                description: 'View the agents that are registered with the relay.',
+                outputSchema: z.object({
+                    agents: z.array(sdk.A2A.AgentCardSchema).describe('The agents that are registered with the relay.'),
+                }),
+            },
+            async () => {
+                const result: sdk.A2A.AgentCard[] = (await this.relay?.getAgentCards()) ?? [];
+                const text: string =
+                    result && result.length > 0
+                        ? sdk.formatJson({ agents: result })
+                        : 'No agents registered with the relay.';
+                return {
+                    content: [
+                        {
+                            type: 'text' as const,
+                            text: text,
+                        },
+                    ],
+                    structuredContent: {
+                        agents: result ?? [],
+                    },
+                };
+            },
+        );
+
+        this.registerTool(
+            'searchAgents',
+            {
+                title: 'Search Agents',
+                description:
+                    'Search for agents by name, description, or skills. The query is case insensitive and will match against the entire name, description, and skills of the agents.',
+                inputSchema: z.object({
+                    query: z.string().describe('The query to search against.'),
+                }),
+                outputSchema: z.object({
+                    agents: z.array(sdk.A2A.AgentCardSchema).describe('The agents that match the query.'),
+                }),
+            },
+            async (args) => {
+                const result: sdk.A2A.AgentCard[] = (await this.relay?.searchAgents({ query: args.query })) ?? [];
+                const text: string =
+                    result && result.length > 0
+                        ? sdk.formatJson({ agents: result })
+                        : 'No agents found. This may be because the query is not valid or the agents are not responding.';
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: text,
+                        },
+                    ],
+                    structuredContent: {
+                        agents: result,
+                    },
+                };
+            },
+        );
+
+        if (tools) {
+            for (const tool of tools) {
+                this.registerTool(tool.name, tool.definition, tool.callback);
+            }
+        }
+    }
 }
 
 export { RelayServer };
