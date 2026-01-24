@@ -45,9 +45,9 @@
     "prepublishOnly": "npm run clean:all && npm i && npm run build && npm test"
   },
   "dependencies": {
-    "@artinet/agent-relay": "^0.1.1",
+    "@artinet/agent-relay": "^0.1.5",
     "@artinet/sdk": "^0.6.4",
-    "@artinet/types": "^0.0.9",
+    "@artinet/types": "^0.1.4",
     "@modelcontextprotocol/sdk": "^1.24.3",
     "p-limit": "^7.2.0",
     "portscanner": "^2.2.0",
