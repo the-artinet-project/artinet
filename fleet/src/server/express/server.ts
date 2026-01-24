@@ -6,7 +6,10 @@
 import { Server } from 'http';
 import * as sdk from '@artinet/sdk';
 import express from 'express';
-import { StreamableHTTPServerTransportOptions } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import {
+    StreamableHTTPServerTransport,
+    StreamableHTTPServerTransportOptions,
+} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CreateAgentRoute } from '../../routes/create/index.js';
 import { Settings as FleetSettings } from '../../settings.js';
 import { DEFAULTS } from '../../default.js';
@@ -15,6 +18,8 @@ import * as agent from './agent-request.js';
 import * as testing from './test-request.js';
 import * as deployment from './deploy-request.js';
 import { AGENT_FIELD_NAME } from './agent-request.js';
+import { handleMCP } from './mcp.js';
+import { mountMCP } from '../mcp/index.js';
 
 /**
  * Extended settings for the Express Fleet server.
@@ -38,8 +43,13 @@ export type Settings = FleetSettings & {
      * @see {@link https://expressjs.com/en/guide/writing-middleware.html Writing Middleware}
      */
     auth?: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>;
-} & {
-    mcp?: StreamableHTTPServerTransportOptions;
+
+    /** MCP transport options. Defaults to `undefined`. */
+    mcp?: {
+        path?: string;
+        options: StreamableHTTPServerTransportOptions;
+        getTransport?: (req: express.Request) => Promise<StreamableHTTPServerTransport>;
+    };
 };
 
 /**
@@ -177,6 +187,7 @@ export function fleet(
                 user,
             }),
     );
+
     router.use(
         `${agentPath}/:${AGENT_FIELD_NAME}`,
         async (req: express.Request, res: express.Response, next: express.NextFunction) =>
@@ -204,6 +215,21 @@ export function fleet(
             }),
         sdk.errorHandler,
     );
+
+    if (settings.mcp) {
+        const mountedMCP = mountMCP(context);
+        router.use(
+            context.mcp?.path ?? `/mcp`,
+            async (req: express.Request, res: express.Response) => {
+                const relay = await mountedMCP;
+                const getTransport =
+                    context.mcp?.getTransport ??
+                    (() => Promise.resolve(new StreamableHTTPServerTransport(context.mcp?.options ?? {})));
+                await handleMCP(relay, req, res, getTransport);
+            },
+            sdk.errorHandler,
+        );
+    }
 
     app.use(basePath, router);
 
