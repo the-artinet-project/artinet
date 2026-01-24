@@ -20,7 +20,7 @@ import {
     WebStandardStreamableHTTPServerTransport,
     WebStandardStreamableHTTPServerTransportOptions,
 } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
-import { mountMCP } from '../mcp/index.js';
+import { mountMCP } from '../../mcp/index.js';
 import { handleMCP } from './mcp.js';
 /**
  * Extended settings for the Hono Fleet server.
@@ -224,11 +224,15 @@ export function fleet(
 
     if (context.mcp) {
         const mountedMCP = mountMCP(context);
+        context.relay = mountedMCP;
+        const getTransport =
+            context.mcp?.getTransport ??
+            (() => {
+                const transport = new WebStandardStreamableHTTPServerTransport(context.mcp?.options ?? {});
+                return () => Promise.resolve(transport);
+            })();
         router.all(context.mcp?.path ?? `/mcp`, async (ctx: hono.Context, _) => {
             const relay = await mountedMCP;
-            const getTransport =
-                context.mcp?.getTransport ??
-                (() => Promise.resolve(new WebStandardStreamableHTTPServerTransport(context.mcp?.options ?? {})));
             return await handleMCP(relay, ctx, getTransport);
         });
     }

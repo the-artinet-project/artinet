@@ -19,7 +19,7 @@ import * as testing from './test-request.js';
 import * as deployment from './deploy-request.js';
 import { AGENT_FIELD_NAME } from './agent-request.js';
 import { handleMCP } from './mcp.js';
-import { mountMCP } from '../mcp/index.js';
+import { mountMCP } from '../../mcp/index.js';
 
 /**
  * Extended settings for the Express Fleet server.
@@ -218,13 +218,15 @@ export function fleet(
 
     if (settings.mcp) {
         const mountedMCP = mountMCP(context);
+        context.relay = mountedMCP;
+        const getTransport = context.mcp?.getTransport ?? (() => {
+            const transport = new StreamableHTTPServerTransport(context.mcp?.options ?? {});
+            return () => Promise.resolve(transport);
+        })();
         router.use(
             context.mcp?.path ?? `/mcp`,
             async (req: express.Request, res: express.Response) => {
                 const relay = await mountedMCP;
-                const getTransport =
-                    context.mcp?.getTransport ??
-                    (() => Promise.resolve(new StreamableHTTPServerTransport(context.mcp?.options ?? {})));
                 await handleMCP(relay, req, res, getTransport);
             },
             sdk.errorHandler,
