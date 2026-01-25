@@ -32,18 +32,18 @@ The agent definition schema is designed to evolve with the community's needs:
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
-   ```bash
-   git clone https://github.com/your-username/agent-def.git
-   cd agent-def
-   ```
+    ```bash
+    git clone https://github.com/your-username/artinet.git
+    cd artinet/agent-def
+    ```
 3. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 4. **Create a branch** for your changes:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
 ## Development Workflow
 
@@ -86,17 +86,17 @@ When modifying schemas in `src/definition.ts`:
 ## Submitting Changes
 
 1. **Commit your changes** with clear, descriptive commit messages:
-   ```bash
-   git commit -m "Add support for custom metadata fields"
-   ```
+    ```bash
+    git commit -m "Add support for custom metadata fields"
+    ```
 2. **Push to your fork**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+    ```bash
+    git push origin feature/your-feature-name
+    ```
 3. **Open a Pull Request** on GitHub with:
-   - Clear description of what you've changed and why
-   - Reference to any related issues
-   - Examples of how to use new features
+    - Clear description of what you've changed and why
+    - Reference to any related issues
+    - Examples of how to use new features
 
 ## Proposing Major Changes
 

@@ -12,7 +12,7 @@ A standardized, portable definition format for collaborative AI agents.
 
 ## Overview
 
-`agent-def` provides TypeScript/Zod schemas for defining agent configurations that can be validated, serialized as YAML frontmatter (agent.md files), and deployed across environments.
+`agent-def` provides TypeScript/Zod schemas for defining agent configurations that can be validated, serialized as YAML front-matter (agent.md files), and deployed across environments.
 
 **Core schemas:**
 
@@ -31,46 +31,62 @@ npm install agent-def
 ## Usage
 
 ```typescript
-import { AgentDefinitionSchema, AgentConfigurationSchema } from "agent-def";
+import { AgentDefinitionSchema, AgentConfigurationSchema } from 'agent-def';
 
 // Parse an agent definition
 const agentDef = AgentDefinitionSchema.parse({
-  id: "backend-architect",
-  name: "Backend System Architect",
-  modelId: "openai/gpt-4",
-  toolIds: ["filesystem", "database-analyzer"],
-  groupIds: ["team:backend", "project:api-v2"],
-  agentIds: ["database-specialist"],
-  instructions: "You are a backend system architect...",
+    id: 'backend-architect',
+    name: 'Backend System Architect',
+    modelId: 'openai/gpt-4',
+    toolUris: ['filesystem', 'database-analyzer'],
+    groupIds: ['team:backend', 'project:api-v2'],
+    agentUris: ['database-specialist'],
+    instructions: 'You are a backend system architect...',
 });
 
 // Extend with deployment configuration
 const agentConfig = AgentConfigurationSchema.parse({
-  ...agentDef,
-  services: [
-    { type: "mcp", id: "filesystem", url: "http://localhost:3000/mcp/fs" },
-    {
-      type: "a2a",
-      id: "database-specialist",
-      url: "https://agents.example.com/db",
-    },
-  ],
-  metadata: { environment: "production", region: "us-east-1" },
+    ...agentDef,
+    services: [
+        {
+            type: 'mcp',
+            uri: 'filesystem',
+            url: 'http://localhost:3000/mcp/fs',
+            info: {
+                implementation: {
+                    version: '0.0.1',
+                    name: `filesystem-mcp`,
+                    serverCapabilities: {},
+                },
+            },
+        },
+        {
+            type: 'a2a',
+            uri: 'database-specialist',
+            url: 'https://agents.example.com/db',
+            info: {
+                protocolVersion: '0.3.0',
+                name: 'database-specialist',
+                ...
+            },
+        },
+    ],
+    metadata: { environment: 'production', region: 'us-east-1' },
 });
 ```
 
 ## agent.md Format
 
-Store definitions as markdown files with YAML frontmatter:
+Store definitions as markdown files with YAML front-matter:
 
 ```markdown
 ---
-id: backend-architect
+uri: backend-architect
 name: Backend System Architect
 modelId: openai/gpt-4
-toolIds: [filesystem, database-analyzer]
+toolUris: [filesystem, database-analyzer]
 groupIds: [team:backend, project:api-v2]
-agentIds: [database-specialist, security-auditor]
+agentUris: [database-specialist, security-auditor]
 ---
 
 You are a backend system architect specializing in scalable API design.
@@ -95,7 +111,7 @@ npm run lint
 
 ## Future Direction
 
-**The goal is to eventually merge more definitions (e.g. ProjectNanda Agent Definitions, Agency definitions) into a unified spec**. This consolidation will enable consistent agent definitions, discovery, sharing, and simplified tooling across the artinet.
+**The goal is to eventually merge more definitions (e.g. [Project Nanda's](https://github.com/projnanda/agentfacts-format) Agent Facts, [AGNTCY](https://github.com/agntcy/identity) definitions, [AI Card](https://github.com/Agent-Card/ai-card)) into a unified spec**. This consolidation will enable consistent agent definitions, discovery, sharing, and simplified tooling across the artinet.
 
 ## Contributing
 
@@ -114,6 +130,6 @@ Apache-2.0
 
 ## Links
 
-- [GitHub Repository](https://github.com/the-artinet-project/agent-def)
-- [Issue Tracker](https://github.com/the-artinet-project/agent-def/issues)
+- [GitHub Repository](https://github.com/the-artinet-project/artinet)
+- [Issue Tracker](https://github.com/the-artinet-project/artinet/issues)
 - [Contributing Guide](CONTRIBUTING.md)
