@@ -1,6 +1,6 @@
 {
   "name": "@artinet/agent-relay",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A library for discovering and relaying messages between A2A enabled AI agents via the @artinet/sdk.",
   "author": "artinet",
   "license": "Apache-2.0",

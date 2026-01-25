@@ -1,3 +1,21 @@
+## 0.1.6 (2026-01-25)
+
+### 🚀 Features
+
+- Add error handling for artinet API access ([f8f32af](https://github.com/the-artinet-project/artinet/commit/f8f32af))
+
+### 🩹 Fixes
+
+- Correct variable name for separator in openai-util.ts ([27fbe76](https://github.com/the-artinet-project/artinet/commit/27fbe76))
+
+### 🧱 Updated Dependencies
+
+- Updated agent-def to 0.1.6
+
+### ❤️ Thank You
+
+- EditUndo
+
 ## 0.1.5 (2026-01-18)
 
 ### 🚀 Features

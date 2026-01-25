@@ -1,6 +1,6 @@
 {
   "name": "@artinet/agent-relay-mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A Model Context Protocol (MCP) server for relaying messages between A2A enabled AI agents.",
   "author": "artinet",
   "license": "Apache-2.0",
