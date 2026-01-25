@@ -20,28 +20,3 @@ export function getTags(config: AgentConfiguration): string[] {
     tags.push('a2a');
     return tags;
 }
-
-const services = [
-    {
-        type: 'mcp',
-        uri: 'filesystem',
-        url: 'http://localhost:3000/mcp/fs',
-        info: {
-            implementation: {
-                version: '0.0.1',
-                name: `filesystem-mcp`,
-                serverCapabilities: {},
-            },
-        },
-    },
-    {
-        type: 'a2a',
-        uri: 'database-specialist',
-        url: 'https://agents.example.com/db',
-        info: {
-            protocolVersion: '0.3.0',
-            name: 'database-specialist',
-            // ...
-        },
-    },
-];
