@@ -5,14 +5,10 @@
 
 import { orc8, Orc8Params } from 'orc8';
 import { openaiProvider } from 'orc8/openai';
-import { AgentConfiguration, isAgentConfiguration } from 'agent-def';
-import { hydra } from '@artinet/armada/hydra';
-import { StoredAgent } from '@artinet/armada';
+import { AgentConfiguration } from 'agent-def';
 import * as sdk from '@artinet/sdk';
 import { Runtime } from '@artinet/types';
 import { RequestContext, loadFunction } from '../types/definitions.js';
-
-const ENABLE_HYDRATION = process.env.EXPERIMENTAL_ENABLE_HYDRATION === 'true';
 
 const DEFAULT_INSTRUCTIONS = 'You are a helpful assistant that can use tools and agents to fulfill requests.';
 
@@ -38,21 +34,12 @@ export const loadAgent: loadFunction = async (config: AgentConfiguration, contex
           })
         : undefined;
 
-    const hydrated = ENABLE_HYDRATION
-        ? hydra(
-              context,
-              async (data: StoredAgent) => await context.load(data.configuration!, context),
-              (data: StoredAgent) => !!data.configuration && isAgentConfiguration(data.configuration),
-          )
-        : undefined;
-
     const o8 = orc8.create({
         ...(config as Partial<Omit<Orc8Params, 'modelId' | 'instructions' | 'services' | 'provider'>>),
         modelId: config.modelId ?? 'gpt-4o',
         instructions: config.instructions ?? context.defaultInstructions ?? DEFAULT_INSTRUCTIONS,
         provider,
         tasks: context.tasks,
-        callableStorage: hydrated,
     });
 
     if (requiredAgentsNotLoaded(config, context)) {
