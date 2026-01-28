@@ -1,4 +1,6 @@
 *
+!docs
+!docs/**
 !dockerfile
 !src
 !src/**

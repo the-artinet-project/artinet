@@ -31,31 +31,68 @@ npm install agent-def
 ## Usage
 
 ```typescript
-import { AgentDefinitionSchema, AgentConfigurationSchema } from "agent-def";
+import { AgentDefinitionSchema, AgentConfigurationSchema } from 'agent-def';
 
 // Parse an agent definition
 const agentDef = AgentDefinitionSchema.parse({
-  id: "backend-architect",
-  name: "Backend System Architect",
-  modelId: "openai/gpt-4",
-  toolIds: ["filesystem", "database-analyzer"],
-  groupIds: ["team:backend", "project:api-v2"],
-  agentIds: ["database-specialist"],
-  instructions: "You are a backend system architect...",
+    uri: 'backend-architect',
+    name: 'Backend System Architect',
+    modelId: 'openai/gpt-4',
+    toolUris: ['filesystem', 'database-analyzer'],
+    groupIds: ['team:backend', 'project:api-v2'],
+    agentUris: ['database-specialist'],
+    instructions: 'You are a backend system architect...',
 });
 
 // Extend with deployment configuration
 const agentConfig = AgentConfigurationSchema.parse({
-  ...agentDef,
-  services: [
-    { type: "mcp", id: "filesystem", url: "http://localhost:3000/mcp/fs" },
-    {
-      type: "a2a",
-      id: "database-specialist",
-      url: "https://agents.example.com/db",
-    },
-  ],
-  metadata: { environment: "production", region: "us-east-1" },
+    ...agentDef,
+    services: [
+        {
+            type: 'mcp',
+            uri: 'filesystem',
+            url: 'http://localhost:3000/mcp/fs',
+            info: {
+                uri: 'filesystem-mcp',
+                implementation: {
+                    name: 'File System MCP',
+                    version: '0.0.1',
+                },
+                serverCapabilities: {},
+                tools: [],
+                resources: [],
+                prompts: [],
+            }
+        },
+        {
+            type: 'a2a',
+            uri: 'database-specialist',
+            url: 'https://agents.example.com/db',
+            info:{
+                protocolVersion: '0.3.0',
+                name: 'DB Specialist'
+                description: 'An agent with access to PostgresSQL',
+                url: 'https://agents.example.com/db',
+                version: '0.0.1',
+                defaultInputModes: ['text'],
+                defaultOutputModes: ['text'],
+                preferredTransport: "JSONRPC",
+                capabilities: {
+                    streaming: true,
+                    pushNotifications: false,
+                },
+                skills:[
+                    {
+                        id: `db-query`
+                        name: 'Query Database',
+                        description: 'The Agent can search a local database for matching strings',
+                        tags: ['query']
+                    }
+                ]
+            }
+        },
+    ],
+    metadata: { environment: 'production', region: 'us-east-1' },
 });
 ```
 
@@ -65,12 +102,13 @@ Store definitions as markdown files with YAML frontmatter:
 
 ```markdown
 ---
-id: backend-architect
+schemaVersion: 0.1.0
+uri: backend-architect
 name: Backend System Architect
 modelId: openai/gpt-4
-toolIds: [filesystem, database-analyzer]
+toolUris: [filesystem, database-analyzer]
 groupIds: [team:backend, project:api-v2]
-agentIds: [database-specialist, security-auditor]
+agentUris: [database-specialist, security-auditor]
 ---
 
 You are a backend system architect specializing in scalable API design.
@@ -95,7 +133,7 @@ npm run lint
 
 ## Future Direction
 
-**The goal is to eventually merge more definitions (e.g. ProjectNanda Agent Definitions, Agency definitions) into a unified spec**. This consolidation will enable consistent agent definitions, discovery, sharing, and simplified tooling across the artinet.
+**The goal is to eventually merge more definitions (e.g. ProjectNanda Agent Facts, AGNTCY definitions) into a unified spec**. This consolidation will enable consistent agent definitions, discovery, sharing, and simplified tooling across the artinet.
 
 ## Contributing
 
