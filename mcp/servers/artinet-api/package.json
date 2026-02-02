@@ -1,0 +1,47 @@
+{
+    "name": "@artinet/artinet-api-mcp",
+    "version": "0.0.10",
+    "description": "Lightweight MCP server for Artinet API (register & search agents)",
+    "author": "artinet",
+    "license": "Apache-2.0",
+    "type": "module",
+    "main": "./dist/src/index.js",
+    "module": "./dist/src/index.js",
+    "types": "./dist/src/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-artinet-project/artinet.git"
+    },
+    "issues": {
+        "url": "https://github.com/the-artinet-project/artinet/issues"
+    },
+    "bin": {
+        "artinet-api-mcp": "dist/bin/stdio.js"
+    },
+    "files": [
+        "dist",
+        "package.json",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "clean": "rimraf dist",
+        "start": "node dist/bin/stdio.js",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    },
+    "dependencies": {
+        "@artinet/metadata-validator": "^0.0.5",
+        "@modelcontextprotocol/sdk": "^1.24.3",
+        "zod": "^3.25"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "jest": "^30.2.0",
+        "rimraf": "^6.1.2",
+        "ts-jest": "^29.4.6",
+        "typescript": "^5.9.3"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}
