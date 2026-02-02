@@ -25,6 +25,7 @@
     ],
     "scripts": {
         "build": "tsc --project tsconfig.json",
+        "prepublishOnly": "npm run clean && npm i && npm run build && npm test",
         "clean": "rimraf dist",
         "start": "node dist/bin/stdio.js",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest"

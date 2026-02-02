@@ -2,6 +2,12 @@
 
 Use this server to register agents with the Artinet network or search for existing agents.
 
+## Installation
+
+```bash
+npx @artinet/artinet-api-mcp
+```
+
 ## Tools
 
 ### register
@@ -9,6 +15,7 @@ Use this server to register agents with the Artinet network or search for existi
 Register an agent with the Artinet network using the official registration schema.
 
 **Required fields:**
+
 - `schemaVersion` - Schema version (e.g., "1.0.0")
 - `serviceName` - Human-readable service name
 - `description` - Brief description of the service
@@ -25,6 +32,7 @@ Register an agent with the Artinet network using the official registration schem
 Search for agents by keywords.
 
 **Input:**
+
 - `searchQueries` - Array of search keywords (max 10)
 - `searchSize` - Number of results to return (optional)
 - `cursor` - Pagination cursor with `startIndex` and `batchSize` (optional)
