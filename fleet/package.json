@@ -1,114 +1,114 @@
 {
-  "name": "@artinet/fleet",
-  "version": "0.1.5",
-  "description": "A an agentic orchestration server for on premise deployment.",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+    "name": "@artinet/fleet",
+    "version": "0.1.7",
+    "description": "A an agentic orchestration server for on premise deployment.",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./sqlite": {
+            "types": "./dist/storage/sqlite.d.ts",
+            "import": "./dist/storage/sqlite.js",
+            "default": "./dist/storage/sqlite.js"
+        },
+        "./express": {
+            "types": "./dist/server/express/fleet.d.ts",
+            "import": "./dist/server/express/fleet.js",
+            "default": "./dist/server/express/fleet.js"
+        },
+        "./hono": {
+            "types": "./dist/server/hono/fleet.d.ts",
+            "import": "./dist/server/hono/fleet.js",
+            "default": "./dist/server/hono/fleet.js"
+        }
     },
-    "./sqlite": {
-      "types": "./dist/storage/sqlite.d.ts",
-      "import": "./dist/storage/sqlite.js",
-      "default": "./dist/storage/sqlite.js"
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "lint": "eslint .",
+        "clean": "rimraf dist",
+        "prepublishOnly": "npm run build && npm test"
     },
-    "./express": {
-      "types": "./dist/server/express/fleet.d.ts",
-      "import": "./dist/server/express/fleet.js",
-      "default": "./dist/server/express/fleet.js"
+    "keywords": [
+        "artinet",
+        "a2a",
+        "mcp",
+        "agent",
+        "deployment",
+        "orchestration",
+        "artificial intelligence"
+    ],
+    "author": "artinet",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-artinet-project/artinet.git"
     },
-    "./hono": {
-      "types": "./dist/server/hono/fleet.d.ts",
-      "import": "./dist/server/hono/fleet.js",
-      "default": "./dist/server/hono/fleet.js"
+    "bugs": {
+        "url": "https://github.com/the-artinet-project/artinet/issues"
+    },
+    "homepage": "https://artinet.io",
+    "files": [
+        "dist",
+        "package.json",
+        "README.md",
+        "LICENSE"
+    ],
+    "rootDir": ".",
+    "dependencies": {
+        "@artinet/armada": "^0.1.4",
+        "@artinet/sdk": "^0.6.4",
+        "@artinet/types": "^0.1.4",
+        "@sindresorhus/slugify": "^3.0.0",
+        "agent-def": "^0.1.4",
+        "orc8": "^0.1.4",
+        "zod": "^3.25"
+    },
+    "peerDependencies": {
+        "@a2a-js/sdk": "^0.3.7",
+        "@modelcontextprotocol/sdk": "^1.24.3",
+        "@opentelemetry/api": "^1.9.0",
+        "drizzle-orm": "^0.45.1",
+        "express": "^5.2.1",
+        "hono": "^4.11.3",
+        "openai": "^6.15.0",
+        "pino": "^10.1.0"
+    },
+    "devDependencies": {
+        "@a2a-js/sdk": "^0.3.7",
+        "@eslint/js": "^9.39.2",
+        "@modelcontextprotocol/sdk": "^1.24.3",
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/escape-html": "^1.0.4",
+        "@types/express": "^5.0.6",
+        "@types/jest": "^29.5.14",
+        "@types/node": "^25.0.9",
+        "@types/supertest": "^6.0.3",
+        "autocannon": "^8.0.0",
+        "better-sqlite3": "^12.5.0",
+        "drizzle-orm": "^0.45.1",
+        "eslint": "^9.39.2",
+        "express": "^5.2.1",
+        "globals": "^17.0.0",
+        "hono": "^4.11.4",
+        "jest": "29.7.0",
+        "pino": "^10.2.0",
+        "pm2": "^6.0.14",
+        "rimraf": "^6.1.2",
+        "supertest": "latest",
+        "ts-jest": "^29.4.6",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.53.0",
+        "undici": "^5.29.0"
+    },
+    "engines": {
+        "node": ">=20.0.0"
     }
-  },
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "lint": "eslint .",
-    "clean": "rimraf dist",
-    "prepublishOnly": "npm run build && npm test"
-  },
-  "keywords": [
-    "artinet",
-    "a2a",
-    "mcp",
-    "agent",
-    "deployment",
-    "orchestration",
-    "artificial intelligence"
-  ],
-  "author": "artinet",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/the-artinet-project/artinet.git"
-  },
-  "bugs": {
-    "url": "https://github.com/the-artinet-project/artinet/issues"
-  },
-  "homepage": "https://artinet.io",
-  "files": [
-    "dist",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
-  "rootDir": ".",
-  "dependencies": {
-    "@artinet/armada": "^0.1.4",
-    "@artinet/sdk": "^0.6.4",
-    "@artinet/types": "^0.1.4",
-    "@sindresorhus/slugify": "^3.0.0",
-    "agent-def": "^0.1.4",
-    "orc8": "^0.1.4",
-    "zod": "^3.25"
-  },
-  "peerDependencies": {
-    "@a2a-js/sdk": "^0.3.7",
-    "@modelcontextprotocol/sdk": "^1.24.3",
-    "@opentelemetry/api": "^1.9.0",
-    "drizzle-orm": "^0.45.1",
-    "express": "^5.2.1",
-    "hono": "^4.11.3",
-    "openai": "^6.15.0",
-    "pino": "^10.1.0"
-  },
-  "devDependencies": {
-    "@a2a-js/sdk": "^0.3.7",
-    "@eslint/js": "^9.39.2",
-    "@modelcontextprotocol/sdk": "^1.24.3",
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/escape-html": "^1.0.4",
-    "@types/express": "^5.0.6",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^25.0.9",
-    "@types/supertest": "^6.0.3",
-    "autocannon": "^8.0.0",
-    "better-sqlite3": "^12.5.0",
-    "drizzle-orm": "^0.45.1",
-    "eslint": "^9.39.2",
-    "express": "^5.2.1",
-    "globals": "^17.0.0",
-    "hono": "^4.11.4",
-    "jest": "29.7.0",
-    "pino": "^10.2.0",
-    "pm2": "^6.0.14",
-    "rimraf": "^6.1.2",
-    "supertest": "latest",
-    "ts-jest": "^29.4.6",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.0",
-    "undici": "^5.29.0"
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  }
 }
