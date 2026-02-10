@@ -3,72 +3,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as hono from "hono";
-import * as sdk from "@artinet/sdk";
+import * as sdk from '@artinet/sdk';
 import {
-  CreateAgent,
-  CreateAgentRoute,
-  CreateAgentRequestSchema,
-} from "../../routes/create/index.js";
-import { generateRequestId, generateRegistrationId } from "./utils.js";
-
-export type handler = (
-  ctx: hono.Context,
-  next: hono.Next,
-  context: CreateAgentRoute["context"],
-  deploy?: CreateAgentRoute["implementation"]
-) => Promise<void>;
-
-export async function handle(
-  ctx: hono.Context,
-  _next: hono.Next,
-  context: CreateAgentRoute["context"],
-  deploy: CreateAgentRoute["implementation"] = CreateAgent
-): Promise<void> {
-  /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
-  const req = sdk.safeParse(await ctx.req.text());
-  const request: CreateAgentRoute["request"] = await sdk.validateSchema(
+    CreateAgent,
+    CreateAgentMount,
+    CreateAgentRoute,
     CreateAgentRequestSchema,
-    req
-  );
+} from '../../routes/create/index.js';
+import { generateRequestId, generateRegistrationId } from './utils.js';
+import { Session } from './types.js';
 
-  sdk.logger.info(`deploying agent: ${request.config.name}`);
-  sdk.logger.debug(`deploying agent: ${sdk.formatJson(request)}`);
+export type Mount = CreateAgentMount<Session>;
 
-  context.registrationId = generateRegistrationId(request.config.uri);
-  const result: CreateAgentRoute["response"] = await deploy(request, context);
-  ctx.res = ctx.json(result);
-}
+export const factory: Mount['factory'] =
+    ({ implementation = CreateAgent }: { implementation: CreateAgentRoute['implementation'] }): Mount['handler'] =>
+    async (params): Promise<void> =>
+        await handle(params, implementation);
 
-export const factory =
-  (deploy: CreateAgentRoute["implementation"] = CreateAgent): handler =>
-  async (
-    ctx: hono.Context,
-    next: hono.Next,
-    context: CreateAgentRoute["context"]
-  ) =>
-    await handle(ctx, next, context, deploy);
+export const handle: Mount['handler'] = async (
+    { session: { ctx }, context, intercepts },
+    implementation: CreateAgentRoute['implementation'] = CreateAgent,
+): Promise<void> => {
+    /* hono.Context.req uses a raw JSON.parse() so we prefer to use the text() and our own safeParse() */
+    const req = sdk.safeParse(await ctx.req.text());
+    const request: CreateAgentRoute['request'] = await sdk.validateSchema(CreateAgentRequestSchema, req);
 
-export interface Params {
-  ctx: hono.Context;
-  next: hono.Next;
-  context: CreateAgentRoute["context"];
-  handler: handler;
-  user: (ctx: hono.Context) => Promise<string>;
-}
-export async function request({
-  ctx,
-  next,
-  context,
-  handler = handle,
-  user,
-}: Params): Promise<void> {
-  const reqId =
-    ctx.req.header("x-request-id") ?? sdk.safeParse(await ctx.req.text())?.id;
-  const requestContext: CreateAgentRoute["context"] = {
-    ...context,
-    requestId: generateRequestId(context, reqId),
-    userId: await user?.(ctx),
-  };
-  await handler(ctx, next, requestContext);
-}
+    sdk.logger.info(`deploying agent: ${request.config.name}`);
+    sdk.logger.debug(`deploying agent: ${sdk.formatJson(request)}`);
+
+    context.registrationId = generateRegistrationId(request.config.uri);
+    const result: CreateAgentRoute['response'] = await implementation(request, context, intercepts);
+    ctx.res = ctx.json(result);
+};
+
+export const request: Mount['request'] = async (
+    { session, context, handler = handle, user, intercepts },
+    implementation: CreateAgentRoute['implementation'] = CreateAgent,
+): Promise<void> => {
+    const { ctx } = session;
+    const reqId = ctx.req.header('x-request-id') ?? sdk.safeParse(await ctx.req.text())?.id;
+    const _context: CreateAgentRoute['context'] = {
+        ...context,
+        requestId: generateRequestId(context, reqId),
+        userId: await user?.(session),
+    };
+    await handler({ session, context: _context, intercepts }, implementation);
+};

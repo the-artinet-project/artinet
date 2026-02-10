@@ -3,74 +3,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import express from "express";
 import {
-  CreateAgent,
-  CreateAgentRoute,
-  CreateAgentRequestSchema,
-} from "../../routes/create/index.js";
-import { generateRequestId, generateRegistrationId } from "./utils.js";
-import { logger, validateSchema, formatJson } from "@artinet/sdk";
-
-export type handler = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-  context: CreateAgentRoute["context"],
-  deploy?: CreateAgentRoute["implementation"]
-) => Promise<void>;
-
-export async function handle(
-  req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
-  context: CreateAgentRoute["context"],
-  deploy: CreateAgentRoute["implementation"] = CreateAgent
-): Promise<void> {
-  const request: CreateAgentRoute["request"] = await validateSchema(
+    CreateAgent,
+    CreateAgentRoute,
     CreateAgentRequestSchema,
-    req?.body ?? {}
-  );
+    CreateAgentMount,
+} from '../../routes/create/index.js';
+import { generateRequestId, generateRegistrationId } from './utils.js';
+import { logger, validateSchema, formatJson } from '@artinet/sdk';
+import { Session } from './types.js';
 
-  logger.info(`deploying agent: ${request.config.name}`);
-  logger.debug(`deploying agent: ${formatJson(request)}`);
+export type Mount = CreateAgentMount<Session>;
 
-  context.registrationId = generateRegistrationId(request.config.uri);
-  const result: CreateAgentRoute["response"] = await deploy(request, context);
-  res.json(result);
-}
+export const handle: Mount['handler'] = async (
+    { session: { request, response }, context, intercepts },
+    implementation: CreateAgentRoute['implementation'] = CreateAgent,
+): Promise<void> => {
+    const req: CreateAgentRoute['request'] = await validateSchema(CreateAgentRequestSchema, request?.body ?? {});
 
-export const factory =
-  (deploy: CreateAgentRoute["implementation"] = CreateAgent): handler =>
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-    context: CreateAgentRoute["context"]
-  ) =>
-    await handle(req, res, next, context, deploy);
+    logger.info(`deploying agent: ${req.config.name}`);
+    logger.debug(`deploying agent: ${formatJson(req)}`);
 
-export interface Params {
-  request: express.Request;
-  response: express.Response;
-  next: express.NextFunction;
-  context: CreateAgentRoute["context"];
-  handler: handler;
-  user: (req: express.Request) => Promise<string>;
-}
+    context.registrationId = generateRegistrationId(req.config.uri);
+    const res: CreateAgentRoute['response'] = await implementation(req, context, intercepts);
+    response.json(res);
+};
 
-export async function request({
-  request: req,
-  response: res,
-  next,
-  context,
-  handler = handle,
-  user,
-}: Params): Promise<void> {
-  const requestContext: CreateAgentRoute["context"] = {
-    ...context,
-    requestId: generateRequestId(context, req),
-    userId: await user?.(req),
-  };
-  return await handler(req, res, next, requestContext);
-}
+export const factory: Mount['factory'] =
+    ({ implementation = CreateAgent }: { implementation: CreateAgentRoute['implementation'] }): Mount['handler'] =>
+    async (params: {
+        session: Session;
+        context: CreateAgentRoute['context'];
+        intercepts?: CreateAgentRoute['intercept'][];
+    }): Promise<void> =>
+        await handle(params, implementation);
+
+export const request: Mount['request'] = async (
+    { session, context, handler = handle, user, intercepts },
+    implementation: CreateAgentRoute['implementation'] = CreateAgent,
+): Promise<void> => {
+    const _context: CreateAgentRoute['context'] = {
+        ...context,
+        requestId: generateRequestId(context, session.request),
+        userId: await user?.(session),
+    };
+    return await handler({ session, context: _context, intercepts }, implementation);
+};

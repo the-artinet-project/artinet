@@ -22,3 +22,5 @@ export const DEFAULTS = {
   storage: new InMemoryStore(),
   baseUrl: "http://localhost:3000",
 };
+
+export const AGENT_FIELD_NAME = 'agentId';

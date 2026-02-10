@@ -3,106 +3,90 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as sdk from "@artinet/sdk";
-import express from "express";
+import * as sdk from '@artinet/sdk';
 import {
-  TestAgent,
-  TestAgentRoute,
-  TestRequestSchema,
-  TestRequest,
-} from "../../routes/request/index.js";
-import { v4 as uuidv4 } from "uuid";
-import { handleJSONRPCResponse } from "./rpc.js";
-import { generateRequestId } from "./utils.js";
-
-export type handler = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-  context: TestAgentRoute["context"],
-  test?: TestAgentRoute["implementation"]
-) => Promise<void>;
-
-export async function handle(
-  req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
-  context: TestAgentRoute["context"],
-  test: TestAgentRoute["implementation"] = TestAgent
-): Promise<void> {
-  let parsed: Omit<TestRequest, "method" | "params"> = await sdk.validateSchema(
+    TestAgent,
+    TestAgentRoute,
     TestRequestSchema,
-    req?.body ?? {}
-  );
+    TestRequest,
+    TestAgentMount,
+} from '../../routes/request/index.js';
+import { v4 as uuidv4 } from 'uuid';
+import { handleJSONRPCResponse } from './rpc.js';
+import { generateRequestId } from './utils.js';
+import { Session } from './types.js';
 
-  let id = parsed.id ?? uuidv4();
-  parsed.id = id;
+/**
+ * Handler utilities for agent test/evaluation requests.
+ *
+ * Exports a reusable handler function for routing test/evaluation requests to agent instances,
+ * validating the request body, and returning the result as a JSON-RPC response.
+ *
+ * Used by the deployment server to provide a standard agent test/evaluation endpoint interface.
+ *
+ * @module server/handlers/test
+ */
 
-  let request: TestAgentRoute["request"] = parsed as TestAgentRoute["request"];
-  context.target = parsed.config;
-  request.method = "test/invoke";
-  request.params = null;
-
-  const response: TestAgentRoute["response"] = await test(request, context);
-
-  await handleJSONRPCResponse(res, String(id), request.method, response);
-}
-
-export const factory =
-  (test: TestAgentRoute["implementation"] = TestAgent): handler =>
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-    context: TestAgentRoute["context"]
-  ) =>
-    await handle(req, res, next, context, test);
+export type Mount = TestAgentMount<Session>;
 
 const MAX_TEST_ID_ATTEMPTS = 10;
-const getTestId = async (
-  context: Omit<TestAgentRoute["context"], "agentId">
-) => {
-  let testId = uuidv4();
-  let free = false;
-  for (let i = 0; i < MAX_TEST_ID_ATTEMPTS; i++) {
-    if (await context.storage.get(testId)) {
-      testId = uuidv4();
-    } else {
-      free = true;
-      break;
+const generateTestId = async (context: Omit<TestAgentRoute['context'], 'agentId'>): Promise<string> => {
+    let testId = uuidv4();
+    let free = false;
+    for (let i = 0; i < MAX_TEST_ID_ATTEMPTS; i++) {
+        if (await context.storage.get(testId)) {
+            testId = uuidv4();
+        } else {
+            free = true;
+            break;
+        }
     }
-  }
-  if (!free) {
-    throw sdk.INTERNAL_ERROR({
-      message: `Failed to find a free test agent ID after ${MAX_TEST_ID_ATTEMPTS} attempts`,
-      id: testId,
-    });
-  }
-  return testId;
+
+    if (!free) {
+        throw sdk.INTERNAL_ERROR({
+            message: `Failed to find a free test agent ID after ${MAX_TEST_ID_ATTEMPTS} attempts`,
+            id: testId,
+        });
+    }
+    return testId;
 };
 
-export interface Params {
-  request: express.Request;
-  response: express.Response;
-  next: express.NextFunction;
-  context: Omit<TestAgentRoute["context"], "agentId">;
-  handler: handler;
-  user: (request: express.Request) => Promise<string>;
-}
+export const factory: Mount['factory'] =
+    ({ implementation = TestAgent }: { implementation: TestAgentRoute['implementation'] }): Mount['handler'] =>
+    async (params): Promise<void> =>
+        await handle(params, implementation);
 
-export async function request({
-  request: req,
-  response: res,
-  next,
-  context,
-  handler = handle,
-  user,
-}: Params): Promise<void> {
-  const requestContext: TestAgentRoute["context"] = {
-    ...context,
-    agentId: await getTestId(context),
-    requestId: generateRequestId(context, req),
-    userId: await user?.(req),
-  };
-  return await handler(req, res, next, requestContext);
-}
+export const handle: Mount['handler'] = async (
+    { session: { request, response }, context },
+    implementation: TestAgentRoute['implementation'] = TestAgent,
+): Promise<void> => {
+    let parsed: Omit<TestRequest, 'method' | 'params'> = await sdk.validateSchema(
+        TestRequestSchema,
+        request?.body ?? {},
+    );
+
+    let id = parsed.id ?? uuidv4();
+    parsed.id = id;
+
+    let req: TestAgentRoute['request'] = parsed as TestAgentRoute['request'];
+    context.target = parsed.config;
+    req.method = 'test/invoke';
+    req.params = null;
+
+    const res: TestAgentRoute['response'] = await implementation(req, context);
+
+    return await handleJSONRPCResponse(response, String(id), req.method, res);
+};
+
+export const request: Mount['request'] = async (
+    { session, context, handler = handle, user, intercepts },
+    implementation: TestAgentRoute['implementation'] = TestAgent,
+): Promise<void> => {
+    const _context: TestAgentRoute['context'] = {
+        ...context,
+        agentId: await generateTestId(context),
+        requestId: generateRequestId(context, session.request),
+        userId: await user?.(session),
+    };
+    return await handler({ session, context: _context, intercepts }, implementation);
+};
