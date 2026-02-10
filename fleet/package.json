@@ -62,12 +62,12 @@
     ],
     "rootDir": ".",
     "dependencies": {
-        "@artinet/armada": "^0.1.4",
-        "@artinet/sdk": "^0.6.4",
-        "@artinet/types": "^0.1.4",
+        "@artinet/armada": "^0.1.7",
+        "@artinet/sdk": "^0.6.11",
+        "@artinet/types": "^0.1.5",
         "@sindresorhus/slugify": "^3.0.0",
-        "agent-def": "^0.1.4",
-        "orc8": "^0.1.4",
+        "agent-def": "^0.1.5",
+        "orc8": "^0.1.5",
         "zod": "^3.25"
     },
     "peerDependencies": {
