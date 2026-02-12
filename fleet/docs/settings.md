@@ -18,7 +18,7 @@ fleet({
     middleware: new Middleware(),
 
     // Express-specific
-    user: async (req) => req.headers['x-user-id'],
+    user: async ({ request }) => request.headers['x-user-id'],
     auth: async (req, res, next) => {
         /* ... */ next();
     },
@@ -252,19 +252,25 @@ These settings are specific to the Express adapter.
 import { fleet, type ExpressSettings } from '@artinet/fleet/express';
 ```
 
+### Session
+
+| Property  | Fields                        | Type                                                           |
+| --------- | ----------------------------- | -------------------------------------------------------------- |
+| `Session` | `{ request, response, next }` | `{ express.Request; express.Response; express.NextFunction; }` |
+
 ### user
 
-| Property | Type                                        | Default             |
-| -------- | ------------------------------------------- | ------------------- |
-| `user`   | `(req: express.Request) => Promise<string>` | Returns `"default"` |
+| Property | Type                                    | Default             |
+| -------- | --------------------------------------- | ------------------- |
+| `user`   | `(session: Session) => Promise<string>` | Returns `"default"` |
 
 Extracts the user ID from an incoming request. Used for multi-tenant agent isolation.
 
 ```typescript
 fleet({
-    user: async (req) => {
+    user: async ({ request }) => {
         // Extract from JWT
-        const token = req.headers.authorization?.split(' ')[1];
+        const token = request.headers.authorization?.split(' ')[1];
         const decoded = jwt.verify(token, secret);
         return decoded.userId;
     },
@@ -275,7 +281,7 @@ Or from a custom header
 
 ```typescript
 fleet({
-    user: async (req) => (req.headers['x-user-id'] as string) ?? 'anonymous',
+    user: async ({ request }) => (request.headers['x-user-id'] as string) ?? 'anonymous',
 });
 ```
 
@@ -386,17 +392,23 @@ These settings are specific to the Hono adapter.
 import { fleet, type HonoSettings } from '@artinet/fleet/hono';
 ```
 
+### Session
+
+| Property  | Fields          | Type                           |
+| --------- | --------------- | ------------------------------ |
+| `Session` | `{ ctx, next }` | `{ hono.Context; hono.Next; }` |
+
 ### user
 
-| Property | Type                                     | Default             |
-| -------- | ---------------------------------------- | ------------------- |
-| `user`   | `(ctx: hono.Context) => Promise<string>` | Returns `"default"` |
+| Property | Type                                    | Default             |
+| -------- | --------------------------------------- | ------------------- |
+| `user`   | `(session: Session) => Promise<string>` | Returns `"default"` |
 
 Extracts the user ID from the Hono context. Used for multi-tenant agent isolation.
 
 ```typescript
 fleet({
-    user: async (ctx) => {
+    user: async ({ ctx }) => {
         // Extract from JWT via Hono's jwt middleware
         const payload = ctx.get('jwtPayload');
         return payload?.sub ?? 'anonymous';
@@ -408,7 +420,7 @@ Or from a header
 
 ```typescript
 fleet({
-    user: async (ctx) => ctx.req.header('x-user-id') ?? 'anonymous',
+    user: async ({ ctx }) => ctx.req.header('x-user-id') ?? 'anonymous',
 });
 ```
 
@@ -525,8 +537,8 @@ const server = fleet(
         basePath: '/api/v1',
         inferenceProviderUrl: process.env.INFERENCE_URL,
 
-        user: async (req) => {
-            const token = req.headers.authorization?.split(' ')[1];
+        user: async ({ request }) => {
+            const token = request.headers.authorization?.split(' ')[1];
             return token ? decodeToken(token).userId : 'anonymous';
         },
 

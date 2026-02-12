@@ -281,7 +281,7 @@ Connection: keep-alive
 
 **Event Types:**
 
-```
+```json
 event: task.status
 data: {"taskId":"task-456","contextId":"ctx-789","status":{"state":"working"}}
 

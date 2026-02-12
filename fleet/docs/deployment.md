@@ -97,8 +97,8 @@ const server = fleet(
             next();
         },
 
-        user: async (req) => {
-            const token = req.headers.authorization?.split(' ')[1];
+        user: async ({ request }) => {
+            const token = request.headers.authorization?.split(' ')[1];
             return decodeToken(token).userId;
         },
 
