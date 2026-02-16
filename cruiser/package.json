@@ -41,6 +41,11 @@
             "types": "./dist/openclaw/index.d.ts",
             "import": "./dist/openclaw/index.js",
             "default": "./dist/openclaw/index.js"
+        },
+        "./pi": {
+            "types": "./dist/pi/index.d.ts",
+            "import": "./dist/pi/index.js",
+            "default": "./dist/pi/index.js"
         }
     },
     "rootDir": ".",
@@ -73,7 +78,8 @@
         "claude",
         "openai",
         "strands",
-        "openclaw"
+        "openclaw",
+        "pi-agent-core"
     ],
     "author": "artinet",
     "license": "Apache-2.0",
@@ -95,8 +101,9 @@
         "@a2a-js/sdk": "^0.3.7",
         "@anthropic-ai/claude-agent-sdk": "^0.2.2",
         "@anthropic-ai/sdk": "^0.71.2",
-        "@mastra/core": "^0.24.9",
-        "@mastra/server": "^0.24.9",
+        "@mastra/core": "^1.4.0",
+        "@mastra/server": "^1.4.0",
+        "@mariozechner/pi-agent-core": "^0.52.12",
         "@modelcontextprotocol/sdk": "^1.24.3",
         "@strands-agents/sdk": "^0.1.4",
         "express": "^5.1.0",
@@ -122,8 +129,9 @@
         "@langchain/openai": "^1.2.1",
         "@mastra/core": "^1.4.0",
         "@mastra/server": "^1.4.0",
-        "@openai/agents": "^0.3.7",
         "@openrouter/ai-sdk-provider": "^1.5.4",
+        "@mariozechner/pi-agent-core": "^0.52.12",
+        "@openai/agents": "^0.4.9",
         "@strands-agents/sdk": "^0.1.4",
         "@types/jest": "^29.5.14",
         "@types/node": "^25.0.9",
