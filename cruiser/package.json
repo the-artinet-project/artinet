@@ -1,142 +1,148 @@
 {
-  "name": "@artinet/cruiser",
-  "version": "0.1.5",
-  "description": "A library for building A2A enabled runtime Agents.",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+    "name": "@artinet/cruiser",
+    "version": "0.1.5",
+    "description": "A library for building A2A enabled runtime Agents.",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./mastra": {
+            "types": "./dist/mastra/index.d.ts",
+            "import": "./dist/mastra/index.js",
+            "default": "./dist/mastra/index.js"
+        },
+        "./langchain": {
+            "types": "./dist/langchain/index.d.ts",
+            "import": "./dist/langchain/index.js",
+            "default": "./dist/langchain/index.js"
+        },
+        "./claude": {
+            "types": "./dist/claude/index.d.ts",
+            "import": "./dist/claude/index.js",
+            "default": "./dist/claude/index.js"
+        },
+        "./openai": {
+            "types": "./dist/openai/index.d.ts",
+            "import": "./dist/openai/index.js",
+            "default": "./dist/openai/index.js"
+        },
+        "./strands": {
+            "types": "./dist/strands/index.d.ts",
+            "import": "./dist/strands/index.js",
+            "default": "./dist/strands/index.js"
+        },
+        "./openclaw": {
+            "types": "./dist/openclaw/index.d.ts",
+            "import": "./dist/openclaw/index.js",
+            "default": "./dist/openclaw/index.js"
+        }
     },
-    "./mastra": {
-      "types": "./dist/mastra/index.d.ts",
-      "import": "./dist/mastra/index.js",
-      "default": "./dist/mastra/index.js"
+    "rootDir": ".",
+    "files": [
+        "dist",
+        "package.json",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "clean": "rimraf dist",
+        "rebuild": "rimraf dist node_modules/ package-lock.json && npm i && npm run build",
+        "lint": "eslint src --ext .ts",
+        "package-test": "npm run build && npm pack && sync && sleep 1 && docker build -f ./deployment/test.dockerfile -t cruiser-test . && docker run --env-file .env --rm cruiser-test && rm artinet-cruiser-*.tgz",
+        "prepublishOnly": "rimraf dist && npm run build && npm run lint && npm test",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+        "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
     },
-    "./langchain": {
-      "types": "./dist/langchain/index.d.ts",
-      "import": "./dist/langchain/index.js",
-      "default": "./dist/langchain/index.js"
+    "keywords": [
+        "agent2agent",
+        "a2a",
+        "artinet",
+        "ai",
+        "agent",
+        "artificial intelligence",
+        "mastra",
+        "langchain",
+        "claude",
+        "openai",
+        "strands",
+        "openclaw"
+    ],
+    "author": "artinet",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-artinet-project/artinet.git"
     },
-    "./claude": {
-      "types": "./dist/claude/index.d.ts",
-      "import": "./dist/claude/index.js",
-      "default": "./dist/claude/index.js"
+    "bugs": {
+        "url": "https://github.com/the-artinet-project/artinet/issues"
     },
-    "./openai": {
-      "types": "./dist/openai/index.d.ts",
-      "import": "./dist/openai/index.js",
-      "default": "./dist/openai/index.js"
+    "homepage": "https://artinet.io",
+    "dependencies": {
+        "@artinet/sdk": "^0.6.4",
+        "@artinet/types": "^0.1.4",
+        "uuid": "^13.0.0"
     },
-    "./strands": {
-      "types": "./dist/strands/index.d.ts",
-      "import": "./dist/strands/index.js",
-      "default": "./dist/strands/index.js"
+    "peerDependencies": {
+        "@a2a-js/sdk": "^0.3.7",
+        "@anthropic-ai/claude-agent-sdk": "^0.2.2",
+        "@anthropic-ai/sdk": "^0.71.2",
+        "@mastra/core": "^0.24.9",
+        "@mastra/server": "^0.24.9",
+        "@modelcontextprotocol/sdk": "^1.24.3",
+        "@strands-agents/sdk": "^0.1.4",
+        "express": "^5.1.0",
+        "langchain": "^1.2.7",
+        "openai": "^6.15.0"
+    },
+    "peerDependenciesMeta": {
+        "@a2a-js/sdk": {
+            "optional": false
+        },
+        "express": {
+            "optional": false
+        },
+        "@modelcontextprotocol/sdk": {
+            "optional": false
+        }
+    },
+    "devDependencies": {
+        "@openrouter/ai-sdk-provider": "^1.5.4",
+        "@a2a-js/sdk": "^0.3.7",
+        "@anthropic-ai/claude-agent-sdk": "^0.2.2",
+        "@anthropic-ai/sdk": "^0.71.2",
+        "@eslint/js": "^9.39.2",
+        "@langchain/openai": "^1.2.1",
+        "@mastra/core": "^0.24.9",
+        "@mastra/server": "^2.0.4",
+        "@openai/agents": "^0.3.7",
+        "@strands-agents/sdk": "^0.1.4",
+        "@types/jest": "^29.5.14",
+        "@types/node": "^25.0.9",
+        "@types/uuid": "^10.0.0",
+        "ai": "^5.0.10",
+        "eslint": "^9.39.2",
+        "globals": "^17.0.0",
+        "jest": "29.7.0",
+        "langchain": "^1.2.10",
+        "rimraf": "^6.1.2",
+        "ts-jest": "^29.4.6",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.53.0"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "directories": {
+        "test": "tests"
     }
-  },
-  "rootDir": ".",
-  "files": [
-    "dist",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "clean": "rimraf dist",
-    "rebuild": "rimraf dist node_modules/ package-lock.json && npm i && npm run build",
-    "lint": "eslint src --ext .ts",
-    "package-test": "npm run build && npm pack && sync && sleep 1 && docker build -f ./deployment/test.dockerfile -t cruiser-test . && docker run --env-file .env --rm cruiser-test && rm artinet-cruiser-*.tgz",
-    "prepublishOnly": "rimraf dist && npm run build && npm run lint && npm test",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
-  },
-  "keywords": [
-    "agent2agent",
-    "a2a",
-    "artinet",
-    "ai",
-    "agent",
-    "artificial intelligence",
-    "mastra",
-    "langchain",
-    "claude",
-    "openai",
-    "strands"
-  ],
-  "author": "artinet",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/the-artinet-project/artinet.git"
-  },
-  "bugs": {
-    "url": "https://github.com/the-artinet-project/artinet/issues"
-  },
-  "homepage": "https://artinet.io",
-  "dependencies": {
-    "@artinet/sdk": "^0.6.4",
-    "@artinet/types": "^0.1.4",
-    "uuid": "^13.0.0"
-  },
-  "peerDependencies": {
-    "@a2a-js/sdk": "^0.3.7",
-    "@anthropic-ai/claude-agent-sdk": "^0.2.2",
-    "@anthropic-ai/sdk": "^0.71.2",
-    "@mastra/core": "^0.24.9",
-    "@mastra/server": "^0.24.9",
-    "@modelcontextprotocol/sdk": "^1.24.3",
-    "@strands-agents/sdk": "^0.1.4",
-    "express": "^5.1.0",
-    "langchain": "^1.2.7",
-    "openai": "^6.15.0"
-  },
-  "peerDependenciesMeta": {
-    "@a2a-js/sdk": {
-      "optional": false
-    },
-    "express": {
-      "optional": false
-    },
-    "@modelcontextprotocol/sdk": {
-      "optional": false
-    }
-  },
-  "devDependencies": {
-    "@openrouter/ai-sdk-provider": "^1.5.4",
-    "@a2a-js/sdk": "^0.3.7",
-    "@anthropic-ai/claude-agent-sdk": "^0.2.2",
-    "@anthropic-ai/sdk": "^0.71.2",
-    "@eslint/js": "^9.39.2",
-    "@langchain/openai": "^1.2.1",
-    "@mastra/core": "^0.24.9",
-    "@mastra/server": "^2.0.4",
-    "@openai/agents": "^0.3.7",
-    "@strands-agents/sdk": "^0.1.4",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^25.0.9",
-    "@types/uuid": "^10.0.0",
-    "ai": "^5.0.10",
-    "eslint": "^9.39.2",
-    "globals": "^17.0.0",
-    "jest": "29.7.0",
-    "langchain": "^1.2.10",
-    "rimraf": "^6.1.2",
-    "ts-jest": "^29.4.6",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.0"
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "directories": {
-    "test": "tests"
-  }
 }
