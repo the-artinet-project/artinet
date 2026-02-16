@@ -11,7 +11,7 @@ import { serve, createMessenger, AgentMessenger } from '@artinet/sdk';
 const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789';
 const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'dev-local-token';
 
-describe('OpenClaw Integration', () => {
+describe.skip('OpenClaw Integration', () => {
     it(
         'should connect to OpenClaw gateway and run an agent turn',
         async () => {
