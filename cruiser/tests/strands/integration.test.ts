@@ -8,13 +8,15 @@ const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KE
 const baseURL = process.env.INFERENCE_PROVIDER_URL;
 
 describe('Strands Integration', () => {
-    const model = new OpenAIModel({
-        apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
-        clientConfig: {
-            baseURL,
-        },
-        modelId: 'gpt-4o-mini',
-    });
+    const model = hasApiKey
+        ? new OpenAIModel({
+              apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+              clientConfig: {
+                  baseURL,
+              },
+              modelId: 'gpt-4o-mini',
+          })
+        : undefined;
     beforeAll(() => {
         if (!hasApiKey) {
             console.log('Skipping Strands integration tests: OPENAI_API_KEY not set');
