@@ -59,7 +59,7 @@ describe('OpenClaw Integration', () => {
                     timeoutMs: 20_000,
                 },
             );
-
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             serve({ agent: a2agent, port: 3001 }).start();
             await new Promise((resolve) => setTimeout(resolve, 1000));
             const messenger: AgentMessenger = await createMessenger({
