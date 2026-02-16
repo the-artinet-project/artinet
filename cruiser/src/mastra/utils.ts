@@ -88,10 +88,10 @@ export async function getAgentCard<OUTPUT extends OutputSchema = undefined>({
     card?: sdk.A2A.AgentCardParams;
     options?: AgentExecutionOptions<OUTPUT>;
 }): Promise<sdk.A2A.AgentCard> {
-    const [instructions, tools]: [
+    const [instructions, tools = {}]: [
         Awaited<ReturnType<typeof agent.getInstructions>>,
-        Awaited<ReturnType<typeof agent.listTools>>,
-    ] = await Promise.all([agent.getInstructions(), agent.listTools()]);
+        Awaited<ReturnType<typeof agent.listTools>> | undefined,
+    ] = await Promise.all([agent.getInstructions(), agent.listTools?.() ?? Promise.resolve({})]);
 
     const agentCard: sdk.A2A.AgentCard = sdk.describe.card({
         name: agent.id,
