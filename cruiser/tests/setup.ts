@@ -20,6 +20,7 @@ config({ path: resolve(__dirname, '../.env.local') });
 config({ path: resolve(__dirname, '../.env') });
 config({ path: resolve(__dirname, '../../.env.local') });
 config({ path: resolve(__dirname, '../../.env') });
+config({ path: resolve(__dirname, '../../../.env') });
 
 export const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
 export const baseURL = process.env.INFERENCE_PROVIDER_URL;
