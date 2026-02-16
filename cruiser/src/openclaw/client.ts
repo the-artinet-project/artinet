@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { WebSocket as NodeWebSocket } from 'ws';
 import {
     createSignedDevicePayload,
     persistConnectAuth,
@@ -7,6 +8,8 @@ import {
     resolveOrCreateDeviceIdentity,
 } from './auth.js';
 import type { OpenClawAgent, OpenClawResult } from './utils.js';
+
+const WebSocketImpl = (globalThis.WebSocket ?? (NodeWebSocket as unknown as typeof WebSocket));
 
 type OpenClawResponseFrame = {
     type: 'res';
@@ -71,7 +74,7 @@ export class OpenClawGatewayClient {
     }
 
     public async ensureConnected(): Promise<void> {
-        if (this.isConnected && this.socket?.readyState === WebSocket.OPEN) {
+        if (this.isConnected && this.socket?.readyState === WebSocketImpl.OPEN) {
             return;
         }
 
@@ -80,7 +83,7 @@ export class OpenClawGatewayClient {
         }
 
         this.connectPromise = new Promise<void>((resolve, reject) => {
-            const socket = new WebSocket(this.url);
+            const socket = new WebSocketImpl(this.url);
             this.socket = socket;
 
             const connectTimeout = setTimeout(() => {
@@ -322,7 +325,7 @@ export class OpenClawGatewayClient {
     }
 
     private sendFrame(frame: unknown): void {
-        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        if (!this.socket || this.socket.readyState !== WebSocketImpl.OPEN) {
             throw new Error('OpenClaw gateway is not connected');
         }
 
