@@ -131,6 +131,7 @@
         "@mastra/server": "^1.4.0",
         "@openrouter/ai-sdk-provider": "^1.5.4",
         "@mariozechner/pi-agent-core": "^0.52.12",
+        "@mariozechner/pi-ai": "^0.52.12",
         "@openai/agents": "^0.4.9",
         "@strands-agents/sdk": "^0.1.4",
         "@types/jest": "^29.5.14",
