@@ -19,6 +19,7 @@
  * | Mastra     | `@artinet/cruiser/mastra`      | {@link MastraAgent}  |
  * | OpenClaw   | `@artinet/cruiser/openclaw`    | {@link OpenClawAgent}|
  * | OpenAI     | `@artinet/cruiser/openai`      | {@link OpenAIAgent}  |
+ * | Pi Agent   | `@artinet/cruiser/pi-agent-core`| {@link PiAgentCoreAgent} |
  * | Strands    | `@artinet/cruiser/strands`     | {@link StrandsAgent} |
  *
  * ## Quick Start
