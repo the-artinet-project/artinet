@@ -9,7 +9,8 @@
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import { INTEGRATION_TIMEOUT } from '../setup';
 import { dock } from '../../src/claude';
-const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
+import { hasApiKey, testIfApiKey } from '../setup';
+
 describe('Claude Integration', () => {
     beforeAll(() => {
         if (!hasApiKey) {
@@ -17,14 +18,9 @@ describe('Claude Integration', () => {
         }
     });
 
-    it(
+    testIfApiKey(
         'should run a Claude query and receive streaming response',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const a2agent = await dock(
                 {
                     model: 'claude-sonnet-4-20250514',
@@ -42,14 +38,9 @@ describe('Claude Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should handle Claude agent with system prompt',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const a2agent = await dock(
                 {
                     systemPrompt: 'Your name is TestBot. Always introduce yourself when asked about your name.',

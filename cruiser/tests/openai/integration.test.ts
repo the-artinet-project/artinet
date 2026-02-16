@@ -11,8 +11,7 @@ import OpenAI from 'openai';
 import { INTEGRATION_TIMEOUT } from '../setup';
 import { dock } from '../../src/openai';
 import * as sdk from '@artinet/sdk';
-const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
-const baseURL = process.env.INFERENCE_PROVIDER_URL;
+import { testIfApiKey, hasApiKey, baseURL, apiKey } from '../setup';
 
 describe('OpenAI Integration', () => {
     beforeAll(() => {
@@ -24,7 +23,7 @@ describe('OpenAI Integration', () => {
         // If using OpenRouter or custom provider, set up a custom OpenAI client
         if (baseURL) {
             const client = new OpenAI({
-                apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+                apiKey: apiKey,
                 baseURL,
             });
             setDefaultOpenAIClient(client);
@@ -32,14 +31,9 @@ describe('OpenAI Integration', () => {
         }
     });
 
-    it(
+    testIfApiKey(
         'should create and run an OpenAI agent with real LLM',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             // Use a model that works with OpenRouter
             const modelName = baseURL ? 'openai/gpt-4o-mini' : 'gpt-4o-mini';
 
@@ -62,14 +56,9 @@ describe('OpenAI Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should handle multi-turn conversation',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const modelName = baseURL ? 'openai/gpt-4o-mini' : 'gpt-4o-mini';
 
             const agent = new OpenAIAgent({

@@ -4,19 +4,16 @@ import { INTEGRATION_TIMEOUT } from '../setup';
 import { OpenAIModel } from '@strands-agents/sdk/openai';
 import { dock } from '../../src/strands';
 import * as sdk from '@artinet/sdk';
-const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
-const baseURL = process.env.INFERENCE_PROVIDER_URL;
+import { testIfApiKey, hasApiKey, baseURL, apiKey } from '../setup';
 
 describe('Strands Integration', () => {
-    const model = hasApiKey
-        ? new OpenAIModel({
-              apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
-              clientConfig: {
-                  baseURL,
-              },
-              modelId: 'gpt-4o-mini',
-          })
-        : undefined;
+    const model = new OpenAIModel({
+        apiKey: apiKey,
+        clientConfig: {
+            baseURL,
+        },
+        modelId: 'gpt-4o-mini',
+    });
     beforeAll(() => {
         if (!hasApiKey) {
             console.log('Skipping Strands integration tests: OPENAI_API_KEY not set');
@@ -26,14 +23,9 @@ describe('Strands Integration', () => {
         }
     });
 
-    it(
+    testIfApiKey(
         'should create and invoke a Strands agent with real LLM',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const agent = new StrandsAgent({
                 model,
                 systemPrompt: 'You are a helpful assistant. Respond briefly.',
@@ -52,14 +44,9 @@ describe('Strands Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should handle multi-turn conversation with Strands agent',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const agent = new StrandsAgent({
                 model,
                 systemPrompt:
@@ -92,14 +79,9 @@ describe('Strands Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should return stop reason in agent result',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const agent = new StrandsAgent({
                 model,
                 systemPrompt: 'You are a helpful assistant.',

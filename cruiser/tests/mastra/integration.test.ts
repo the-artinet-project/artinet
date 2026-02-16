@@ -10,9 +10,7 @@ import { Agent as MastraAgent } from '@mastra/core/agent';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { dock } from '../../src/mastra';
 import { INTEGRATION_TIMEOUT } from '../setup';
-
-const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
-const baseURL = process.env.INFERENCE_PROVIDER_URL;
+import { hasApiKey, baseURL, apiKey, testIfApiKey } from '../setup';
 
 describe('Mastra Integration', () => {
     beforeAll(() => {
@@ -24,16 +22,11 @@ describe('Mastra Integration', () => {
         }
     });
 
-    it(
+    testIfApiKey(
         'should create and run a Mastra agent with real LLM',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const openai = createOpenRouter({
-                apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+                apiKey: apiKey,
                 ...(baseURL && { baseURL }),
             });
 
@@ -61,16 +54,11 @@ describe('Mastra Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should include usage metadata in response',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             const openai = createOpenRouter({
-                apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+                apiKey: apiKey,
                 ...(baseURL && { baseURL }),
             });
 

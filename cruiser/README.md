@@ -199,6 +199,10 @@ const artinetAgent = await dock(
 npm test
 ```
 
+## Contributor Guide
+
+For dock implementation standards and integration best practices, see `AGENT.md`.
+
 ## Contributing
 
 Additional dock functions are welcome! Please open an issue or submit a Pull Request on [GitHub](https://github.com/the-artinet-project/artinet).

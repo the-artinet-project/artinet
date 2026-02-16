@@ -8,11 +8,25 @@ import { INTEGRATION_TIMEOUT } from '../setup';
 import { dock } from '../../src/openclaw';
 import { serve, createMessenger, AgentMessenger } from '@artinet/sdk';
 
-const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789';
-const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'dev-local-token';
+const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL;
+const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN;
 
-describe.skip('OpenClaw Integration', () => {
-    it(
+function testIfGateway(testName: string, test: () => Promise<void>, timeout?: number) {
+    return it(
+        testName,
+        async () => {
+            if (!gatewayUrl || !gatewayToken) {
+                console.log('Skipping OpenClaw integration tests: OPENCLAW_GATEWAY_URL not set');
+                return;
+            }
+            return test();
+        },
+        timeout,
+    );
+}
+
+describe('OpenClaw Integration', () => {
+    testIfGateway(
         'should connect to OpenClaw gateway and run an agent turn',
         async () => {
             const a2agent = await dock(
@@ -43,7 +57,7 @@ describe.skip('OpenClaw Integration', () => {
         },
         INTEGRATION_TIMEOUT,
     );
-    it(
+    testIfGateway(
         'should connect to OpenClaw gateway and via an A2A server',
         async () => {
             const a2agent = await dock(
@@ -61,7 +75,6 @@ describe.skip('OpenClaw Integration', () => {
             );
             await new Promise((resolve) => setTimeout(resolve, 1000));
             serve({ agent: a2agent, port: 3001 }).start();
-            await new Promise((resolve) => setTimeout(resolve, 1000));
             const messenger: AgentMessenger = await createMessenger({
                 baseUrl: `http://localhost:3001`,
             });

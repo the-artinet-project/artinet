@@ -4,10 +4,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { INTEGRATION_TIMEOUT } from '../setup';
 import { dock } from '../../src/langchain';
 import * as artinet from '@artinet/sdk';
-
-const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
-const baseURL = process.env.INFERENCE_PROVIDER_URL;
-
+import { hasApiKey, baseURL, testIfApiKey, apiKey } from '../setup';
 describe('LangChain Integration', () => {
     beforeAll(() => {
         if (!hasApiKey) {
@@ -18,20 +15,15 @@ describe('LangChain Integration', () => {
         }
     });
 
-    it(
+    testIfApiKey(
         'should create and run a LangChain agent with real LLM',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-
             // Use OpenRouter model format if using custom provider
             const modelName = baseURL ? 'openai/gpt-4o-mini' : 'gpt-4o-mini';
 
             const model = new ChatOpenAI({
                 model: modelName,
-                apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+                apiKey: apiKey,
                 configuration: baseURL ? { baseURL } : undefined,
             });
 
@@ -60,19 +52,14 @@ describe('LangChain Integration', () => {
         INTEGRATION_TIMEOUT,
     );
 
-    it(
+    testIfApiKey(
         'should handle multi-turn conversation with LangChain agent',
         async () => {
-            if (!hasApiKey) {
-                console.log('Skipping: OPENAI_API_KEY not set');
-                return;
-            }
-            console.log('hasApiKey', hasApiKey);
             const modelName = baseURL ? 'openai/gpt-4o-mini' : 'gpt-4o-mini';
 
             const model = new ChatOpenAI({
                 model: modelName,
-                apiKey: process.env.OPENAI_API_KEY ?? process.env.INFERENCE_API_KEY,
+                apiKey: apiKey,
                 configuration: baseURL ? { baseURL } : undefined,
             });
 
@@ -97,7 +84,6 @@ describe('LangChain Integration', () => {
                 }),
             );
             expect(result2.status.message?.parts).toBeDefined();
-
             const lastMessage = result2.status.message?.parts[result2.status.message?.parts.length - 1];
             expect(lastMessage?.kind).toBe('text');
             expect(lastMessage?.text).toBeDefined();
