@@ -1,6 +1,6 @@
 {
     "name": "@artinet/cruiser",
-    "version": "0.1.5",
+    "version": "0.1.7",
     "description": "A library for building A2A enabled runtime Agents.",
     "type": "module",
     "main": "./dist/index.js",
