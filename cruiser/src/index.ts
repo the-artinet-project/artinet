@@ -17,6 +17,7 @@
  * | Claude     | `@artinet/cruiser/claude`      | {@link ClaudeAgent}  |
  * | LangChain  | `@artinet/cruiser/langchain`   | {@link ReactAgent}   |
  * | Mastra     | `@artinet/cruiser/mastra`      | {@link MastraAgent}  |
+ * | OpenClaw   | `@artinet/cruiser/openclaw`    | {@link OpenClawAgent}|
  * | OpenAI     | `@artinet/cruiser/openai`      | {@link OpenAIAgent}  |
  * | Strands    | `@artinet/cruiser/strands`     | {@link StrandsAgent} |
  *
