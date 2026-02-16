@@ -10,13 +10,10 @@
  * @see {@link https://github.com/mastra-ai/mastra} Mastra Source
  */
 
-import * as sdk from "@artinet/sdk";
-import {
-  AgentExecutionOptions,
-  Agent as MastraAgent,
-} from "@mastra/core/agent";
-import { CoreMessage, SystemMessage } from "@mastra/core/llm";
-import { OutputSchema } from "@mastra/core/stream";
+import * as sdk from '@artinet/sdk';
+import { AgentExecutionOptions, Agent as MastraAgent } from '@mastra/core/agent';
+import { CoreMessage, SystemMessage } from '@mastra/core/llm';
+import { OutputSchema } from '@mastra/core/stream';
 
 /**
  * Converts Mastra {@link SystemMessage} instructions to a plain string.
@@ -34,29 +31,29 @@ import { OutputSchema } from "@mastra/core/stream";
  * @internal
  */
 function convertInstructionsToString(message: SystemMessage): string {
-  if (!message) {
-    return "";
-  }
+    if (!message) {
+        return '';
+    }
 
-  if (typeof message === "string") {
-    return message;
-  }
+    if (typeof message === 'string') {
+        return message;
+    }
 
-  if (Array.isArray(message)) {
-    return message
-      .map((m) => {
-        if (typeof m === "string") {
-          return m;
-        }
-        // Safely extract content from message objects
-        return typeof m.content === "string" ? m.content : "";
-      })
-      .filter((content) => content) // Remove empty strings
-      .join("\n");
-  }
+    if (Array.isArray(message)) {
+        return message
+            .map((m) => {
+                if (typeof m === 'string') {
+                    return m;
+                }
+                // Safely extract content from message objects
+                return typeof m.content === 'string' ? m.content : '';
+            })
+            .filter((content) => content) // Remove empty strings
+            .join('\n');
+    }
 
-  // Handle single message object - safely extract content
-  return typeof message.content === "string" ? message.content : "";
+    // Handle single message object - safely extract content
+    return typeof message.content === 'string' ? message.content : '';
 }
 
 /**
@@ -82,43 +79,40 @@ function convertInstructionsToString(message: SystemMessage): string {
  * });
  * ```
  */
-export async function getAgentCard<
-  OUTPUT extends OutputSchema = undefined,
-  FORMAT extends "aisdk" | "mastra" = "mastra"
->({
-  agent,
-  card,
-  options: _options,
+export async function getAgentCard<OUTPUT extends OutputSchema = undefined>({
+    agent,
+    card,
+    options: _options,
 }: {
-  agent: MastraAgent;
-  card?: sdk.A2A.AgentCardParams;
-  options?: AgentExecutionOptions<OUTPUT, FORMAT>;
+    agent: MastraAgent;
+    card?: sdk.A2A.AgentCardParams;
+    options?: AgentExecutionOptions<OUTPUT>;
 }): Promise<sdk.A2A.AgentCard> {
-  const [instructions, tools]: [
-    Awaited<ReturnType<typeof agent.getInstructions>>,
-    Awaited<ReturnType<typeof agent.getTools>>
-  ] = await Promise.all([agent.getInstructions(), agent.getTools()]);
+    const [instructions, tools]: [
+        Awaited<ReturnType<typeof agent.getInstructions>>,
+        Awaited<ReturnType<typeof agent.listTools>>,
+    ] = await Promise.all([agent.getInstructions(), agent.listTools()]);
 
-  const agentCard: sdk.A2A.AgentCard = sdk.describe.card({
-    name: agent.id,
-    ...(typeof card === "string" ? { name: card } : card),
-    description: convertInstructionsToString(instructions),
-    capabilities: {
-      streaming: true,
-      pushNotifications: true,
-      stateTransitionHistory: false,
-    },
-    defaultInputModes: ["text"],
-    defaultOutputModes: ["text"],
-    skills: Object.entries(tools).map(([toolId, tool]) => ({
-      id: toolId,
-      name: toolId,
-      description: tool.description || `Tool: ${toolId}`,
-      tags: ["tool"],
-    })),
-  });
+    const agentCard: sdk.A2A.AgentCard = sdk.describe.card({
+        name: agent.id,
+        ...(typeof card === 'string' ? { name: card } : card),
+        description: convertInstructionsToString(instructions),
+        capabilities: {
+            streaming: true,
+            pushNotifications: true,
+            stateTransitionHistory: false,
+        },
+        defaultInputModes: ['text'],
+        defaultOutputModes: ['text'],
+        skills: Object.entries(tools).map(([toolId, tool]) => ({
+            id: toolId,
+            name: toolId,
+            description: tool.description || `Tool: ${toolId}`,
+            tags: ['tool'],
+        })),
+    });
 
-  return agentCard;
+    return agentCard;
 }
 
 /**
@@ -140,10 +134,10 @@ export async function getAgentCard<
  * ```
  */
 export function convertToCoreMessage(message: sdk.A2A.Message): CoreMessage {
-  return {
-    role: message.role === "user" ? "user" : "assistant",
-    content: message.parts.map((msg) => convertToCoreMessagePart(msg)),
-  };
+    return {
+        role: message.role === 'user' ? 'user' : 'assistant',
+        content: message.parts.map((msg) => convertToCoreMessagePart(msg)),
+    };
 }
 
 /**
@@ -160,23 +154,23 @@ export function convertToCoreMessage(message: sdk.A2A.Message): CoreMessage {
  * @internal
  */
 function convertToCoreMessagePart(part: sdk.A2A.Part) {
-  switch (part.kind) {
-    case "text":
-      return {
-        type: "text",
-        text: part.text,
-      } as const;
-    case "file":
-      return {
-        type: "file",
-        data:
-          "uri" in part.file && part.file.uri
-            ? new URL(part.file.uri)
-            : /**Appeasing the type system */
-              part.file.bytes!,
-        mimeType: part.file.mimeType ?? "unknown",
-      } as const;
-    case "data":
-      throw new Error("Data parts are not supported in core messages");
-  }
+    switch (part.kind) {
+        case 'text':
+            return {
+                type: 'text',
+                text: part.text,
+            } as const;
+        case 'file':
+            return {
+                type: 'file',
+                data:
+                    'uri' in part.file && part.file.uri
+                        ? new URL(part.file.uri)
+                        : /**Appeasing the type system */
+                          part.file.bytes!,
+                mimeType: part.file.mimeType ?? 'unknown',
+            } as const;
+        case 'data':
+            throw new Error('Data parts are not supported in core messages');
+    }
 }

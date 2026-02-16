@@ -41,15 +41,12 @@
  * @see {@link https://mastra.ai/docs} Mastra Documentation
  */
 
-import { OutputSchema } from "@mastra/core/stream";
-import {
-  Agent as MastraAgent,
-  AgentExecutionOptions,
-} from "@mastra/core/agent";
-import * as sdk from "@artinet/sdk";
-import { getAgentCard, convertToCoreMessage } from "./utils.js";
-import { v4 as uuidv4 } from "uuid";
-import { Dock, Park } from "../corsair.js";
+import { OutputSchema } from '@mastra/core/stream';
+import { Agent as MastraAgent, AgentExecutionOptions } from '@mastra/core/agent';
+import * as sdk from '@artinet/sdk';
+import { getAgentCard, convertToCoreMessage } from './utils.js';
+import { v4 as uuidv4 } from 'uuid';
+import { Dock, Park } from '../corsair.js';
 
 /**
  * Docks a Mastra agent onto artinet.
@@ -112,65 +109,56 @@ import { Dock, Park } from "../corsair.js";
  * });
  * ```
  */
-export const dock: Dock<
-  MastraAgent,
-  AgentExecutionOptions<OutputSchema | undefined, "aisdk" | "mastra">
-> = async (
-  agent: MastraAgent,
-  card?: sdk.A2A.AgentCardParams,
-  options?: AgentExecutionOptions<OutputSchema | undefined, "aisdk" | "mastra">
+export const dock: Dock<MastraAgent, AgentExecutionOptions<OutputSchema | undefined>> = async (
+    agent: MastraAgent,
+    card?: sdk.A2A.AgentCardParams,
+    options?: AgentExecutionOptions<OutputSchema | undefined>,
 ): Promise<sdk.Agent> => {
-  /**No need to segregate tasks between agents */
-  const agentCard = await getAgentCard({ agent, card, options });
-  sdk.logger.debug(`Mastra[${agent.id}]:[card:${JSON.stringify(agentCard)}]`);
-  return sdk.cr8(agentCard).from(async function* (context: sdk.A2A.Context) {
-    sdk.logger.debug(
-      `Mastra[${agent.id}]:[context:${context.contextId}]: starting`
-    );
-    const task = await context.getTask();
+    /**No need to segregate tasks between agents */
+    const agentCard = await getAgentCard({ agent, card, options });
+    sdk.logger.debug(`Mastra[${agent.id}]:[card:${JSON.stringify(agentCard)}]`);
+    return sdk.cr8(agentCard).from(async function* (context: sdk.A2A.Context) {
+        sdk.logger.debug(`Mastra[${agent.id}]:[context:${context.contextId}]: starting`);
+        const task = await context.getTask();
 
-    const messages: sdk.A2A.Message[] = sdk.getLatestHistory(task);
+        const messages: sdk.A2A.Message[] = sdk.getLatestHistory(task);
 
-    const resourceId =
-      (task.metadata?.resourceId as string) ??
-      (context.metadata?.resourceId as string) ??
-      (context.userMessage.metadata?.resourceId as string) ??
-      agent.id;
+        const resourceId =
+            (task.metadata?.resourceId as string) ??
+            (context.metadata?.resourceId as string) ??
+            (context.userMessage.metadata?.resourceId as string) ??
+            agent.id;
 
-    const result = await agent.generate(messages.map(convertToCoreMessage), {
-      runId: task.id,
-      ...options,
-      ...(context.contextId ? { threadId: context.contextId, resourceId } : {}),
+        const result = await agent.generate(messages.map(convertToCoreMessage), {
+            runId: task.id,
+            ...options,
+            ...(context.contextId ? { threadId: context.contextId, resourceId } : {}),
+        });
+
+        const metadata = {
+            ...(task.metadata ?? {}),
+            execution: {
+                toolCalls: result.toolCalls,
+                toolResults: result.toolResults,
+                usage: result.usage,
+                finishReason: result.finishReason,
+            },
+        };
+        const completedUpdate: sdk.A2A.TaskStatusUpdateEvent = sdk.describe.update.completed({
+            taskId: task.id,
+            contextId: task.contextId,
+            message: sdk.describe.message({
+                messageId: uuidv4(),
+                role: 'agent',
+                parts: [sdk.describe.part.text(result.text)],
+                metadata,
+            }),
+        });
+        yield completedUpdate;
     });
-
-    const metadata = {
-      ...(task.metadata ?? {}),
-      execution: {
-        toolCalls: result.toolCalls,
-        toolResults: result.toolResults,
-        usage: result.usage,
-        finishReason: result.finishReason,
-      },
-    };
-    const completedUpdate: sdk.A2A.TaskStatusUpdateEvent =
-      sdk.describe.update.completed({
-        taskId: task.id,
-        contextId: task.contextId,
-        message: sdk.describe.message({
-          messageId: uuidv4(),
-          role: "agent",
-          parts: [sdk.describe.part.text(result.text)],
-          metadata,
-        }),
-      });
-    yield completedUpdate;
-  });
 };
 
 /**
  * @deprecated Use {@link dock} instead.
  */
-export const park: Park<
-  MastraAgent,
-  AgentExecutionOptions<OutputSchema | undefined, "aisdk" | "mastra">
-> = dock;
+export const park: Park<MastraAgent, AgentExecutionOptions<OutputSchema | undefined>> = dock;
