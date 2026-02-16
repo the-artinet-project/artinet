@@ -26,6 +26,7 @@ Universal adapters for multi-agent interoperability.
 | **LangChain**        | `@artinet/cruiser/langchain` | Text ✅ |
 | **Strands (AWS)**    | `@artinet/cruiser/strands`   | Text ✅ |
 | **OpenClaw**         | `@artinet/cruiser/openclaw`  | Text ✅ |
+| **Pi**               | `@artinet/cruiser/pi`        | Text ✅ |
 
 ## Installation
 
@@ -55,6 +56,9 @@ npm install @strands-agents/sdk
 # openclaw runs as a gateway service/CLI
 # see: https://github.com/openclaw/openclaw
 # Cruiser's OpenClaw dock uses the standard Gateway WebSocket protocol.
+
+# pi-agent-core
+npm install @mariozechner/pi-agent-core
 ```
 
 ## Quick Start
