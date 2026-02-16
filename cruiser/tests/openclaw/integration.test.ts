@@ -14,7 +14,7 @@ const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789';
 const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'dev-local-token';
 
 describe('OpenClaw Integration', () => {
-    it.skip(
+    it(
         'should connect to OpenClaw gateway and run an agent turn',
         async () => {
             const a2agent = await dock(
