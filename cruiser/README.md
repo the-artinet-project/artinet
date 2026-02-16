@@ -25,6 +25,7 @@ Universal adapters for multi-agent interoperability.
 | **Claude Agent SDK** | `@artinet/cruiser/claude`    | Text ✅ |
 | **LangChain**        | `@artinet/cruiser/langchain` | Text ✅ |
 | **Strands (AWS)**    | `@artinet/cruiser/strands`   | Text ✅ |
+| **OpenClaw**         | `@artinet/cruiser/openclaw`  | Text ✅ |
 
 ## Installation
 
@@ -49,6 +50,11 @@ npm install langchain @langchain/core
 
 # Strands (AWS)
 npm install @strands-agents/sdk
+
+# OpenClaw
+# openclaw runs as a gateway service/CLI
+# see: https://github.com/openclaw/openclaw
+# Cruiser's OpenClaw dock uses the standard Gateway WebSocket protocol.
 ```
 
 ## Quick Start
@@ -58,18 +64,18 @@ npm install @strands-agents/sdk
 Create an agent from any of the supported frameworks and dock it onto artinet:
 
 ```typescript
-import { Agent } from "@openai/agents";
-import { dock } from "@artinet/cruiser/openai";
-import { serve } from "@artinet/sdk";
+import { Agent } from '@openai/agents';
+import { dock } from '@artinet/cruiser/openai';
+import { serve } from '@artinet/sdk';
 
 // 1. Create your agent
 const agent = new Agent({
-  name: "assistant",
-  instructions: "You are a helpful assistant",
+    name: 'assistant',
+    instructions: 'You are a helpful assistant',
 });
 
 // 2. Dock it onto artinet
-const artinetAgent = await dock(agent, { name: "My Assistant" });
+const artinetAgent = await dock(agent, { name: 'My Assistant' });
 
 // 3. Spin it up as an A2A compatible Server
 serve({ agent: artinetAgent, port: 3000 });
@@ -82,35 +88,33 @@ serve({ agent: artinetAgent, port: 3000 });
 Create interoperable multi-agent systems:
 
 ```typescript
-import { serve, cr8 } from "@artinet/sdk";
-import { dock as dockMastra } from "@artinet/cruiser/mastra";
-import { dock as dockOpenAI } from "@artinet/cruiser/openai";
-import { Agent as MastraAgent } from "@mastra/core/agent";
-import { Agent as OpenAIAgent } from "@openai/agents";
-import { MastraModel } from "./mastra-model";
+import { serve, cr8 } from '@artinet/sdk';
+import { dock as dockMastra } from '@artinet/cruiser/mastra';
+import { dock as dockOpenAI } from '@artinet/cruiser/openai';
+import { Agent as MastraAgent } from '@mastra/core/agent';
+import { Agent as OpenAIAgent } from '@openai/agents';
+import { MastraModel } from './mastra-model';
 
 // Use agents from different frameworks
-const researcher = await dockOpenAI(
-  new OpenAIAgent({ name: "researcher", instructions: "Research topics" }),
-  { name: "Researcher" }
-);
+const researcher = await dockOpenAI(new OpenAIAgent({ name: 'researcher', instructions: 'Research topics' }), {
+    name: 'Researcher',
+});
 
-const writer = await dockMastra(
-  new MastraAgent({ name: "writer", instructions: "Write content", model }),
-  { name: "Writer" }
-);
+const writer = await dockMastra(new MastraAgent({ name: 'writer', instructions: 'Write content', model }), {
+    name: 'Writer',
+});
 
 // Chain them together
-const agent = cr8("Orchestrator Agent")
-  // The researcher will receive the incoming user message
-  .sendMessage({ agent: researcher })
-  // The results are passed to the writer with additional instructions
-  .sendMessage({
-    agent: writer,
-    message: "use the research results to create a publishable article",
-  }).agent;
+const agent = cr8('Orchestrator Agent')
+    // The researcher will receive the incoming user message
+    .sendMessage({ agent: researcher })
+    // The results are passed to the writer with additional instructions
+    .sendMessage({
+        agent: writer,
+        message: 'use the research results to create a publishable article',
+    }).agent;
 
-console.log(await agent.sendMessage("I want to learn about the Roman Empire."));
+console.log(await agent.sendMessage('I want to learn about the Roman Empire.'));
 ```
 
 - For more information on how to chain agent requests see the [artinet-sdk](https://github.com/the-artinet-project/artinet-sdk/blob/main/docs/create.md#agent-orchestration)
@@ -132,23 +136,23 @@ Each adapter exports a `dock` function with the same signature:
 ### Describe your agent
 
 ```typescript
-import { dock } from "@artinet/cruiser/openai";
+import { dock } from '@artinet/cruiser/openai';
 
 const artinetAgent = await dock(
-  myAgent,
-  {
-    name: "Production Assistant",
-    description: "Enterprise-grade AI assistant",
-    skills: [
-      { id: "search", name: "Web Search", description: "Search the internet" },
-      { id: "code", name: "Code Generation", description: "Write code" },
-    ],
-  },
-  {
-    // Most adapters allow for framework specific options to be passed
-    maxTurns: 10,
-    signal: abortController.signal,
-  }
+    myAgent,
+    {
+        name: 'Production Assistant',
+        description: 'Enterprise-grade AI assistant',
+        skills: [
+            { id: 'search', name: 'Web Search', description: 'Search the internet' },
+            { id: 'code', name: 'Code Generation', description: 'Write code' },
+        ],
+    },
+    {
+        // Most adapters allow for framework specific options to be passed
+        maxTurns: 10,
+        signal: abortController.signal,
+    },
 );
 ```
 
