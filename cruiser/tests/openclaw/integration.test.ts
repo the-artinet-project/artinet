@@ -6,9 +6,7 @@
 import { describe, it, expect } from '@jest/globals';
 import { INTEGRATION_TIMEOUT } from '../setup';
 import { dock } from '../../src/openclaw';
-import { applyDefaults, serve, createMessenger, AgentMessenger } from '@artinet/sdk';
-
-applyDefaults();
+import { serve, createMessenger, AgentMessenger } from '@artinet/sdk';
 
 const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL ?? 'ws://127.0.0.1:18789';
 const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN ?? 'dev-local-token';

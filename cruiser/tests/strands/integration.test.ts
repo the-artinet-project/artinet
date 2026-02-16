@@ -4,7 +4,7 @@ import { INTEGRATION_TIMEOUT } from '../setup';
 import { OpenAIModel } from '@strands-agents/sdk/openai';
 import { dock } from '../../src/strands';
 import * as sdk from '@artinet/sdk';
-const hasApiKey = !!process.env.OPENAI_API_KEY && !!process.env.INFERENCE_API_KEY;
+const hasApiKey = !!process.env.OPENAI_API_KEY || !!process.env.INFERENCE_API_KEY;
 const baseURL = process.env.INFERENCE_PROVIDER_URL;
 
 describe('Strands Integration', () => {
